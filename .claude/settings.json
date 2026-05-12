@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "PowerShell(Get-ChildItem \"c:\\\\Users\\\\admseneca\\\\Documents\\\\Proyectos\\\\sports-platform\\\\Frontend\\\\sport_platform\\\\lib\" -Recurse | Where-Object { $_.PSIsContainer })",
-      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\admseneca\\\\Documents\\\\Proyectos\\\\sports-platform\\\\Frontend\\\\sport_platform\\\\lib\" -Recurse | Where-Object { $_.PSIsContainer } | Select-Object FullName)"
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\admseneca\\\\Documents\\\\Proyectos\\\\sports-platform\\\\Frontend\\\\sport_platform\\\\lib\" -Recurse | Where-Object { $_.PSIsContainer } | Select-Object FullName)",
+      "Bash(flutter analyze *)"
     ]
   }
 }
