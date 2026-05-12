@@ -1,30 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/auth_constants/login_strings_constants.dart';
+import 'package:sport_platform/core/constants/auth_constants/register_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/auth_logo.dart';
 import 'package:sport_platform/shared/widgets/social_button.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
 
-class LoginBody extends StatelessWidget {
+class RegisterBody extends StatelessWidget {
   final GlobalKey<FormState> formKey;
+  final TextEditingController nameController;
   final TextEditingController emailController;
   final TextEditingController passwordController;
+  final TextEditingController confirmPasswordController;
   final bool obscurePassword;
+  final bool obscureConfirmPassword;
   final bool isLoading;
-  final VoidCallback onLogin;
+  final VoidCallback onRegister;
   final VoidCallback onTogglePassword;
-  final VoidCallback? onSignUp;
+  final VoidCallback onToggleConfirmPassword;
+  final VoidCallback onSignIn;
 
-  const LoginBody({
+  const RegisterBody({
     super.key,
     required this.formKey,
+    required this.nameController,
     required this.emailController,
     required this.passwordController,
+    required this.confirmPasswordController,
     required this.obscurePassword,
+    required this.obscureConfirmPassword,
     required this.isLoading,
-    required this.onLogin,
+    required this.onRegister,
     required this.onTogglePassword,
-    this.onSignUp,
+    required this.onToggleConfirmPassword,
+    required this.onSignIn,
   });
 
   @override
@@ -37,16 +45,14 @@ class LoginBody extends StatelessWidget {
         _buildHeader(),
         const SizedBox(height: 36),
         _buildForm(),
-        const SizedBox(height: 12),
-        _buildForgotPassword(),
         const SizedBox(height: 28),
-        _buildLoginButton(),
+        _buildRegisterButton(),
         const SizedBox(height: 24),
         _buildDivider(),
         const SizedBox(height: 24),
         _buildSocialButtons(),
         const SizedBox(height: 32),
-        _buildSignUp(),
+        _buildSignIn(),
         const SizedBox(height: 24),
       ],
     );
@@ -56,7 +62,7 @@ class LoginBody extends StatelessWidget {
     return const Column(
       children: [
         Text(
-          LoginStringsConstants.welcomeBack,
+          RegisterStringsConstants.createAccount,
           style: TextStyle(
             color: AppColors.white,
             fontSize: 28,
@@ -66,7 +72,7 @@ class LoginBody extends StatelessWidget {
         ),
         SizedBox(height: 8),
         Text(
-          LoginStringsConstants.signInSubtitle,
+          RegisterStringsConstants.signUpSubtitle,
           style: TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
         ),
       ],
@@ -79,20 +85,32 @@ class LoginBody extends StatelessWidget {
       child: Column(
         children: [
           SportTextField(
+            controller: nameController,
+            hint: RegisterStringsConstants.fullNameHint,
+            icon: Icons.person_outline,
+            keyboardType: TextInputType.name,
+            validator: (v) {
+              if (v == null || v.isEmpty) return RegisterStringsConstants.nameRequired;
+              if (v.trim().length < 2) return RegisterStringsConstants.nameTooShort;
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          SportTextField(
             controller: emailController,
-            hint: LoginStringsConstants.emailHint,
+            hint: RegisterStringsConstants.emailHint,
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (v) {
-              if (v == null || v.isEmpty) return LoginStringsConstants.emailRequired;
-              if (!v.contains('@')) return LoginStringsConstants.emailInvalid;
+              if (v == null || v.isEmpty) return RegisterStringsConstants.emailRequired;
+              if (!v.contains('@')) return RegisterStringsConstants.emailInvalid;
               return null;
             },
           ),
           const SizedBox(height: 16),
           SportTextField(
             controller: passwordController,
-            hint: LoginStringsConstants.passwordHint,
+            hint: RegisterStringsConstants.passwordHint,
             icon: Icons.lock_outline,
             obscureText: obscurePassword,
             suffixIcon: IconButton(
@@ -106,8 +124,30 @@ class LoginBody extends StatelessWidget {
               onPressed: onTogglePassword,
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return LoginStringsConstants.passwordRequired;
-              if (v.length < 6) return LoginStringsConstants.passwordTooShort;
+              if (v == null || v.isEmpty) return RegisterStringsConstants.passwordRequired;
+              if (v.length < 6) return RegisterStringsConstants.passwordTooShort;
+              return null;
+            },
+          ),
+          const SizedBox(height: 16),
+          SportTextField(
+            controller: confirmPasswordController,
+            hint: RegisterStringsConstants.confirmPasswordHint,
+            icon: Icons.lock_outline,
+            obscureText: obscureConfirmPassword,
+            suffixIcon: IconButton(
+              icon: Icon(
+                obscureConfirmPassword
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+                color: AppColors.whiteSubtle,
+                size: 20,
+              ),
+              onPressed: onToggleConfirmPassword,
+            ),
+            validator: (v) {
+              if (v == null || v.isEmpty) return RegisterStringsConstants.confirmPasswordRequired;
+              if (v != passwordController.text) return RegisterStringsConstants.passwordsDoNotMatch;
               return null;
             },
           ),
@@ -116,26 +156,12 @@ class LoginBody extends StatelessWidget {
     );
   }
 
-  Widget _buildForgotPassword() {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: TextButton(
-        onPressed: () {},
-        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-        child: const Text(
-          LoginStringsConstants.forgotPassword,
-          style: TextStyle(color: AppColors.primaryLight, fontSize: 13),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoginButton() {
+  Widget _buildRegisterButton() {
     return SizedBox(
       width: double.infinity,
       height: 52,
       child: ElevatedButton(
-        onPressed: isLoading ? null : onLogin,
+        onPressed: isLoading ? null : onRegister,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryLight,
           foregroundColor: AppColors.white,
@@ -153,7 +179,7 @@ class LoginBody extends StatelessWidget {
                 ),
               )
             : const Text(
-                LoginStringsConstants.signIn,
+                RegisterStringsConstants.signUpButton,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -171,7 +197,7 @@ class LoginBody extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            LoginStringsConstants.orContinueWith,
+            RegisterStringsConstants.orContinueWith,
             style: TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
           ),
         ),
@@ -183,25 +209,25 @@ class LoginBody extends StatelessWidget {
   Widget _buildSocialButtons() {
     return Row(
       children: [
-        Expanded(child: SocialButton(label: LoginStringsConstants.google, icon: Icons.g_mobiledata)),
+        Expanded(child: SocialButton(label: RegisterStringsConstants.google, icon: Icons.g_mobiledata)),
         const SizedBox(width: 12),
-        Expanded(child: SocialButton(label: LoginStringsConstants.apple, icon: Icons.apple)),
+        Expanded(child: SocialButton(label: RegisterStringsConstants.apple, icon: Icons.apple)),
       ],
     );
   }
 
-  Widget _buildSignUp() {
+  Widget _buildSignIn() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text(
-          LoginStringsConstants.noAccount,
+          RegisterStringsConstants.alreadyHaveAccount,
           style: TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
         ),
         GestureDetector(
-          onTap: onSignUp,
+          onTap: onSignIn,
           child: const Text(
-            LoginStringsConstants.signUp,
+            RegisterStringsConstants.signInLink,
             style: TextStyle(
               color: AppColors.primaryLight,
               fontSize: 14,
