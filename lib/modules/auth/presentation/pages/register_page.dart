@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/register_body.dart';
+import 'package:sport_platform/modules/users/presentation/pages/complete_profile_page.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
@@ -47,7 +48,9 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       if (!mounted) return;
       AppSnackbar.success(context, 'Registro exitoso');
-      Navigator.of(context).pop();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const CompleteProfilePage()),
+      );
     } catch (e) {
       if (!mounted) return;
       AppSnackbar.error(context, 'Error al registrarse. Intenta de nuevo.');

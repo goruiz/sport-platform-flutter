@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
+import 'package:sport_platform/core/services/auth_storage.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/register_page.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/login_body.dart';
+import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
-import 'package:sport_platform/core/network/api_endpoints.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -29,34 +31,29 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+
     try {
-      if (!_formKey.currentState!.validate()) return;
-      setState(() => _isLoading = true);
-      _client
-          .post(
-            ApiEndpoints.login,
-            data: {
-              'email': _emailController.text,
-              'password': _passwordController.text,
-            },
-          )
-          .then((response) {
-            // Handle successful login (e.g., save token, navigate to home)
-            AppSnackbar.success(context, 'Login exitoso');
-            setState(() => _isLoading = false);
-          })
-          .catchError((error) {
-            // Handle login error
-            AppSnackbar.error(
-              context,
-              'Error al iniciar sesión. Intenta de nuevo.',
-            );
-            print('Login failed: $error');
-            setState(() => _isLoading = false);
-          });
+      final response = await _client.post(
+        ApiEndpoints.login,
+        data: {
+          'email': _emailController.text.trim(),
+          'password': _passwordController.text,
+        },
+      );
+      final token = response.data['token'] as String;
+      await AuthStorage.saveToken(token);
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const HomePage()),
+        (route) => false,
+      );
     } catch (e) {
-      print('Login error: $e');
-      setState(() => _isLoading = false);
+      if (!mounted) return;
+      AppSnackbar.error(context, 'Correo o contraseña incorrectos.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

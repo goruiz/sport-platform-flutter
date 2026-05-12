@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:sport_platform/core/services/auth_storage.dart';
 import 'api_endpoints.dart';
 
 class DioClient {
@@ -13,6 +14,18 @@ class DioClient {
         headers: {'Content-Type': 'application/json'},
       ),
     );
+
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final token = await AuthStorage.getToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          handler.next(options);
+        },
+      ),
+    );
   }
 
   Future<Response> get(String path, {Map<String, dynamic>? queryParams}) =>
@@ -25,12 +38,4 @@ class DioClient {
       _dio.put(path, data: data);
 
   Future<Response> delete(String path) => _dio.delete(path);
-
-  void setAuthToken(String token) {
-    _dio.options.headers['Authorization'] = 'Bearer $token';
-  }
-
-  void clearAuthToken() {
-    _dio.options.headers.remove('Authorization');
-  }
 }
