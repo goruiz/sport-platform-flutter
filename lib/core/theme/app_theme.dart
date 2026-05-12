@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_platform/main.dart';
 import 'app_colors.dart';
 
 class AppTheme {
