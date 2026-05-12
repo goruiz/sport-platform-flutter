@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/register_body.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
+import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 
@@ -34,26 +35,25 @@ class _RegisterPageState extends State<RegisterPage> {
   void _onRegister() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
-    _client
-        .post(
-          ApiEndpoints.register,
-          data: {
-            'email': _emailController.text,
-            'password': _passwordController.text,
-            'confirm_password': _confirmPasswordController.text,
-          },
-        )
-        .then((response) {
-          // Handle successful registration (e.g., navigate to login)
-          print('Registration successful: ${response.data}');
-          setState(() => _isLoading = false);
-          Navigator.of(context).pop();
-        })
-        .catchError((error) {
-          // Handle registration error
-          print('Registration failed: $error');
-          setState(() => _isLoading = false);
-        });
+
+    try {
+      await _client.post(
+        ApiEndpoints.register,
+        data: {
+          'email': _emailController.text,
+          'password': _passwordController.text,
+          'confirm_password': _confirmPasswordController.text,
+        },
+      );
+      if (!mounted) return;
+      AppSnackbar.success(context, 'Registro exitoso');
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+      AppSnackbar.error(context, 'Error al registrarse. Intenta de nuevo.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/register_page.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/login_body.dart';
+import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 
@@ -31,7 +32,8 @@ class _LoginPageState extends State<LoginPage> {
     try {
       if (!_formKey.currentState!.validate()) return;
       setState(() => _isLoading = true);
-      _client.post(
+      _client
+          .post(
             ApiEndpoints.login,
             data: {
               'email': _emailController.text,
@@ -40,11 +42,15 @@ class _LoginPageState extends State<LoginPage> {
           )
           .then((response) {
             // Handle successful login (e.g., save token, navigate to home)
-            print('Login successful: ${response.data}');
+            AppSnackbar.success(context, 'Login exitoso');
             setState(() => _isLoading = false);
           })
           .catchError((error) {
             // Handle login error
+            AppSnackbar.error(
+              context,
+              'Error al iniciar sesión. Intenta de nuevo.',
+            );
             print('Login failed: $error');
             setState(() => _isLoading = false);
           });

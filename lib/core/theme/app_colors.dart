@@ -11,4 +11,7 @@ class AppColors {
   static const Color inputFill = Color(0x1AFFFFFF);
   static const Color inputBorder = Color(0x33FFFFFF);
   static const Color error = Color(0xFFEF5350);
+  static const Color success = Color(0xFF4CAF50);
+  static const Color warning = Color(0xFFFF9800);
+  static const Color info = Color(0xFF2196F3);
 }
