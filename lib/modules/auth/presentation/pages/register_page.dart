@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/register_body.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
+import 'package:sport_platform/core/network/api_endpoints.dart';
+import 'package:sport_platform/core/network/dio_client.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -15,9 +17,10 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
+  bool _showPassword = true;
+  bool _showConfirmPassword = true;
   bool _isLoading = false;
+  final _client = DioClient();
 
   @override
   void dispose() {
@@ -31,8 +34,26 @@ class _RegisterPageState extends State<RegisterPage> {
   void _onRegister() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
+    _client
+        .post(
+          ApiEndpoints.register,
+          data: {
+            'email': _emailController.text,
+            'password': _passwordController.text,
+            'confirm_password': _confirmPasswordController.text,
+          },
+        )
+        .then((response) {
+          // Handle successful registration (e.g., navigate to login)
+          print('Registration successful: ${response.data}');
+          setState(() => _isLoading = false);
+          Navigator.of(context).pop();
+        })
+        .catchError((error) {
+          // Handle registration error
+          print('Registration failed: $error');
+          setState(() => _isLoading = false);
+        });
   }
 
   @override
@@ -41,18 +62,17 @@ class _RegisterPageState extends State<RegisterPage> {
       body: GradientBackground(
         child: RegisterBody(
           formKey: _formKey,
-          nameController: _nameController,
           emailController: _emailController,
           passwordController: _passwordController,
           confirmPasswordController: _confirmPasswordController,
-          obscurePassword: _obscurePassword,
-          obscureConfirmPassword: _obscureConfirmPassword,
+          showPassword: _showPassword,
+          showConfirmPassword: _showConfirmPassword,
           isLoading: _isLoading,
           onRegister: _onRegister,
           onTogglePassword: () =>
-              setState(() => _obscurePassword = !_obscurePassword),
+              setState(() => _showPassword = !_showPassword),
           onToggleConfirmPassword: () =>
-              setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+              setState(() => _showConfirmPassword = !_showConfirmPassword),
           onSignIn: () => Navigator.of(context).pop(),
         ),
       ),

@@ -7,12 +7,11 @@ import 'package:sport_platform/shared/widgets/sport_text_field.dart';
 
 class RegisterBody extends StatelessWidget {
   final GlobalKey<FormState> formKey;
-  final TextEditingController nameController;
   final TextEditingController emailController;
   final TextEditingController passwordController;
   final TextEditingController confirmPasswordController;
-  final bool obscurePassword;
-  final bool obscureConfirmPassword;
+  final bool showPassword;
+  final bool showConfirmPassword;
   final bool isLoading;
   final VoidCallback onRegister;
   final VoidCallback onTogglePassword;
@@ -22,12 +21,11 @@ class RegisterBody extends StatelessWidget {
   const RegisterBody({
     super.key,
     required this.formKey,
-    required this.nameController,
     required this.emailController,
     required this.passwordController,
     required this.confirmPasswordController,
-    required this.obscurePassword,
-    required this.obscureConfirmPassword,
+    required this.showPassword,
+    required this.showConfirmPassword,
     required this.isLoading,
     required this.onRegister,
     required this.onTogglePassword,
@@ -84,17 +82,6 @@ class RegisterBody extends StatelessWidget {
       key: formKey,
       child: Column(
         children: [
-          SportTextField(
-            controller: nameController,
-            hint: RegisterStringsConstants.fullNameHint,
-            icon: Icons.person_outline,
-            keyboardType: TextInputType.name,
-            validator: (v) {
-              if (v == null || v.isEmpty) return RegisterStringsConstants.nameRequired;
-              if (v.trim().length < 2) return RegisterStringsConstants.nameTooShort;
-              return null;
-            },
-          ),
           const SizedBox(height: 16),
           SportTextField(
             controller: emailController,
@@ -102,8 +89,10 @@ class RegisterBody extends StatelessWidget {
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (v) {
-              if (v == null || v.isEmpty) return RegisterStringsConstants.emailRequired;
-              if (!v.contains('@')) return RegisterStringsConstants.emailInvalid;
+              if (v == null || v.isEmpty)
+                return RegisterStringsConstants.emailRequired;
+              if (!v.contains('@'))
+                return RegisterStringsConstants.emailInvalid;
               return null;
             },
           ),
@@ -112,10 +101,10 @@ class RegisterBody extends StatelessWidget {
             controller: passwordController,
             hint: RegisterStringsConstants.passwordHint,
             icon: Icons.lock_outline,
-            obscureText: obscurePassword,
+            obscureText: showPassword,
             suffixIcon: IconButton(
               icon: Icon(
-                obscurePassword
+                showPassword
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
                 color: AppColors.whiteSubtle,
@@ -124,8 +113,10 @@ class RegisterBody extends StatelessWidget {
               onPressed: onTogglePassword,
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return RegisterStringsConstants.passwordRequired;
-              if (v.length < 6) return RegisterStringsConstants.passwordTooShort;
+              if (v == null || v.isEmpty)
+                return RegisterStringsConstants.passwordRequired;
+              if (v.length < 6)
+                return RegisterStringsConstants.passwordTooShort;
               return null;
             },
           ),
@@ -134,10 +125,10 @@ class RegisterBody extends StatelessWidget {
             controller: confirmPasswordController,
             hint: RegisterStringsConstants.confirmPasswordHint,
             icon: Icons.lock_outline,
-            obscureText: obscureConfirmPassword,
+            obscureText: showConfirmPassword,
             suffixIcon: IconButton(
               icon: Icon(
-                obscureConfirmPassword
+                showConfirmPassword
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
                 color: AppColors.whiteSubtle,
@@ -146,8 +137,10 @@ class RegisterBody extends StatelessWidget {
               onPressed: onToggleConfirmPassword,
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return RegisterStringsConstants.confirmPasswordRequired;
-              if (v != passwordController.text) return RegisterStringsConstants.passwordsDoNotMatch;
+              if (v == null || v.isEmpty)
+                return RegisterStringsConstants.confirmPasswordRequired;
+              if (v != passwordController.text)
+                return RegisterStringsConstants.passwordsDoNotMatch;
               return null;
             },
           ),
@@ -165,8 +158,12 @@ class RegisterBody extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryLight,
           foregroundColor: AppColors.white,
-          disabledBackgroundColor: AppColors.primaryLight.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          disabledBackgroundColor: AppColors.primaryLight.withValues(
+            alpha: 0.5,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           elevation: 0,
         ),
         child: isLoading
@@ -209,9 +206,19 @@ class RegisterBody extends StatelessWidget {
   Widget _buildSocialButtons() {
     return Row(
       children: [
-        Expanded(child: SocialButton(label: RegisterStringsConstants.google, icon: Icons.g_mobiledata)),
+        Expanded(
+          child: SocialButton(
+            label: RegisterStringsConstants.google,
+            icon: Icons.g_mobiledata,
+          ),
+        ),
         const SizedBox(width: 12),
-        Expanded(child: SocialButton(label: RegisterStringsConstants.apple, icon: Icons.apple)),
+        Expanded(
+          child: SocialButton(
+            label: RegisterStringsConstants.apple,
+            icon: Icons.apple,
+          ),
+        ),
       ],
     );
   }

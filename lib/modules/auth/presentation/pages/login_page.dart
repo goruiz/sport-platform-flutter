@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/register_page.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/login_body.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
+import 'package:sport_platform/core/network/api_endpoints.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  final _client = DioClient();
 
   @override
   void dispose() {
@@ -25,10 +28,30 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onLogin() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isLoading = false);
+    try {
+      if (!_formKey.currentState!.validate()) return;
+      setState(() => _isLoading = true);
+      _client.post(
+            ApiEndpoints.login,
+            data: {
+              'email': _emailController.text,
+              'password': _passwordController.text,
+            },
+          )
+          .then((response) {
+            // Handle successful login (e.g., save token, navigate to home)
+            print('Login successful: ${response.data}');
+            setState(() => _isLoading = false);
+          })
+          .catchError((error) {
+            // Handle login error
+            print('Login failed: $error');
+            setState(() => _isLoading = false);
+          });
+    } catch (e) {
+      print('Login error: $e');
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -44,9 +67,9 @@ class _LoginPageState extends State<LoginPage> {
           onLogin: _onLogin,
           onTogglePassword: () =>
               setState(() => _obscurePassword = !_obscurePassword),
-          onSignUp: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const RegisterPage()),
-          ),
+          onSignUp: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const RegisterPage())),
         ),
       ),
     );
