@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/auth_constants/login_strings_constants.dart';
+import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 class AuthLogo extends StatelessWidget {

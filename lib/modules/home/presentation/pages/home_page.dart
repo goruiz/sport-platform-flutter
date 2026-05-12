@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/app_strings_constants.dart';
-import 'package:sport_platform/core/constants/home_strings_constants.dart';
+import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
+import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/shared/widgets/logout_button.dart';
 

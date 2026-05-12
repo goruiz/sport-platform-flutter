@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/auth_constants/login_strings_constants.dart';
+import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/auth_logo.dart';
 import 'package:sport_platform/shared/widgets/social_button.dart';
