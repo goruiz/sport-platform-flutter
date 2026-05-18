@@ -109,7 +109,7 @@ class LoginBody extends StatelessWidget {
             ),
             validator: (v) {
               if (v == null || v.isEmpty) return LoginStringsConstants.passwordRequired.tr();
-              if (v.length < 6) return LoginStringsConstants.passwordTooShort.tr();
+              if (v.length < 8) return LoginStringsConstants.passwordTooShort.tr();
               return null;
             },
           ),

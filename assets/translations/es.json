@@ -16,7 +16,7 @@
     "email_required": "Ingresa tu correo",
     "email_invalid": "Ingresa un correo válido",
     "password_required": "Ingresa tu contraseña",
-    "password_too_short": "Mínimo 6 caracteres",
+    "password_too_short": "Mínimo 8 caracteres",
     "invalid_credentials": "Correo o contraseña incorrectos.",
     "google": "Google",
     "apple": "Apple"
@@ -37,7 +37,7 @@
     "email_required": "Ingresa tu correo",
     "email_invalid": "Ingresa un correo válido",
     "password_required": "Ingresa tu contraseña",
-    "password_too_short": "Mínimo 6 caracteres",
+    "password_too_short": "Mínimo 8 caracteres",
     "confirm_password_required": "Confirma tu contraseña",
     "passwords_do_not_match": "Las contraseñas no coinciden",
     "google": "Google",
