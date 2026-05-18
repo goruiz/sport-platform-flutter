@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/register_strings_constants.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/register_body.dart';
 import 'package:sport_platform/modules/users/presentation/pages/complete_profile_page.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
@@ -47,13 +49,13 @@ class _RegisterPageState extends State<RegisterPage> {
         },
       );
       if (!mounted) return;
-      AppSnackbar.success(context, 'Registro exitoso');
+      AppSnackbar.success(context, RegisterStringsConstants.successMessage.tr());
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const CompleteProfilePage()),
       );
     } catch (e) {
       if (!mounted) return;
-      AppSnackbar.error(context, 'Error al registrarse. Intenta de nuevo.');
+      AppSnackbar.error(context, RegisterStringsConstants.errorMessage.tr());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

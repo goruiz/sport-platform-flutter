@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/strings_constants/profile_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
 
@@ -28,6 +30,7 @@ class CompleteProfileBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -47,22 +50,22 @@ class CompleteProfileBody extends StatelessWidget {
   }
 
   Widget _buildHeader() {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Completa tu perfil',
-          style: TextStyle(
+          ProfileStringsConstants.title.tr(),
+          style: const TextStyle(
             color: AppColors.white,
             fontSize: 28,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
-          'Agrega tus datos para que otros puedan encontrarte.',
-          style: TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+          ProfileStringsConstants.subtitle.tr(),
+          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
         ),
       ],
     );
@@ -71,11 +74,11 @@ class CompleteProfileBody extends StatelessWidget {
   Widget _buildProgressIndicator() {
     return Row(
       children: [
-        _buildStep(label: 'Cuenta', isCompleted: true),
+        _buildStep(label: ProfileStringsConstants.stepAccount.tr(), isCompleted: true),
         _buildStepConnector(isCompleted: true),
-        _buildStep(label: 'Perfil', isActive: true),
+        _buildStep(label: ProfileStringsConstants.stepProfile.tr(), isActive: true),
         _buildStepConnector(isCompleted: false),
-        _buildStep(label: 'Listo'),
+        _buildStep(label: ProfileStringsConstants.stepDone.tr()),
       ],
     );
   }
@@ -149,10 +152,10 @@ class CompleteProfileBody extends StatelessWidget {
               Expanded(
                 child: SportTextField(
                   controller: firstNameController,
-                  hint: 'Primer nombre *',
+                  hint: ProfileStringsConstants.firstName.tr(),
                   icon: Icons.person_outline,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Requerido';
+                    if (v == null || v.trim().isEmpty) return ProfileStringsConstants.required.tr();
                     return null;
                   },
                 ),
@@ -161,7 +164,7 @@ class CompleteProfileBody extends StatelessWidget {
               Expanded(
                 child: SportTextField(
                   controller: middleNameController,
-                  hint: 'Segundo nombre',
+                  hint: ProfileStringsConstants.middleName.tr(),
                   icon: Icons.person_outline,
                 ),
               ),
@@ -173,10 +176,10 @@ class CompleteProfileBody extends StatelessWidget {
               Expanded(
                 child: SportTextField(
                   controller: lastNameController,
-                  hint: 'Primer apellido *',
+                  hint: ProfileStringsConstants.lastName.tr(),
                   icon: Icons.badge_outlined,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'Requerido';
+                    if (v == null || v.trim().isEmpty) return ProfileStringsConstants.required.tr();
                     return null;
                   },
                 ),
@@ -185,7 +188,7 @@ class CompleteProfileBody extends StatelessWidget {
               Expanded(
                 child: SportTextField(
                   controller: secondLastNameController,
-                  hint: 'Segundo apellido',
+                  hint: ProfileStringsConstants.secondLastName.tr(),
                   icon: Icons.badge_outlined,
                 ),
               ),
@@ -194,12 +197,12 @@ class CompleteProfileBody extends StatelessWidget {
           const SizedBox(height: 16),
           SportTextField(
             controller: usernameController,
-            hint: 'Nombre de usuario *',
+            hint: ProfileStringsConstants.username.tr(),
             icon: Icons.alternate_email,
             validator: (v) {
-              if (v == null || v.trim().isEmpty) return 'Requerido';
-              if (v.trim().length < 3) return 'Mínimo 3 caracteres';
-              if (v.contains(' ')) return 'Sin espacios';
+              if (v == null || v.trim().isEmpty) return ProfileStringsConstants.required.tr();
+              if (v.trim().length < 3) return ProfileStringsConstants.usernameTooShort.tr();
+              if (v.contains(' ')) return ProfileStringsConstants.usernameNoSpaces.tr();
               return null;
             },
           ),
@@ -230,9 +233,9 @@ class CompleteProfileBody extends StatelessWidget {
                   strokeWidth: 2.5,
                 ),
               )
-            : const Text(
-                'Guardar perfil',
-                style: TextStyle(
+            : Text(
+                ProfileStringsConstants.saveButton.tr(),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -246,9 +249,9 @@ class CompleteProfileBody extends StatelessWidget {
     return Center(
       child: TextButton(
         onPressed: onSkip,
-        child: const Text(
-          'Completar después',
-          style: TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+        child: Text(
+          ProfileStringsConstants.skipButton.tr(),
+          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
         ),
       ),
     );

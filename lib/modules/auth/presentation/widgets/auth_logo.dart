@@ -1,5 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
+import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 class AuthLogo extends StatelessWidget {
@@ -7,6 +8,7 @@ class AuthLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.locale; // register as dependent so it rebuilds on locale change
     return Column(
       children: [
         Container(
@@ -30,9 +32,9 @@ class AuthLogo extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
-          LoginStringsConstants.appName,
-          style: TextStyle(
+        Text(
+          AppStringsConstants.appName.tr(),
+          style: const TextStyle(
             color: AppColors.white,
             fontSize: 32,
             fontWeight: FontWeight.bold,
@@ -40,9 +42,9 @@ class AuthLogo extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        const Text(
-          LoginStringsConstants.appTagline,
-          style: TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+        Text(
+          AppStringsConstants.appTagline.tr(),
+          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
         ),
       ],
     );

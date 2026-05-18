@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
@@ -7,6 +9,7 @@ import 'package:sport_platform/modules/auth/presentation/widgets/login_body.dart
 import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
+import 'package:sport_platform/shared/widgets/language_selector.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -51,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     } catch (e) {
       if (!mounted) return;
-      AppSnackbar.error(context, 'Correo o contraseña incorrectos.');
+      AppSnackbar.error(context, LoginStringsConstants.invalidCredentials.tr());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -60,6 +63,15 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: const [
+          LanguageSelector(),
+          SizedBox(width: 8),
+        ],
+      ),
       body: GradientBackground(
         child: LoginBody(
           formKey: _formKey,

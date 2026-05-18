@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
@@ -29,6 +30,7 @@ class LoginBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return Column(
       children: [
         const SizedBox(height: 48),
@@ -53,21 +55,21 @@ class LoginBody extends StatelessWidget {
   }
 
   Widget _buildHeader() {
-    return const Column(
+    return Column(
       children: [
         Text(
-          LoginStringsConstants.welcomeBack,
-          style: TextStyle(
+          LoginStringsConstants.welcomeBack.tr(),
+          style: const TextStyle(
             color: AppColors.white,
             fontSize: 28,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
-          LoginStringsConstants.signInSubtitle,
-          style: TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+          LoginStringsConstants.signInSubtitle.tr(),
+          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
         ),
       ],
     );
@@ -80,19 +82,19 @@ class LoginBody extends StatelessWidget {
         children: [
           SportTextField(
             controller: emailController,
-            hint: LoginStringsConstants.emailHint,
+            hint: LoginStringsConstants.emailHint.tr(),
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (v) {
-              if (v == null || v.isEmpty) return LoginStringsConstants.emailRequired;
-              if (!v.contains('@')) return LoginStringsConstants.emailInvalid;
+              if (v == null || v.isEmpty) return LoginStringsConstants.emailRequired.tr();
+              if (!v.contains('@')) return LoginStringsConstants.emailInvalid.tr();
               return null;
             },
           ),
           const SizedBox(height: 16),
           SportTextField(
             controller: passwordController,
-            hint: LoginStringsConstants.passwordHint,
+            hint: LoginStringsConstants.passwordHint.tr(),
             icon: Icons.lock_outline,
             obscureText: obscurePassword,
             suffixIcon: IconButton(
@@ -106,8 +108,8 @@ class LoginBody extends StatelessWidget {
               onPressed: onTogglePassword,
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return LoginStringsConstants.passwordRequired;
-              if (v.length < 6) return LoginStringsConstants.passwordTooShort;
+              if (v == null || v.isEmpty) return LoginStringsConstants.passwordRequired.tr();
+              if (v.length < 6) return LoginStringsConstants.passwordTooShort.tr();
               return null;
             },
           ),
@@ -122,9 +124,9 @@ class LoginBody extends StatelessWidget {
       child: TextButton(
         onPressed: () {},
         style: TextButton.styleFrom(padding: EdgeInsets.zero),
-        child: const Text(
-          LoginStringsConstants.forgotPassword,
-          style: TextStyle(color: AppColors.primaryLight, fontSize: 13),
+        child: Text(
+          LoginStringsConstants.forgotPassword.tr(),
+          style: const TextStyle(color: AppColors.primaryLight, fontSize: 13),
         ),
       ),
     );
@@ -152,9 +154,9 @@ class LoginBody extends StatelessWidget {
                   strokeWidth: 2.5,
                 ),
               )
-            : const Text(
-                LoginStringsConstants.signIn,
-                style: TextStyle(
+            : Text(
+                LoginStringsConstants.signIn.tr(),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -165,17 +167,17 @@ class LoginBody extends StatelessWidget {
   }
 
   Widget _buildDivider() {
-    return const Row(
+    return Row(
       children: [
-        Expanded(child: Divider(color: AppColors.inputBorder, thickness: 1)),
+        const Expanded(child: Divider(color: AppColors.inputBorder, thickness: 1)),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            LoginStringsConstants.orContinueWith,
-            style: TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+            LoginStringsConstants.orContinueWith.tr(),
+            style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
           ),
         ),
-        Expanded(child: Divider(color: AppColors.inputBorder, thickness: 1)),
+        const Expanded(child: Divider(color: AppColors.inputBorder, thickness: 1)),
       ],
     );
   }
@@ -183,9 +185,9 @@ class LoginBody extends StatelessWidget {
   Widget _buildSocialButtons() {
     return Row(
       children: [
-        Expanded(child: SocialButton(label: LoginStringsConstants.google, icon: Icons.g_mobiledata)),
+        Expanded(child: SocialButton(label: LoginStringsConstants.google.tr(), icon: Icons.g_mobiledata)),
         const SizedBox(width: 12),
-        Expanded(child: SocialButton(label: LoginStringsConstants.apple, icon: Icons.apple)),
+        Expanded(child: SocialButton(label: LoginStringsConstants.apple.tr(), icon: Icons.apple)),
       ],
     );
   }
@@ -194,15 +196,15 @@ class LoginBody extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          LoginStringsConstants.noAccount,
-          style: TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+        Text(
+          LoginStringsConstants.noAccount.tr(),
+          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
         ),
         GestureDetector(
           onTap: onSignUp,
-          child: const Text(
-            LoginStringsConstants.signUp,
-            style: TextStyle(
+          child: Text(
+            LoginStringsConstants.signUp.tr(),
+            style: const TextStyle(
               color: AppColors.primaryLight,
               fontSize: 14,
               fontWeight: FontWeight.bold,

@@ -7,7 +7,13 @@
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\admseneca\\\\Documents\\\\Proyectos\\\\sports-platform\\\\Frontend\\\\sport_platform\\\\lib\" -Recurse -Directory)",
       "Bash(Select-Object FullName)",
       "Bash(Sort-Object FullName)",
-      "Bash(flutter pub *)"
+      "Bash(flutter pub *)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\admseneca\\\\Documents\\\\Proyectos\\\\sports-platform\\\\Frontend\\\\sport_platform\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(mkdir -p \"c:\\\\Users\\\\admseneca\\\\Documents\\\\Proyectos\\\\sports-platform\\\\Frontend\\\\sport_platform\\\\assets\\\\translations\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\admseneca\\Documents\\Proyectos\\sports-platform\\Frontend\\sport_platform\\assets"
     ]
   }
 }

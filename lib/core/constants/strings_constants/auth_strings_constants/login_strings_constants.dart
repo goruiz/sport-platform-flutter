@@ -1,26 +1,23 @@
 class LoginStringsConstants {
-  // App
-  static const String appName = 'Sports Platform';
-  static const String appTagline = 'Your Smart Sports Companion';
+  static const String appName = 'app.name';
+  static const String appTagline = 'app.tagline';
 
-  // Auth - Login
-  static const String welcomeBack = 'Welcome Back';
-  static const String signInSubtitle = 'Sign in to continue your journey';
-  static const String emailHint = 'Email address';
-  static const String passwordHint = 'Password';
-  static const String forgotPassword = 'Forgot password?';
-  static const String signIn = 'Sign In';
-  static const String orContinueWith = 'or continue with';
-  static const String noAccount = "Don't have an account? ";
-  static const String signUp = 'Sign Up';
+  static const String welcomeBack = 'login.welcome_back';
+  static const String signInSubtitle = 'login.sign_in_subtitle';
+  static const String emailHint = 'login.email_hint';
+  static const String passwordHint = 'login.password_hint';
+  static const String forgotPassword = 'login.forgot_password';
+  static const String signIn = 'login.sign_in';
+  static const String orContinueWith = 'login.or_continue_with';
+  static const String noAccount = 'login.no_account';
+  static const String signUp = 'login.sign_up';
 
-  // Auth - Validation
-  static const String emailRequired = 'Enter your email';
-  static const String emailInvalid = 'Enter a valid email';
-  static const String passwordRequired = 'Enter your password';
-  static const String passwordTooShort = 'Minimum 6 characters';
+  static const String emailRequired = 'login.email_required';
+  static const String emailInvalid = 'login.email_invalid';
+  static const String passwordRequired = 'login.password_required';
+  static const String passwordTooShort = 'login.password_too_short';
+  static const String invalidCredentials = 'login.invalid_credentials';
 
-  // Social
-  static const String google = 'Google';
-  static const String apple = 'Apple';
+  static const String google = 'login.google';
+  static const String apple = 'login.apple';
 }

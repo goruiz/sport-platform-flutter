@@ -1,7 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/shared/widgets/language_selector.dart';
 import 'package:sport_platform/shared/widgets/logout_button.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,16 +16,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
-  final List<_NavItem> _navItems = const [
-    _NavItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: HomeStringsConstants.navHome),
-    _NavItem(icon: Icons.group_outlined, activeIcon: Icons.group, label: HomeStringsConstants.navTeams),
-    _NavItem(icon: Icons.event_outlined, activeIcon: Icons.event, label: HomeStringsConstants.navEvents),
-    _NavItem(icon: Icons.leaderboard_outlined, activeIcon: Icons.leaderboard, label: HomeStringsConstants.navRankings),
-    _NavItem(icon: Icons.person_outline, activeIcon: Icons.person, label: HomeStringsConstants.navProfile),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return Scaffold(
       backgroundColor: AppColors.backgroundEnd,
       appBar: _buildAppBar(),
@@ -36,30 +31,39 @@ class _HomePageState extends State<HomePage> {
     return AppBar(
       backgroundColor: AppColors.primaryDark,
       elevation: 0,
-      title: const Text(
-        AppStringsConstants.appName,
-        style: TextStyle(
+      title: Text(
+        AppStringsConstants.appName.tr(),
+        style: const TextStyle(
           color: AppColors.white,
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
       ),
-      actions: [
+      actions: const [
+        LanguageSelector(),
         IconButton(
-          icon: const Icon(Icons.notifications_outlined, color: AppColors.white),
-          onPressed: () {},
+          icon: Icon(Icons.notifications_outlined, color: AppColors.white),
+          onPressed: null,
         ),
-        const LogoutButton(),
-        const SizedBox(width: 4),
+        LogoutButton(),
+        SizedBox(width: 4),
       ],
     );
   }
 
   Widget _buildBody() {
-    return const _HomeContent();
+    return _HomeContent();
   }
 
   Widget _buildBottomNav() {
+    final navItems = [
+      _NavItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: HomeStringsConstants.navHome.tr()),
+      _NavItem(icon: Icons.group_outlined, activeIcon: Icons.group, label: HomeStringsConstants.navTeams.tr()),
+      _NavItem(icon: Icons.event_outlined, activeIcon: Icons.event, label: HomeStringsConstants.navEvents.tr()),
+      _NavItem(icon: Icons.leaderboard_outlined, activeIcon: Icons.leaderboard, label: HomeStringsConstants.navRankings.tr()),
+      _NavItem(icon: Icons.person_outline, activeIcon: Icons.person, label: HomeStringsConstants.navProfile.tr()),
+    ];
+
     return BottomNavigationBar(
       currentIndex: _currentIndex,
       onTap: (index) => setState(() => _currentIndex = index),
@@ -69,7 +73,7 @@ class _HomePageState extends State<HomePage> {
       type: BottomNavigationBarType.fixed,
       selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
       unselectedLabelStyle: const TextStyle(fontSize: 11),
-      items: _navItems
+      items: navItems
           .map(
             (item) => BottomNavigationBarItem(
               icon: Icon(item.icon),
@@ -87,6 +91,7 @@ class _HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -94,28 +99,28 @@ class _HomeContent extends StatelessWidget {
         children: [
           _buildWelcomeBanner(),
           const SizedBox(height: 28),
-          _buildSectionTitle(HomeStringsConstants.sectionUpcomingEvents),
+          _buildSectionTitle(HomeStringsConstants.sectionUpcomingEvents.tr()),
           const SizedBox(height: 12),
           _buildPlaceholderCard(
             icon: Icons.event_outlined,
-            title: HomeStringsConstants.noEventsTitle,
-            subtitle: HomeStringsConstants.noEventsSubtitle,
+            title: HomeStringsConstants.noEventsTitle.tr(),
+            subtitle: HomeStringsConstants.noEventsSubtitle.tr(),
           ),
           const SizedBox(height: 28),
-          _buildSectionTitle(HomeStringsConstants.sectionMyTeams),
+          _buildSectionTitle(HomeStringsConstants.sectionMyTeams.tr()),
           const SizedBox(height: 12),
           _buildPlaceholderCard(
             icon: Icons.group_outlined,
-            title: HomeStringsConstants.noTeamsTitle,
-            subtitle: HomeStringsConstants.noTeamsSubtitle,
+            title: HomeStringsConstants.noTeamsTitle.tr(),
+            subtitle: HomeStringsConstants.noTeamsSubtitle.tr(),
           ),
           const SizedBox(height: 28),
-          _buildSectionTitle(HomeStringsConstants.sectionRankings),
+          _buildSectionTitle(HomeStringsConstants.sectionRankings.tr()),
           const SizedBox(height: 12),
           _buildPlaceholderCard(
             icon: Icons.leaderboard_outlined,
-            title: HomeStringsConstants.noRankingsTitle,
-            subtitle: HomeStringsConstants.noRankingsSubtitle,
+            title: HomeStringsConstants.noRankingsTitle.tr(),
+            subtitle: HomeStringsConstants.noRankingsSubtitle.tr(),
           ),
         ],
       ),
@@ -134,29 +139,29 @@ class _HomeContent extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            HomeStringsConstants.welcomeLabel,
-            style: TextStyle(
+            HomeStringsConstants.welcomeLabel.tr(),
+            style: const TextStyle(
               color: AppColors.whiteSubtle,
               fontSize: 14,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
-            AppStringsConstants.appName,
-            style: TextStyle(
+            AppStringsConstants.appName.tr(),
+            style: const TextStyle(
               color: AppColors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Text(
-            HomeStringsConstants.welcomeSubtitle,
-            style: TextStyle(
+            HomeStringsConstants.welcomeSubtitle.tr(),
+            style: const TextStyle(
               color: AppColors.whiteSubtle,
               fontSize: 13,
             ),

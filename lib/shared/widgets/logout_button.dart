@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/strings_constants/logout_strings_constants.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
@@ -22,20 +24,20 @@ class _LogoutButtonState extends State<LogoutButton> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.primaryDark,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Cerrar sesión',
-          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
+        title: Text(
+          LogoutStringsConstants.title.tr(),
+          style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
         ),
-        content: const Text(
-          '¿Estás seguro de que deseas cerrar sesión?',
-          style: TextStyle(color: AppColors.whiteSubtle),
+        content: Text(
+          LogoutStringsConstants.confirm.tr(),
+          style: const TextStyle(color: AppColors.whiteSubtle),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(color: AppColors.whiteSubtle),
+            child: Text(
+              LogoutStringsConstants.cancel.tr(),
+              style: const TextStyle(color: AppColors.whiteSubtle),
             ),
           ),
           ElevatedButton(
@@ -47,7 +49,7 @@ class _LogoutButtonState extends State<LogoutButton> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text('Cerrar sesión'),
+            child: Text(LogoutStringsConstants.button.tr()),
           ),
         ],
       ),
@@ -74,6 +76,7 @@ class _LogoutButtonState extends State<LogoutButton> {
 
   @override
   Widget build(BuildContext context) {
+    context.locale;
     return _isLoading
         ? const Padding(
             padding: EdgeInsets.all(14),
@@ -88,7 +91,7 @@ class _LogoutButtonState extends State<LogoutButton> {
           )
         : IconButton(
             icon: const Icon(Icons.logout, color: AppColors.white),
-            tooltip: 'Cerrar sesión',
+            tooltip: LogoutStringsConstants.tooltip.tr(),
             onPressed: _onLogout,
           );
   }
