@@ -16,6 +16,7 @@ class RegisterStringsConstants {
   static const String emailInvalid = 'register.email_invalid';
   static const String passwordRequired = 'register.password_required';
   static const String passwordTooShort = 'register.password_too_short';
+  static const String passwordWeak = 'register.password_weak';
   static const String confirmPasswordRequired = 'register.confirm_password_required';
   static const String passwordsDoNotMatch = 'register.passwords_do_not_match';
   static const String successMessage = 'register.success';

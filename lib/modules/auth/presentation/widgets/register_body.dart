@@ -114,7 +114,14 @@ class RegisterBody extends StatelessWidget {
             ),
             validator: (v) {
               if (v == null || v.isEmpty) return RegisterStringsConstants.passwordRequired.tr();
-              if (v.length < 6) return RegisterStringsConstants.passwordTooShort.tr();
+              if (v.length < 8) return RegisterStringsConstants.passwordTooShort.tr();
+              final hasUpper = RegExp(r'[A-Z]').hasMatch(v);
+              final hasLower = RegExp(r'[a-z]').hasMatch(v);
+              final hasDigit = RegExp(r'\d').hasMatch(v);
+              final hasSpecial = RegExp(r'[!@#$%^&*(),.?":{}|<>\-_=+\[\]\\;`~]').hasMatch(v);
+              if (!hasUpper || !hasLower || !hasDigit || !hasSpecial) {
+                return RegisterStringsConstants.passwordWeak.tr();
+              }
               return null;
             },
           ),

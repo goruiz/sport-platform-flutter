@@ -38,6 +38,7 @@
     "email_invalid": "Gültige E-Mail eingeben",
     "password_required": "Passwort eingeben",
     "password_too_short": "Mindestens 8 Zeichen",
+    "password_weak": "Muss Groß-, Kleinbuchstabe, Zahl und Sonderzeichen enthalten",
     "confirm_password_required": "Passwort bestätigen",
     "passwords_do_not_match": "Passwörter stimmen nicht überein",
     "google": "Google",
