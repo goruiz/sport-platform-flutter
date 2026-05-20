@@ -1,10 +1,62 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/shared/widgets/language_selector.dart';
 import 'package:sport_platform/shared/widgets/logout_button.dart';
+
+enum _MenuStyle { carousel, drawer }
+
+// ─────────────────────── Quick Action Data ───────────────────────────────────
+
+class _QuickActionItem {
+  final IconData icon;
+  final String labelKey;
+  final Color color;
+
+  const _QuickActionItem({
+    required this.icon,
+    required this.labelKey,
+    required this.color,
+  });
+}
+
+const List<_QuickActionItem> _kQuickActionItems = [
+  _QuickActionItem(
+    icon: Icons.group_add,
+    labelKey: HomeStringsConstants.actionCreateTeam,
+    color: Color(0xFF2E7D32),
+  ),
+  _QuickActionItem(
+    icon: Icons.emoji_events,
+    labelKey: HomeStringsConstants.actionCreateTournament,
+    color: Color(0xFFE65100),
+  ),
+  _QuickActionItem(
+    icon: Icons.sports_soccer,
+    labelKey: HomeStringsConstants.actionCreateLeague,
+    color: Color(0xFF1565C0),
+  ),
+  _QuickActionItem(
+    icon: Icons.workspace_premium,
+    labelKey: HomeStringsConstants.actionBuyPlan,
+    color: Color(0xFFF57F17),
+  ),
+  _QuickActionItem(
+    icon: Icons.login,
+    labelKey: HomeStringsConstants.actionJoinLeague,
+    color: Color(0xFF00695C),
+  ),
+  _QuickActionItem(
+    icon: Icons.sports,
+    labelKey: HomeStringsConstants.actionMyMatches,
+    color: Color(0xFF6A1B9A),
+  ),
+];
+
+// ─────────────────────── Home Page ───────────────────────────────────────────
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +67,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+  _MenuStyle _menuStyle = _MenuStyle.carousel;
 
   static const _tabIcons = [
     Icons.home_outlined,
@@ -37,7 +90,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: AppColors.backgroundEnd,
       appBar: _buildAppBar(),
-      body: _currentIndex == 0 ? const _HomeTab() : _PlaceholderTab(index: _currentIndex),
+      drawer: _menuStyle == _MenuStyle.drawer ? const _QuickActionsDrawer() : null,
+      body: _currentIndex == 0
+          ? _HomeTab(menuStyle: _menuStyle)
+          : _PlaceholderTab(index: _currentIndex),
       bottomNavigationBar: _buildBottomNav(),
     );
   }
@@ -46,6 +102,15 @@ class _HomePageState extends State<HomePage> {
     return AppBar(
       backgroundColor: AppColors.primaryDark,
       elevation: 0,
+      automaticallyImplyLeading: false,
+      leading: _menuStyle == _MenuStyle.drawer
+          ? Builder(
+              builder: (ctx) => IconButton(
+                icon: const Icon(Icons.menu, color: AppColors.white),
+                onPressed: () => Scaffold.of(ctx).openDrawer(),
+              ),
+            )
+          : null,
       title: Text(
         AppStringsConstants.appName.tr(),
         style: const TextStyle(
@@ -54,14 +119,30 @@ class _HomePageState extends State<HomePage> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      actions: const [
-        LanguageSelector(),
+      actions: [
         IconButton(
+          icon: Icon(
+            _menuStyle == _MenuStyle.carousel
+                ? Icons.view_sidebar_outlined
+                : Icons.view_carousel_outlined,
+            color: AppColors.white,
+          ),
+          tooltip: _menuStyle == _MenuStyle.carousel
+              ? HomeStringsConstants.switchToDrawer.tr()
+              : HomeStringsConstants.switchToCarousel.tr(),
+          onPressed: () => setState(() {
+            _menuStyle = _menuStyle == _MenuStyle.carousel
+                ? _MenuStyle.drawer
+                : _MenuStyle.carousel;
+          }),
+        ),
+        const LanguageSelector(),
+        const IconButton(
           icon: Icon(Icons.notifications_outlined, color: AppColors.white),
           onPressed: null,
         ),
-        LogoutButton(),
-        SizedBox(width: 4),
+        const LogoutButton(),
+        const SizedBox(width: 4),
       ],
     );
   }
@@ -99,7 +180,9 @@ class _HomePageState extends State<HomePage> {
 // ─────────────────────── Home Tab ───────────────────────────────────────────
 
 class _HomeTab extends StatelessWidget {
-  const _HomeTab();
+  final _MenuStyle menuStyle;
+
+  const _HomeTab({required this.menuStyle});
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +202,17 @@ class _HomeTab extends StatelessWidget {
             child: _SectionHeader(title: HomeStringsConstants.sectionQuickActions.tr()),
           ),
           const SizedBox(height: 12),
-          const _QuickActionsCarousel(),
+          if (menuStyle == _MenuStyle.carousel)
+            const _QuickActionsCarousel()
+          else
+            Builder(
+              builder: (ctx) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _DrawerHintCard(
+                  onTap: () => Scaffold.of(ctx).openDrawer(),
+                ),
+              ),
+            ),
           const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -275,65 +368,88 @@ class _SectionHeader extends StatelessWidget {
 
 // ─────────────────────── Quick Actions Carousel ──────────────────────────────
 
-class _QuickActionItem {
-  final IconData icon;
-  final String labelKey;
-  final Color color;
-
-  const _QuickActionItem({
-    required this.icon,
-    required this.labelKey,
-    required this.color,
-  });
-}
-
-class _QuickActionsCarousel extends StatelessWidget {
+class _QuickActionsCarousel extends StatefulWidget {
   const _QuickActionsCarousel();
 
-  static const List<_QuickActionItem> _items = [
-    _QuickActionItem(
-      icon: Icons.group_add,
-      labelKey: HomeStringsConstants.actionCreateTeam,
-      color: Color(0xFF2E7D32),
-    ),
-    _QuickActionItem(
-      icon: Icons.emoji_events,
-      labelKey: HomeStringsConstants.actionCreateTournament,
-      color: Color(0xFFE65100),
-    ),
-    _QuickActionItem(
-      icon: Icons.sports_soccer,
-      labelKey: HomeStringsConstants.actionCreateLeague,
-      color: Color(0xFF1565C0),
-    ),
-    _QuickActionItem(
-      icon: Icons.workspace_premium,
-      labelKey: HomeStringsConstants.actionBuyPlan,
-      color: Color(0xFFF57F17),
-    ),
-    _QuickActionItem(
-      icon: Icons.login,
-      labelKey: HomeStringsConstants.actionJoinLeague,
-      color: Color(0xFF00695C),
-    ),
-    _QuickActionItem(
-      icon: Icons.sports,
-      labelKey: HomeStringsConstants.actionMyMatches,
-      color: Color(0xFF6A1B9A),
-    ),
-  ];
+  @override
+  State<_QuickActionsCarousel> createState() => _QuickActionsCarouselState();
+}
+
+class _QuickActionsCarouselState extends State<_QuickActionsCarousel> {
+  late final PageController _controller;
+  int _currentPage = 0;
+
+  static const int _itemsPerPage = 3;
+  static int get _pageCount => (_kQuickActionItems.length / _itemsPerPage).ceil();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 110,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        itemCount: _items.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 10),
-        itemBuilder: (_, i) => _QuickActionCard(item: _items[i]),
-      ),
+    return Column(
+      children: [
+        SizedBox(
+          height: 110,
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+              },
+            ),
+            child: PageView.builder(
+              controller: _controller,
+              itemCount: _pageCount,
+              onPageChanged: (i) => setState(() => _currentPage = i),
+              itemBuilder: (_, pageIndex) {
+                final start = pageIndex * _itemsPerPage;
+                final end = (start + _itemsPerPage).clamp(0, _kQuickActionItems.length);
+                final pageItems = _kQuickActionItems.sublist(start, end);
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      for (int i = 0; i < pageItems.length; i++) ...[
+                        if (i > 0) const SizedBox(width: 10),
+                        Expanded(child: _QuickActionCard(item: pageItems[i])),
+                      ],
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            _pageCount,
+            (i) => AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: i == _currentPage ? 20 : 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: i == _currentPage
+                    ? AppColors.primary
+                    : AppColors.whiteSubtle.withValues(alpha: 0.35),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -348,7 +464,6 @@ class _QuickActionCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {},
       child: Container(
-        width: 96,
         decoration: BoxDecoration(
           color: item.color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
@@ -381,6 +496,115 @@ class _QuickActionCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────── Quick Actions Drawer ────────────────────────────────
+
+class _QuickActionsDrawer extends StatelessWidget {
+  const _QuickActionsDrawer();
+
+  @override
+  Widget build(BuildContext context) {
+    context.locale;
+    return Drawer(
+      backgroundColor: AppColors.primaryDark,
+      child: Column(
+        children: [
+          DrawerHeader(
+            decoration: const BoxDecoration(
+              color: AppColors.primaryDark,
+              border: Border(
+                bottom: BorderSide(color: AppColors.inputBorder),
+              ),
+            ),
+            margin: EdgeInsets.zero,
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                HomeStringsConstants.sectionQuickActions.tr(),
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: _kQuickActionItems.length,
+              itemBuilder: (_, i) {
+                final item = _kQuickActionItems[i];
+                return ListTile(
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                  leading: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: item.color.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(item.icon, color: item.color, size: 22),
+                  ),
+                  title: Text(
+                    item.labelKey.tr(),
+                    style: const TextStyle(
+                      color: AppColors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  onTap: () => Navigator.pop(context),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────── Drawer Hint Card ────────────────────────────────────
+
+class _DrawerHintCard extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _DrawerHintCard({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: AppColors.inputFill,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.inputBorder),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.menu, color: AppColors.primaryLight, size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                HomeStringsConstants.openSideMenu.tr(),
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: AppColors.whiteSubtle, size: 20),
           ],
         ),
       ),

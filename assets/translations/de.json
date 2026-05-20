@@ -59,7 +59,7 @@
     "greeting_afternoon": "Guten Tag,",
     "greeting_evening": "Guten Abend,",
     "guest_name": "Champion",
-    "section_quick_actions": "Schnellaktionen",
+    "section_quick_actions": "Menü",
     "action_create_team": "Team erstellen",
     "action_create_tournament": "Turnier",
     "action_create_league": "Liga erstellen",
@@ -85,7 +85,10 @@
     "no_teams_title": "Keine Teams",
     "no_teams_subtitle": "Team beitreten oder erstellen, um zu beginnen",
     "no_rankings_title": "Keine Rangliste",
-    "no_rankings_subtitle": "An Veranstaltungen teilnehmen, um hier zu erscheinen"
+    "no_rankings_subtitle": "An Veranstaltungen teilnehmen, um hier zu erscheinen",
+    "switch_to_drawer": "Seitenmenü",
+    "switch_to_carousel": "Karussellansicht",
+    "open_side_menu": "Seitenmenü für Schnellaktionen öffnen"
   },
   "logout": {
     "title": "Abmelden",

@@ -59,7 +59,7 @@
     "greeting_afternoon": "Buenas tardes,",
     "greeting_evening": "Buenas noches,",
     "guest_name": "Campeón",
-    "section_quick_actions": "Acciones rápidas",
+    "section_quick_actions": "Menú",
     "action_create_team": "Crear equipo",
     "action_create_tournament": "Crear torneo",
     "action_create_league": "Crear liga",
@@ -85,7 +85,10 @@
     "no_teams_title": "Sin equipos",
     "no_teams_subtitle": "Únete o crea un equipo para comenzar",
     "no_rankings_title": "Sin posiciones",
-    "no_rankings_subtitle": "Participa en eventos para aparecer aquí"
+    "no_rankings_subtitle": "Participa en eventos para aparecer aquí",
+    "switch_to_drawer": "Menú lateral",
+    "switch_to_carousel": "Vista carrusel",
+    "open_side_menu": "Abrir menú lateral para acciones rápidas"
   },
   "logout": {
     "title": "Cerrar sesión",

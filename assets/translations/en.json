@@ -59,7 +59,7 @@
     "greeting_afternoon": "Good afternoon,",
     "greeting_evening": "Good evening,",
     "guest_name": "Champion",
-    "section_quick_actions": "Quick actions",
+    "section_quick_actions": "Menu",
     "action_create_team": "Create team",
     "action_create_tournament": "Tournament",
     "action_create_league": "Create league",
@@ -85,7 +85,10 @@
     "no_teams_title": "No teams",
     "no_teams_subtitle": "Join or create a team to get started",
     "no_rankings_title": "No standings",
-    "no_rankings_subtitle": "Participate in events to appear here"
+    "no_rankings_subtitle": "Participate in events to appear here",
+    "switch_to_drawer": "Side menu",
+    "switch_to_carousel": "Carousel view",
+    "open_side_menu": "Open side menu for quick actions"
   },
   "logout": {
     "title": "Log out",

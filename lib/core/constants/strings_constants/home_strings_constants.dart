@@ -42,6 +42,11 @@ class HomeStringsConstants {
   static const String noActivityTitle = 'home.no_activity_title';
   static const String noActivitySubtitle = 'home.no_activity_subtitle';
 
+  // Menu style toggle
+  static const String switchToDrawer = 'home.switch_to_drawer';
+  static const String switchToCarousel = 'home.switch_to_carousel';
+  static const String openSideMenu = 'home.open_side_menu';
+
   // Legacy (kept for compatibility)
   static const String sectionUpcomingEvents = 'home.section_upcoming_events';
   static const String sectionMyTeams = 'home.section_my_teams';
