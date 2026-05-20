@@ -44,7 +44,8 @@
     "google": "Google",
     "apple": "Apple",
     "success": "Registro exitoso",
-    "error": "Error al registrarse. Intenta de nuevo."
+    "error": "Error al registrarse. Intenta de nuevo.",
+    "email_already_exists": "Este correo ya está registrado. Por favor inicia sesión."
   },
   "home": {
     "nav_home": "Inicio",

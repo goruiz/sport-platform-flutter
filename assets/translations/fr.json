@@ -44,7 +44,8 @@
     "google": "Google",
     "apple": "Apple",
     "success": "Inscription réussie",
-    "error": "Erreur lors de l'inscription. Veuillez réessayer."
+    "error": "Erreur lors de l'inscription. Veuillez réessayer.",
+    "email_already_exists": "Cet e-mail est déjà enregistré. Veuillez vous connecter."
   },
   "home": {
     "nav_home": "Accueil",

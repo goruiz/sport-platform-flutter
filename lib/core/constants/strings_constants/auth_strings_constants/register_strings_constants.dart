@@ -21,6 +21,7 @@ class RegisterStringsConstants {
   static const String passwordsDoNotMatch = 'register.passwords_do_not_match';
   static const String successMessage = 'register.success';
   static const String errorMessage = 'register.error';
+  static const String emailAlreadyExists = 'register.email_already_exists';
 
   static const String google = 'register.google';
   static const String apple = 'register.apple';

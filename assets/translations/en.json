@@ -44,7 +44,8 @@
     "google": "Google",
     "apple": "Apple",
     "success": "Registration successful",
-    "error": "Error registering. Please try again."
+    "error": "Error registering. Please try again.",
+    "email_already_exists": "This email is already registered. Please sign in."
   },
   "home": {
     "nav_home": "Home",

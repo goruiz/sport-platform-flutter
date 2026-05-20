@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/register_strings_constants.dart';
@@ -53,7 +54,14 @@ class _RegisterPageState extends State<RegisterPage> {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const CompleteProfilePage()),
       );
-    } catch (e) {
+    } on DioException catch (e) {
+      if (!mounted) return;
+      if (e.response?.statusCode == 409) {
+        AppSnackbar.error(context, RegisterStringsConstants.emailAlreadyExists.tr());
+      } else {
+        AppSnackbar.error(context, RegisterStringsConstants.errorMessage.tr());
+      }
+    } catch (_) {
       if (!mounted) return;
       AppSnackbar.error(context, RegisterStringsConstants.errorMessage.tr());
     } finally {
