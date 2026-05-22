@@ -62,9 +62,8 @@ class ChildrenSheet extends StatelessWidget {
             ),
           ),
           const Divider(color: AppColors.inputBorder, height: 24),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+          Flexible(
+            child: ListView.builder(
             itemCount: parent.children.length,
             itemBuilder: (_, i) {
               final child = parent.children[i];
@@ -99,7 +98,7 @@ class ChildrenSheet extends StatelessWidget {
                 onTap: () => Navigator.pop(context),
               );
             },
-          ),
+          )),
         ],
       ),
     );

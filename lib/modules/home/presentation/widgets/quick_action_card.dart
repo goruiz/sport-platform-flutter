@@ -18,6 +18,7 @@ class QuickActionCard extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.primaryDark,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

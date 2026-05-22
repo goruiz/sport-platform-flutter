@@ -10,7 +10,10 @@
       "Bash(flutter pub *)",
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\admseneca\\\\Documents\\\\Proyectos\\\\sports-platform\\\\Frontend\\\\sport_platform\" -Directory)",
       "Bash(Select-Object Name)",
-      "Bash(mkdir -p \"c:\\\\Users\\\\admseneca\\\\Documents\\\\Proyectos\\\\sports-platform\\\\Frontend\\\\sport_platform\\\\assets\\\\translations\")"
+      "Bash(mkdir -p \"c:\\\\Users\\\\admseneca\\\\Documents\\\\Proyectos\\\\sports-platform\\\\Frontend\\\\sport_platform\\\\assets\\\\translations\")",
+      "Bash(Get-ChildItem -Recurse -Directory -Path \"lib\")",
+      "Bash(Select-Object -First 30)",
+      "Bash(Format-List FullName)"
     ],
     "additionalDirectories": [
       "c:\\Users\\admseneca\\Documents\\Proyectos\\sports-platform\\Frontend\\sport_platform\\assets"
