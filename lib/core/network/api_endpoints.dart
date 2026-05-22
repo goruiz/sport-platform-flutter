@@ -25,6 +25,9 @@ class ApiEndpoints {
   static const String matches = '/matches';
   static String matchById(String id) => '/matches/$id';
 
+  // Menu
+  static const String menu = '/menu';
+
   // Rankings
   static const String rankings = '/rankings';
 

@@ -4,56 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/modules/home/data/services/menu_service.dart';
 import 'package:sport_platform/shared/widgets/language_selector.dart';
 import 'package:sport_platform/shared/widgets/logout_button.dart';
 
 enum _MenuStyle { carousel, drawer }
 
-// ─────────────────────── Quick Action Data ───────────────────────────────────
-
-class _QuickActionItem {
-  final IconData icon;
-  final String labelKey;
-  final Color color;
-
-  const _QuickActionItem({
-    required this.icon,
-    required this.labelKey,
-    required this.color,
-  });
-}
-
-const List<_QuickActionItem> _kQuickActionItems = [
-  _QuickActionItem(
-    icon: Icons.group_add,
-    labelKey: HomeStringsConstants.actionCreateTeam,
-    color: Color(0xFF2E7D32),
-  ),
-  _QuickActionItem(
-    icon: Icons.emoji_events,
-    labelKey: HomeStringsConstants.actionCreateTournament,
-    color: Color(0xFFE65100),
-  ),
-  _QuickActionItem(
-    icon: Icons.sports_soccer,
-    labelKey: HomeStringsConstants.actionCreateLeague,
-    color: Color(0xFF1565C0),
-  ),
-  _QuickActionItem(
-    icon: Icons.workspace_premium,
-    labelKey: HomeStringsConstants.actionBuyPlan,
-    color: Color(0xFFF57F17),
-  ),
-  _QuickActionItem(
-    icon: Icons.login,
-    labelKey: HomeStringsConstants.actionJoinLeague,
-    color: Color(0xFF00695C),
-  ),
-  _QuickActionItem(
-    icon: Icons.sports,
-    labelKey: HomeStringsConstants.actionMyMatches,
-    color: Color(0xFF6A1B9A),
-  ),
+const List<Color> _kMenuColors = [
+  Color(0xFF2E7D32),
+  Color(0xFFE65100),
+  Color(0xFF1565C0),
+  Color(0xFFF57F17),
+  Color(0xFF00695C),
+  Color(0xFF6A1B9A),
+  Color(0xFFAD1457),
+  Color(0xFF37474F),
 ];
 
 // ─────────────────────── Home Page ───────────────────────────────────────────
@@ -68,6 +34,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   _MenuStyle _menuStyle = _MenuStyle.carousel;
+
+  List<MenuItemModel> _menuItems = [];
+  bool _isLoadingMenu = true;
+  bool _menuError = false;
+
+  final _menuService = MenuService();
 
   static const _tabIcons = [
     Icons.home_outlined,
@@ -85,14 +57,50 @@ class _HomePageState extends State<HomePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadMenu();
+  }
+
+  Future<void> _loadMenu() async {
+    setState(() {
+      _isLoadingMenu = true;
+      _menuError = false;
+    });
+    try {
+      final items = await _menuService.getMenu();
+      if (!mounted) return;
+      setState(() => _menuItems = items);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _menuError = true);
+    } finally {
+      if (mounted) setState(() => _isLoadingMenu = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     context.locale;
     return Scaffold(
       backgroundColor: AppColors.backgroundEnd,
       appBar: _buildAppBar(),
-      drawer: _menuStyle == _MenuStyle.drawer ? const _QuickActionsDrawer() : null,
+      drawer: _menuStyle == _MenuStyle.drawer
+          ? _QuickActionsDrawer(
+              items: _menuItems,
+              isLoading: _isLoadingMenu,
+              hasError: _menuError,
+              onRetry: _loadMenu,
+            )
+          : null,
       body: _currentIndex == 0
-          ? _HomeTab(menuStyle: _menuStyle)
+          ? _HomeTab(
+              menuStyle: _menuStyle,
+              menuItems: _menuItems,
+              isLoadingMenu: _isLoadingMenu,
+              menuError: _menuError,
+              onRetryMenu: _loadMenu,
+            )
           : _PlaceholderTab(index: _currentIndex),
       bottomNavigationBar: _buildBottomNav(),
     );
@@ -181,8 +189,18 @@ class _HomePageState extends State<HomePage> {
 
 class _HomeTab extends StatelessWidget {
   final _MenuStyle menuStyle;
+  final List<MenuItemModel> menuItems;
+  final bool isLoadingMenu;
+  final bool menuError;
+  final VoidCallback onRetryMenu;
 
-  const _HomeTab({required this.menuStyle});
+  const _HomeTab({
+    required this.menuStyle,
+    required this.menuItems,
+    required this.isLoadingMenu,
+    required this.menuError,
+    required this.onRetryMenu,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +221,12 @@ class _HomeTab extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           if (menuStyle == _MenuStyle.carousel)
-            const _QuickActionsCarousel()
+            _QuickActionsCarousel(
+              items: menuItems,
+              isLoading: isLoadingMenu,
+              hasError: menuError,
+              onRetry: onRetryMenu,
+            )
           else
             Builder(
               builder: (ctx) => Padding(
@@ -369,7 +392,17 @@ class _SectionHeader extends StatelessWidget {
 // ─────────────────────── Quick Actions Carousel ──────────────────────────────
 
 class _QuickActionsCarousel extends StatefulWidget {
-  const _QuickActionsCarousel();
+  final List<MenuItemModel> items;
+  final bool isLoading;
+  final bool hasError;
+  final VoidCallback onRetry;
+
+  const _QuickActionsCarousel({
+    required this.items,
+    required this.isLoading,
+    required this.hasError,
+    required this.onRetry,
+  });
 
   @override
   State<_QuickActionsCarousel> createState() => _QuickActionsCarouselState();
@@ -380,7 +413,8 @@ class _QuickActionsCarouselState extends State<_QuickActionsCarousel> {
   int _currentPage = 0;
 
   static const int _itemsPerPage = 3;
-  static int get _pageCount => (_kQuickActionItems.length / _itemsPerPage).ceil();
+
+  int get _pageCount => (widget.items.length / _itemsPerPage).ceil().clamp(1, 999);
 
   @override
   void initState() {
@@ -396,6 +430,10 @@ class _QuickActionsCarouselState extends State<_QuickActionsCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.isLoading) return _buildLoading();
+    if (widget.hasError) return _buildError();
+    if (widget.items.isEmpty) return _buildEmpty();
+
     return Column(
       children: [
         SizedBox(
@@ -413,15 +451,20 @@ class _QuickActionsCarouselState extends State<_QuickActionsCarousel> {
               onPageChanged: (i) => setState(() => _currentPage = i),
               itemBuilder: (_, pageIndex) {
                 final start = pageIndex * _itemsPerPage;
-                final end = (start + _itemsPerPage).clamp(0, _kQuickActionItems.length);
-                final pageItems = _kQuickActionItems.sublist(start, end);
+                final end = (start + _itemsPerPage).clamp(0, widget.items.length);
+                final pageItems = widget.items.sublist(start, end);
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Row(
                     children: [
                       for (int i = 0; i < pageItems.length; i++) ...[
                         if (i > 0) const SizedBox(width: 10),
-                        Expanded(child: _QuickActionCard(item: pageItems[i])),
+                        Expanded(
+                          child: _QuickActionCard(
+                            item: pageItems[i],
+                            color: _kMenuColors[(start + i) % _kMenuColors.length],
+                          ),
+                        ),
                       ],
                     ],
                   ),
@@ -452,40 +495,154 @@ class _QuickActionsCarouselState extends State<_QuickActionsCarousel> {
       ],
     );
   }
+
+  Widget _buildLoading() {
+    return SizedBox(
+      height: 110,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          children: List.generate(3, (i) => [
+            if (i > 0) const SizedBox(width: 10),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.inputFill,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.inputBorder),
+                ),
+                child: const Center(
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: AppColors.primaryLight,
+                      strokeWidth: 2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ]).expand((e) => e).toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildError() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GestureDetector(
+        onTap: widget.onRetry,
+        child: Container(
+          height: 80,
+          decoration: BoxDecoration(
+            color: AppColors.inputFill,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.inputBorder),
+          ),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.refresh, color: AppColors.primaryLight, size: 20),
+              SizedBox(width: 8),
+              Text(
+                'Error al cargar el menú. Toca para reintentar.',
+                style: TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmpty() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          color: AppColors.inputFill,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.inputBorder),
+        ),
+        child: const Center(
+          child: Text(
+            'Sin acciones disponibles',
+            style: TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _QuickActionCard extends StatelessWidget {
-  final _QuickActionItem item;
+  final MenuItemModel item;
+  final Color color;
 
-  const _QuickActionCard({required this.item});
+  const _QuickActionCard({required this.item, required this.color});
+
+  void _onTap(BuildContext context) {
+    if (!item.hasChildren) return;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.primaryDark,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _ChildrenSheet(parent: item, parentColor: color),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final icon = MenuItemModel.iconFromString(item.icon);
     return GestureDetector(
-      onTap: () {},
+      onTap: () => _onTap(context),
       child: Container(
         decoration: BoxDecoration(
-          color: item.color.withValues(alpha: 0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: item.color.withValues(alpha: 0.3), width: 1),
+          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: item.color.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(item.icon, color: item.color, size: 22),
+            Stack(
+              alignment: Alignment.topRight,
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: color, size: 22),
+                ),
+                if (item.hasChildren)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.expand_more, color: Colors.white, size: 10),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Text(
-                item.labelKey.tr(),
+                item.name,
                 style: const TextStyle(
                   color: AppColors.white,
                   fontSize: 11,
@@ -503,10 +660,116 @@ class _QuickActionCard extends StatelessWidget {
   }
 }
 
+// ─────────────────────── Children Bottom Sheet ───────────────────────────────
+
+class _ChildrenSheet extends StatelessWidget {
+  final MenuItemModel parent;
+  final Color parentColor;
+
+  const _ChildrenSheet({required this.parent, required this.parentColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.whiteSubtle.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: parentColor.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    MenuItemModel.iconFromString(parent.icon),
+                    color: parentColor,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  parent.name,
+                  style: const TextStyle(
+                    color: AppColors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Divider(color: AppColors.inputBorder, height: 24),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: parent.children.length,
+            itemBuilder: (_, i) {
+              final child = parent.children[i];
+              final color = _kMenuColors[i % _kMenuColors.length];
+              return ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+                leading: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(MenuItemModel.iconFromString(child.icon), color: color, size: 18),
+                ),
+                title: Text(
+                  child.name,
+                  style: const TextStyle(color: AppColors.white, fontSize: 14),
+                ),
+                subtitle: child.description != null && child.description!.isNotEmpty
+                    ? Text(
+                        child.description!,
+                        style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+                      )
+                    : null,
+                onTap: () => Navigator.pop(context),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ─────────────────────── Quick Actions Drawer ────────────────────────────────
 
 class _QuickActionsDrawer extends StatelessWidget {
-  const _QuickActionsDrawer();
+  final List<MenuItemModel> items;
+  final bool isLoading;
+  final bool hasError;
+  final VoidCallback onRetry;
+
+  const _QuickActionsDrawer({
+    required this.items,
+    required this.isLoading,
+    required this.hasError,
+    required this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -535,39 +798,138 @@ class _QuickActionsDrawer extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: _kQuickActionItems.length,
-              itemBuilder: (_, i) {
-                final item = _kQuickActionItems[i];
-                return ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                  leading: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: item.color.withValues(alpha: 0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(item.icon, color: item.color, size: 22),
-                  ),
-                  title: Text(
-                    item.labelKey.tr(),
-                    style: const TextStyle(
-                      color: AppColors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  onTap: () => Navigator.pop(context),
-                );
-              },
-            ),
-          ),
+          Expanded(child: _buildBody(context)),
         ],
       ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.primaryLight),
+      );
+    }
+    if (hasError) {
+      return Center(
+        child: GestureDetector(
+          onTap: onRetry,
+          child: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.refresh, color: AppColors.primaryLight, size: 32),
+              SizedBox(height: 8),
+              Text(
+                'Error al cargar. Toca para reintentar.',
+                style: TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    if (items.isEmpty) {
+      return const Center(
+        child: Text(
+          'Sin acciones disponibles',
+          style: TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+        ),
+      );
+    }
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+      itemCount: items.length,
+      itemBuilder: (_, i) {
+        final item = items[i];
+        final color = _kMenuColors[i % _kMenuColors.length];
+        final leadingWidget = Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.2),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(MenuItemModel.iconFromString(item.icon), color: color, size: 22),
+        );
+
+        if (item.hasChildren) {
+          return Theme(
+            data: Theme.of(context).copyWith(
+              dividerColor: Colors.transparent,
+              splashColor: color.withValues(alpha: 0.1),
+            ),
+            child: ExpansionTile(
+              leading: leadingWidget,
+              title: Text(
+                item.name,
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              subtitle: item.description != null && item.description!.isNotEmpty
+                  ? Text(
+                      item.description!,
+                      style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+                    )
+                  : null,
+              iconColor: color,
+              collapsedIconColor: AppColors.whiteSubtle,
+              tilePadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+              childrenPadding: EdgeInsets.zero,
+              children: item.children.asMap().entries.map((entry) {
+                final childIndex = entry.key;
+                final child = entry.value;
+                final childColor = _kMenuColors[childIndex % _kMenuColors.length];
+                return ListTile(
+                  contentPadding: const EdgeInsets.only(left: 80, right: 20, top: 2, bottom: 2),
+                  leading: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: childColor.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(MenuItemModel.iconFromString(child.icon), color: childColor, size: 16),
+                  ),
+                  title: Text(
+                    child.name,
+                    style: const TextStyle(color: AppColors.white, fontSize: 13),
+                  ),
+                  subtitle: child.description != null && child.description!.isNotEmpty
+                      ? Text(
+                          child.description!,
+                          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 11),
+                        )
+                      : null,
+                  onTap: () => Navigator.pop(context),
+                );
+              }).toList(),
+            ),
+          );
+        }
+
+        return ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+          leading: leadingWidget,
+          title: Text(
+            item.name,
+            style: const TextStyle(
+              color: AppColors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          subtitle: item.description != null && item.description!.isNotEmpty
+              ? Text(
+                  item.description!,
+                  style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+                )
+              : null,
+          onTap: () => Navigator.pop(context),
+        );
+      },
     );
   }
 }
