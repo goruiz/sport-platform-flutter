@@ -27,10 +27,39 @@ class _QuickActionsCarouselState extends State<QuickActionsCarousel> {
   late final PageController _controller;
   int _currentPage = 0;
 
-  static const int _itemsPerPage = 3;
+  int get _itemsPerPage => _computeItemsPerPage(widget.items.length);
 
   int get _pageCount =>
       (widget.items.length / _itemsPerPage).ceil().clamp(1, 999);
+
+  // Picks items-per-page to minimise page count while keeping the last page
+  // more than half full. n≤4 always fits on one page.
+  static int _computeItemsPerPage(int total) {
+    if (total <= 0) return 3;
+    if (total <= 4) return total;
+
+    const maxPages = 4;
+
+    int? bestK;
+    int bestPages = 999;
+
+    for (final k in const [2, 3, 4]) {
+      final pages = (total / k).ceil();
+      if (pages > maxPages) continue;
+      final rem = total % k;
+      final lastPage = rem == 0 ? k : rem;
+      if (lastPage * 2 > k && pages < bestPages) {
+        bestPages = pages;
+        bestK = k;
+      }
+    }
+
+    if (bestK != null) return bestK;
+
+    // Fallback: just use fewest pages (k=4 wins ties)
+    return [2, 3, 4].reduce((a, b) =>
+        (total / a).ceil() <= (total / b).ceil() ? b : a);
+  }
 
   @override
   void initState() {
