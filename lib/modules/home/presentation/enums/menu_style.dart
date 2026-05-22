@@ -1,0 +1,1 @@
+enum HomeMenuStyle { carousel, drawer }
