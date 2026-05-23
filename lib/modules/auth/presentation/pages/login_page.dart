@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
           'password': _passwordController.text,
         },
       );
-      final token = response.data['token'] as String;
+      final token = response.data['data']['token'] as String;
       await AuthStorage.saveToken(token);
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(

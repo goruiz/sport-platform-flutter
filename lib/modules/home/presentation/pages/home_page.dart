@@ -23,26 +23,12 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   HomeMenuStyle _menuStyle = HomeMenuStyle.carousel;
 
+  List<MenuItemModel> _navItems = [];
   List<MenuItemModel> _menuItems = [];
   bool _isLoadingMenu = true;
   bool _menuError = false;
 
   final _menuService = MenuService();
-
-  static const _tabIcons = [
-    Icons.home_outlined,
-    Icons.group_outlined,
-    Icons.event_outlined,
-    Icons.leaderboard_outlined,
-    Icons.person_outline,
-  ];
-  static const _tabActiveIcons = [
-    Icons.home,
-    Icons.group,
-    Icons.event,
-    Icons.leaderboard,
-    Icons.person,
-  ];
 
   @override
   void initState() {
@@ -56,10 +42,14 @@ class _HomePageState extends State<HomePage> {
       _menuError = false;
     });
     try {
-      final items = await _menuService.getMenu();
+      final result = await _menuService.getMenu();
       if (!mounted) return;
-      setState(() => _menuItems = items);
-    } catch (_) {
+      setState(() {
+        _navItems = result.navItems;
+        _menuItems = result.menuItems;
+      });
+    } catch (e, st) {
+      debugPrint('MenuService error: $e\n$st');
       if (!mounted) return;
       setState(() => _menuError = true);
     } finally {
@@ -144,16 +134,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildBottomNav() {
-    final labels = [
-      HomeStringsConstants.navHome.tr(),
-      HomeStringsConstants.navTeams.tr(),
-      HomeStringsConstants.navEvents.tr(),
-      HomeStringsConstants.navRankings.tr(),
-      HomeStringsConstants.navProfile.tr(),
-    ];
+    if (_navItems.isEmpty) return const SizedBox.shrink();
+
+    final safeIndex = _currentIndex.clamp(0, _navItems.length - 1);
 
     return BottomNavigationBar(
-      currentIndex: _currentIndex,
+      currentIndex: safeIndex,
       onTap: (i) => setState(() => _currentIndex = i),
       backgroundColor: AppColors.primaryDark,
       selectedItemColor: AppColors.primaryLight,
@@ -162,14 +148,13 @@ class _HomePageState extends State<HomePage> {
       selectedLabelStyle:
           const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
       unselectedLabelStyle: const TextStyle(fontSize: 11),
-      items: List.generate(
-        5,
-        (i) => BottomNavigationBarItem(
-          icon: Icon(_tabIcons[i]),
-          activeIcon: Icon(_tabActiveIcons[i]),
-          label: labels[i],
-        ),
-      ),
+      items: _navItems
+          .map((item) => BottomNavigationBarItem(
+                icon: Icon(MenuItemModel.iconOutlinedFromString(item.icon)),
+                activeIcon: Icon(MenuItemModel.iconFromString(item.icon)),
+                label: item.name.tr(),
+              ))
+          .toList(),
     );
   }
 }

@@ -1,5 +1,7 @@
 enum AppEnvironment { dev, staging, prod }
 
+enum ApiKeyFormat { camelCase, snakeCase }
+
 class AppConfig {
   static const String _env = String.fromEnvironment(
     'APP_ENV',
@@ -23,4 +25,7 @@ class AppConfig {
 
   static bool get isDev => environment == AppEnvironment.dev;
   static bool get isProd => environment == AppEnvironment.prod;
+
+  // Formato de keys que devuelve el backend. Cambia aquí si el backend cambia.
+  static const ApiKeyFormat apiKeyFormat = ApiKeyFormat.camelCase;
 }

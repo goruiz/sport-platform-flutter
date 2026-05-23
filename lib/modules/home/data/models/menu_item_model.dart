@@ -7,6 +7,8 @@ class MenuItemModel {
   final String? icon;
   final String? url;
   final int order;
+  final int? navOrder;
+  final String? idParentMenu;
   final List<MenuItemModel> children;
 
   const MenuItemModel({
@@ -16,11 +18,13 @@ class MenuItemModel {
     this.icon,
     this.url,
     this.order = 0,
+    this.navOrder,
+    this.idParentMenu,
     this.children = const [],
   });
 
   factory MenuItemModel.fromJson(Map<String, dynamic> json) {
-    // La API usa "submenus" en los padres y "children" en los hijos
+    // Handles both nested (submenus/children arrays) and flat (id_parent_menu) responses
     final rawChildren = (json['submenus'] as List<dynamic>?)
         ?? (json['children'] as List<dynamic>?)
         ?? [];
@@ -37,6 +41,8 @@ class MenuItemModel {
       icon: json['icon'] as String?,
       url: json['url'] as String?,
       order: (json['order'] as num?)?.toInt() ?? 0,
+      navOrder: (json['navOrder'] as num?)?.toInt(),
+      idParentMenu: json['idParentMenu'] as String?,
       children: children,
     );
   }
@@ -48,10 +54,32 @@ class MenuItemModel {
         icon: icon,
         url: url,
         order: order,
+        navOrder: navOrder,
+        idParentMenu: idParentMenu,
         children: children ?? this.children,
       );
 
   bool get hasChildren => children.isNotEmpty;
+  bool get isNavItem   => navOrder != null && navOrder! > 0;
+  bool get isTopLevel  => idParentMenu == null;
+
+  // Outlined variant for nav inactive state; falls back to filled when none exists
+  static IconData iconOutlinedFromString(String? name) {
+    switch (name) {
+      case 'home':        return Icons.home_outlined;
+      case 'leaderboard': return Icons.leaderboard_outlined;
+      case 'person':      return Icons.person_outline;
+      case 'group':       return Icons.group_outlined;
+      case 'event':       return Icons.event_outlined;
+      case 'notifications': return Icons.notifications_outlined;
+      case 'settings':    return Icons.settings_outlined;
+      case 'search':      return Icons.search_outlined;
+      case 'star':        return Icons.star_outline;
+      case 'flag':        return Icons.flag_outlined;
+      case 'shield':      return Icons.shield_outlined;
+      default:            return iconFromString(name);
+    }
+  }
 
   static IconData iconFromString(String? name) {
     switch (name) {

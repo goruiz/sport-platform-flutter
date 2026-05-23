@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
 import 'api_endpoints.dart';
+import 'key_format_interceptor.dart';
 
 class DioClient {
   late final Dio _dio;
@@ -15,7 +16,7 @@ class DioClient {
       ),
     );
 
-    _dio.interceptors.add(
+    _dio.interceptors.addAll([
       InterceptorsWrapper(
         onRequest: (options, handler) async {
           final token = await AuthStorage.getToken();
@@ -25,7 +26,8 @@ class DioClient {
           handler.next(options);
         },
       ),
-    );
+      KeyFormatInterceptor(),
+    ]);
   }
 
   Future<Response> get(String path, {Map<String, dynamic>? queryParams}) =>

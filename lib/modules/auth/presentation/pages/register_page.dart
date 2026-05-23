@@ -2,12 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/register_strings_constants.dart';
-import 'package:sport_platform/modules/auth/presentation/widgets/register_body.dart';
-import 'package:sport_platform/modules/users/presentation/pages/complete_profile_page.dart';
-import 'package:sport_platform/shared/widgets/gradient_background.dart';
-import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
+import 'package:sport_platform/core/services/auth_storage.dart';
+import 'package:sport_platform/modules/auth/presentation/widgets/register_body.dart';
+import 'package:sport_platform/modules/users/presentation/pages/complete_profile_page.dart';
+import 'package:sport_platform/shared/widgets/app_snackbar.dart';
+import 'package:sport_platform/shared/widgets/gradient_background.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -41,7 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _isLoading = true);
 
     try {
-      await _client.post(
+      final response = await _client.post(
         ApiEndpoints.register,
         data: {
           'email': _emailController.text,
@@ -49,6 +50,8 @@ class _RegisterPageState extends State<RegisterPage> {
           'confirm_password': _confirmPasswordController.text,
         },
       );
+      final token = response.data['data']?['token'] as String?;
+      if (token != null) await AuthStorage.saveToken(token);
       if (!mounted) return;
       AppSnackbar.success(context, RegisterStringsConstants.successMessage.tr());
       Navigator.of(context).pushReplacement(
