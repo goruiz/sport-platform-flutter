@@ -10,6 +10,7 @@ class QuickActionsDrawer extends StatelessWidget {
   final bool isLoading;
   final bool hasError;
   final VoidCallback onRetry;
+  final void Function(MenuItemModel item)? onNavigate;
 
   const QuickActionsDrawer({
     super.key,
@@ -17,6 +18,7 @@ class QuickActionsDrawer extends StatelessWidget {
     required this.isLoading,
     required this.hasError,
     required this.onRetry,
+    this.onNavigate,
   });
 
   @override
@@ -117,8 +119,8 @@ class QuickActionsDrawer extends StatelessWidget {
               subtitle: item.description != null && item.description!.isNotEmpty
                   ? Text(
                       item.description!,
-                      style:
-                          const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+                      style: const TextStyle(
+                          color: AppColors.whiteSubtle, fontSize: 12),
                     )
                   : null,
               iconColor: color,
@@ -147,8 +149,7 @@ class QuickActionsDrawer extends StatelessWidget {
                   ),
                   title: Text(
                     child.name,
-                    style:
-                        const TextStyle(color: AppColors.white, fontSize: 13),
+                    style: const TextStyle(color: AppColors.white, fontSize: 13),
                   ),
                   subtitle: child.description != null &&
                           child.description!.isNotEmpty
@@ -158,7 +159,10 @@ class QuickActionsDrawer extends StatelessWidget {
                               color: AppColors.whiteSubtle, fontSize: 11),
                         )
                       : null,
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    onNavigate?.call(child);
+                  },
                 );
               }).toList(),
             ),
@@ -180,11 +184,14 @@ class QuickActionsDrawer extends StatelessWidget {
           subtitle: item.description != null && item.description!.isNotEmpty
               ? Text(
                   item.description!,
-                  style:
-                      const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+                  style: const TextStyle(
+                      color: AppColors.whiteSubtle, fontSize: 12),
                 )
               : null,
-          onTap: () => Navigator.pop(context),
+          onTap: () {
+            Navigator.pop(context);
+            onNavigate?.call(item);
+          },
         );
       },
     );

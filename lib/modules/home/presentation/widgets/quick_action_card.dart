@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/routes/app_route_factory.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/children_sheet.dart';
@@ -14,16 +15,23 @@ class QuickActionCard extends StatelessWidget {
   });
 
   void _onTap(BuildContext context) {
-    if (!item.hasChildren) return;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.primaryDark,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => ChildrenSheet(parent: item, parentColor: color),
-    );
+    if (item.hasChildren) {
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: AppColors.primaryDark,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (_) => ChildrenSheet(
+          parent: item,
+          parentColor: color,
+          onNavigate: (child) => AppRouteFactory.navigateTo(context, child),
+        ),
+      );
+    } else {
+      AppRouteFactory.navigateTo(context, item);
+    }
   }
 
   @override

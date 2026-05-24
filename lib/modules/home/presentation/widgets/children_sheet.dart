@@ -6,11 +6,13 @@ import 'package:sport_platform/modules/home/presentation/constants/menu_colors.d
 class ChildrenSheet extends StatelessWidget {
   final MenuItemModel parent;
   final Color parentColor;
+  final void Function(MenuItemModel item)? onNavigate;
 
   const ChildrenSheet({
     super.key,
     required this.parent,
     required this.parentColor,
+    this.onNavigate,
   });
 
   @override
@@ -64,41 +66,46 @@ class ChildrenSheet extends StatelessWidget {
           const Divider(color: AppColors.inputBorder, height: 24),
           Flexible(
             child: ListView.builder(
-            itemCount: parent.children.length,
-            itemBuilder: (_, i) {
-              final child = parent.children[i];
-              final color = kMenuColors[i % kMenuColors.length];
-              return ListTile(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
-                leading: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
+              itemCount: parent.children.length,
+              itemBuilder: (_, i) {
+                final child = parent.children[i];
+                final color = kMenuColors[i % kMenuColors.length];
+                return ListTile(
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+                  leading: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      MenuItemModel.iconFromString(child.icon),
+                      color: color,
+                      size: 18,
+                    ),
                   ),
-                  child: Icon(
-                    MenuItemModel.iconFromString(child.icon),
-                    color: color,
-                    size: 18,
+                  title: Text(
+                    child.name,
+                    style: const TextStyle(color: AppColors.white, fontSize: 14),
                   ),
-                ),
-                title: Text(
-                  child.name,
-                  style: const TextStyle(color: AppColors.white, fontSize: 14),
-                ),
-                subtitle: child.description != null && child.description!.isNotEmpty
-                    ? Text(
-                        child.description!,
-                        style:
-                            const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
-                      )
-                    : null,
-                onTap: () => Navigator.pop(context),
-              );
-            },
-          )),
+                  subtitle: child.description != null &&
+                          child.description!.isNotEmpty
+                      ? Text(
+                          child.description!,
+                          style: const TextStyle(
+                              color: AppColors.whiteSubtle, fontSize: 12),
+                        )
+                      : null,
+                  onTap: () {
+                    Navigator.pop(context);
+                    onNavigate?.call(child);
+                  },
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

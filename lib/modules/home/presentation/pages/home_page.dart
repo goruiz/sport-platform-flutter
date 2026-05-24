@@ -7,7 +7,7 @@ import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/home/data/services/menu_service.dart';
 import 'package:sport_platform/modules/home/presentation/enums/menu_style.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/home_tab.dart';
-import 'package:sport_platform/modules/home/presentation/widgets/placeholder_tab.dart';
+import 'package:sport_platform/core/routes/app_route_factory.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/quick_actions_drawer.dart';
 import 'package:sport_platform/shared/widgets/language_selector.dart';
 import 'package:sport_platform/shared/widgets/logout_button.dart';
@@ -69,19 +69,27 @@ class _HomePageState extends State<HomePage> {
               isLoading: _isLoadingMenu,
               hasError: _menuError,
               onRetry: _loadMenu,
+              onNavigate: (item) => AppRouteFactory.navigateTo(context, item),
             )
           : null,
-      body: _currentIndex == 0
-          ? HomeTab(
-              menuStyle: _menuStyle,
-              menuItems: _menuItems,
-              isLoadingMenu: _isLoadingMenu,
-              menuError: _menuError,
-              onRetryMenu: _loadMenu,
-            )
-          : PlaceholderTab(index: _currentIndex),
+      body: _buildTabBody(),
       bottomNavigationBar: _buildBottomNav(),
     );
+  }
+
+  Widget _buildTabBody() {
+    if (_navItems.isEmpty) return const SizedBox.shrink();
+    final safeIdx = _currentIndex.clamp(0, _navItems.length - 1);
+    if (safeIdx == 0) {
+      return HomeTab(
+        menuStyle: _menuStyle,
+        menuItems: _menuItems,
+        isLoadingMenu: _isLoadingMenu,
+        menuError: _menuError,
+        onRetryMenu: _loadMenu,
+      );
+    }
+    return AppRouteFactory.tabForItem(_navItems[safeIdx]);
   }
 
   PreferredSizeWidget _buildAppBar() {
