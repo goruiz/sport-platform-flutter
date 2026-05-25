@@ -117,5 +117,46 @@
   "settings": {
     "select_language": "Choisir la langue",
     "language_tooltip": "Changer de langue"
+  },
+  "leagues": {
+    "title": "Ligues",
+    "new_league": "Nouvelle ligue",
+    "edit_league": "Modifier la ligue",
+    "delete_league": "Supprimer la ligue",
+    "confirm_delete": "Êtes-vous sûr de vouloir supprimer \"{0}\" ?",
+    "name": "Nom",
+    "description": "Description",
+    "is_active": "Ligue active",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "no_leagues": "Aucune ligue",
+    "no_leagues_subtitle": "Créez la première ligue pour commencer",
+    "name_required": "Le nom est requis",
+    "error_load": "Erreur lors du chargement des ligues. Veuillez réessayer.",
+    "error_save": "Erreur lors de la sauvegarde de la ligue.",
+    "error_delete": "Erreur lors de la suppression de la ligue.",
+    "success_created": "Ligue créée avec succès",
+    "success_updated": "Ligue mise à jour avec succès",
+    "success_deleted": "Ligue supprimée avec succès",
+    "active": "Active",
+    "inactive": "Inactive",
+    "retry": "Réessayer"
+  },
+  "menu": {
+    "home": "Accueil",
+    "rankings": "Classements",
+    "profile": "Profil",
+    "leagues": {
+      "title": "Liges",
+      "create_league": "Créer une ligue",
+      "tooltip": "Voir les ligues disponibles"
+    },
+    "tournaments": {
+      "title": "Torneos",
+      "create_tournament": "Créer un tournoi",
+      "tooltip": "Voir les tournois disponibles"
+    }
   }
 }

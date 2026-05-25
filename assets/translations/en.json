@@ -117,5 +117,46 @@
   "settings": {
     "select_language": "Select language",
     "language_tooltip": "Change language"
+  },
+  "leagues": {
+    "title": "Leagues",
+    "new_league": "New league",
+    "edit_league": "Edit league",
+    "delete_league": "Delete league",
+    "confirm_delete": "Are you sure you want to delete \"{0}\"?",
+    "name": "Name",
+    "description": "Description",
+    "is_active": "Active league",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "no_leagues": "No leagues",
+    "no_leagues_subtitle": "Create the first league to get started",
+    "name_required": "Name is required",
+    "error_load": "Error loading leagues. Please try again.",
+    "error_save": "Error saving league.",
+    "error_delete": "Error deleting league.",
+    "success_created": "League created successfully",
+    "success_updated": "League updated successfully",
+    "success_deleted": "League deleted successfully",
+    "active": "Active",
+    "inactive": "Inactive",
+    "retry": "Retry"
+  },
+  "menu": {
+    "home": "Home",
+    "rankings": "Rankings",
+    "profile": "Profile",
+    "leagues": {
+      "title": "Leagues",
+      "create_league": "View available leagues",
+      "tooltip": "View available leagues"
+    },
+    "tournaments": {
+      "title": "Tournaments",
+      "create_tournament": "View available tournaments",
+      "tooltip": "View available tournaments"
+    }
   }
 }

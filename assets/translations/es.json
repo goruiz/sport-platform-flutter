@@ -117,5 +117,46 @@
   "settings": {
     "select_language": "Seleccionar idioma",
     "language_tooltip": "Cambiar idioma"
+  },
+  "leagues": {
+    "title": "Ligas",
+    "new_league": "Nueva liga",
+    "edit_league": "Editar liga",
+    "delete_league": "Eliminar liga",
+    "confirm_delete": "¿Estás seguro de que deseas eliminar \"{0}\"?",
+    "name": "Nombre",
+    "description": "Descripción",
+    "is_active": "Liga activa",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "no_leagues": "Sin ligas",
+    "no_leagues_subtitle": "Crea la primera liga para comenzar",
+    "name_required": "El nombre es requerido",
+    "error_load": "Error al cargar las ligas. Intenta de nuevo.",
+    "error_save": "Error al guardar la liga.",
+    "error_delete": "Error al eliminar la liga.",
+    "success_created": "Liga creada exitosamente",
+    "success_updated": "Liga actualizada exitosamente",
+    "success_deleted": "Liga eliminada exitosamente",
+    "active": "Activa",
+    "inactive": "Inactiva",
+    "retry": "Reintentar"
+  },
+  "menu": {
+    "home": "Inicio",
+    "rankings": "Rankings",
+    "profile": "Perfil",
+    "leagues": {
+      "title": "Ligas",
+      "create_league": "Ver ligas disponibles",
+      "tooltip": "Ver ligas disknmknponibles"
+    },
+    "tournaments": {
+      "title": "Torneos",
+      "create_tournament": "Ver torneos disponibles",
+      "tooltip": "Ver torneos disponibles"
+    }
   }
 }

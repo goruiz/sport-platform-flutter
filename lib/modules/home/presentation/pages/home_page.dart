@@ -4,7 +4,7 @@ import 'package:sport_platform/core/constants/strings_constants/app_strings_cons
 import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
-import 'package:sport_platform/modules/home/data/services/menu_service.dart';
+import 'package:sport_platform/modules/home/data/datasource/menu_service.dart';
 import 'package:sport_platform/modules/home/presentation/enums/menu_style.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/home_tab.dart';
 import 'package:sport_platform/core/routes/app_route_factory.dart';
@@ -160,7 +160,7 @@ class _HomePageState extends State<HomePage> {
           .map((item) => BottomNavigationBarItem(
                 icon: Icon(MenuItemModel.iconOutlinedFromString(item.icon)),
                 activeIcon: Icon(MenuItemModel.iconFromString(item.icon)),
-                label: item.name.tr(),
+                label: item.displayName.tr(),
               ))
           .toList(),
     );

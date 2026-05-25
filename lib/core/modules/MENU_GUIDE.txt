@@ -1,0 +1,235 @@
+================================================================================
+  GUÍA DEL SISTEMA DE MENÚ — Plataforma Deportiva
+================================================================================
+
+ARQUITECTURA GENERAL
+────────────────────
+El menú es 100 % dinámico: su estructura, orden e íconos vienen de la base de
+datos. El frontend solo necesita código nuevo cuando se crea una PÁGINA nueva.
+
+  Base de datos (tabla menu)
+          │
+          ▼
+  Backend Spring Boot  →  GET /menu  →  MenuTreeResponse (JSON)
+          │
+          ▼
+  Flutter MenuService  →  MenuItemModel
+          │
+          ├── nav_order != null  →  Bottom Navigation Bar
+          └── nav_order == null  →  Drawer / Carousel de acciones rápidas
+
+ARCHIVOS CLAVE
+──────────────
+  Flutter
+  ├── lib/core/modules/module_registry.dart      Mapa url → widget builder
+  ├── lib/core/modules/modules_bootstrap.dart    ÚNICO lugar para registrar módulos
+  ├── lib/core/routes/app_route_factory.dart     Navegación (usa el registry)
+  ├── lib/modules/home/data/models/
+  │       menu_item_model.dart                   Modelo + mapa de íconos
+  └── assets/translations/{es,en,de,fr}.json    Claves de traducción
+
+  Backend
+  ├── MenuEntity.java                            Entidad JPA (tabla menu)
+  ├── MenuResponse.java / MenuTreeResponse.java  DTOs de respuesta
+  ├── CreateMenuRequest.java                     Body para POST /menu
+  ├── UpdateMenuRequest.java                     Body para PUT /menu/{id}
+  └── src/main/resources/db/migration/          Migraciones Flyway
+
+COLUMNAS IMPORTANTES DE LA TABLA menu
+──────────────────────────────────────
+  id               UUID          Identificador único
+  name             varchar(255)  Nombre legible (para panel admin)
+  translation_key  varchar(255)  Clave de traducción → "menu.home" (nullable)
+  icon             varchar(255)  Nombre del ícono Material → "home", "event"
+  url              varchar(255)  Identificador de módulo  → "/leagues"
+  nav_order        smallint      Si tiene valor: aparece en el Bottom Nav
+  order            int           Orden dentro de su contexto
+  id_parent_menu   uuid          UUID del padre (null = ítem raíz)
+  is_active        boolean       false = oculto en todos los menús
+
+
+================================================================================
+  FLUJO 1 — CREAR UN MENÚ NUEVO
+================================================================================
+
+Hay dos sub-casos según si la página del módulo ya existe o no.
+
+────────────────────────────────────────────────────────────────────────────────
+SUB-CASO A: El módulo ya está registrado (url ya existe en modules_bootstrap.dart)
+────────────────────────────────────────────────────────────────────────────────
+Ejemplo: agregar "Partidos" en el drawer apuntando a /matches (ya registrado).
+
+PASO 1 — Insertar en BD
+  Opción a) Vía API (recomendado en producción):
+    POST /menu
+    Body: {
+      "name": "Partidos",
+      "icon": "sports_soccer",
+      "url": "/matches",
+      "translationKey": "menu.matches",
+      "order": 3,
+      "isActive": true
+    }
+
+  Opción b) SQL directo (solo en desarrollo/local):
+    INSERT INTO menu (id, name, icon, url, translation_key, "order", is_active)
+    VALUES (gen_random_uuid(), 'Partidos', 'sports_soccer', '/matches', 'menu.matches', 3, true);
+
+PASO 2 — Agregar la clave de traducción (si es nueva)
+  En assets/translations/es.json, en.json, de.json, fr.json:
+    "menu": {
+      "matches": "Partidos"    ← ES
+      "matches": "Matches"     ← EN
+      "matches": "Spiele"      ← DE
+      "matches": "Matchs"      ← FR
+    }
+
+  Si translation_key es NULL, el frontend muestra el campo "name" directamente.
+  Usar translation_key es recomendado para apps multilenguaje.
+
+RESULTADO: Cero cambios en código Flutter.
+
+────────────────────────────────────────────────────────────────────────────────
+SUB-CASO B: Módulo nuevo (url nueva, página nueva)
+────────────────────────────────────────────────────────────────────────────────
+Ejemplo: crear el módulo "Ligas" con su propia pantalla en /leagues.
+
+PASO 1 — Crear la página Flutter
+  Archivo: lib/modules/leagues/presentation/pages/leagues_page.dart
+
+  Convención: la página recibe MenuItemModel como parámetro.
+    class LeaguesPage extends StatelessWidget {
+      final MenuItemModel item;
+      const LeaguesPage({super.key, required this.item});
+      ...
+    }
+
+PASO 2 — Registrar el módulo (UNA línea)
+  Archivo: lib/core/modules/modules_bootstrap.dart
+    ModuleRegistry.register('/leagues', (item) => LeaguesPage(item: item));
+
+PASO 3 — Insertar en BD (igual que Sub-caso A, con url '/leagues')
+
+PASO 4 — Agregar traducción en los 4 JSON (si se usa translation_key)
+  "menu": { "leagues": "Ligas" }
+
+PASO 5 — Agregar el ícono si es nuevo (opcional)
+  Archivo: lib/modules/home/data/models/menu_item_model.dart
+  En el Map _filledIcons:
+    'mi_icono': Icons.mi_icono,
+  En el Map _outlinedIcons (si tiene variante outlined):
+    'mi_icono': Icons.mi_icono_outlined,
+
+PARA APARECER EN EL BOTTOM NAV (en vez del drawer)
+  Agregar nav_order en el INSERT:
+    INSERT INTO menu (..., nav_order, ...) VALUES (..., 2, ...);
+  O vía API: incluir "navOrder": 2 en el body.
+  El Bottom Nav se construye automáticamente con todos los ítems que tienen nav_order.
+
+PARA CREAR UN SUBMENÚ (ítem con hijos)
+  Insertar el padre sin url (o url vacía) y los hijos con id_parent_menu = UUID del padre.
+  El drawer los muestra como ExpansionTile automáticamente.
+  Ejemplo:
+    INSERT INTO menu (id, name, icon, "order", is_active)
+    VALUES ('UUID-padre', 'Competencias', 'emoji_events', 1, true);
+
+    INSERT INTO menu (id, name, icon, url, id_parent_menu, "order", is_active)
+    VALUES (gen_random_uuid(), 'Ligas',   'military_tech', '/leagues',     'UUID-padre', 1, true),
+           (gen_random_uuid(), 'Torneos', 'emoji_events',  '/tournaments', 'UUID-padre', 2, true);
+
+
+================================================================================
+  FLUJO 2 — MODIFICAR UN MENÚ EXISTENTE
+================================================================================
+
+La mayoría de cambios son solo en la base de datos. El frontend los refleja
+automáticamente en el próximo getMenu().
+
+CAMBIOS QUE NO REQUIEREN CÓDIGO FLUTTER
+  ┌─────────────────────────────┬──────────────────────────────────────────────┐
+  │ Cambio                      │ SQL / API                                    │
+  ├─────────────────────────────┼──────────────────────────────────────────────┤
+  │ Renombrar                   │ UPDATE menu SET name='Nuevo nombre'          │
+  │ Cambiar clave traducción    │ UPDATE menu SET translation_key='menu.xxx'   │
+  │ Cambiar ícono               │ UPDATE menu SET icon='event'                 │
+  │ Reordenar en drawer         │ UPDATE menu SET "order"=2                    │
+  │ Mover al Bottom Nav         │ UPDATE menu SET nav_order=3                  │
+  │ Quitar del Bottom Nav       │ UPDATE menu SET nav_order=NULL               │
+  │ Desactivar (ocultar)        │ UPDATE menu SET is_active=false              │
+  │ Cambiar URL/módulo          │ UPDATE menu SET url='/nuevo-modulo'          │
+  │ Cambiar padre (submenú)     │ UPDATE menu SET id_parent_menu='UUID-padre'  │
+  └─────────────────────────────┴──────────────────────────────────────────────┘
+
+  Vía API:  PUT /menu/{id}   con el body solo con los campos a cambiar.
+
+CAMBIOS QUE SÍ REQUIEREN CÓDIGO FLUTTER
+  - Cambiar el ícono a uno que no esté en el mapa _filledIcons / _outlinedIcons
+    → Agregar la entrada en menu_item_model.dart
+
+  - Cambiar la URL a un módulo cuya página no existe
+    → Crear la página + registrar en modules_bootstrap.dart (Sub-caso B)
+
+AGREGAR NUEVA COLUMNA A LA TABLA (cambio estructural)
+  1. Crear migración Flyway: src/main/resources/db/migration/V{n}__descripcion.sql
+     Convención de nombres: V2__add_description_to_menu.sql
+  2. Agregar el campo en MenuEntity.java (getter + setter + @Column)
+  3. Agregar el campo en MenuResponse.java y MenuTreeResponse.java
+  4. Agregar el campo en CreateMenuRequest.java y UpdateMenuRequest.java (si aplica)
+  5. El mapper MapStruct lo propaga automáticamente (no requiere cambios)
+  6. Arrancar el backend → Flyway aplica la migración automáticamente
+
+
+================================================================================
+  FLUJO 3 — ELIMINAR UN MENÚ
+================================================================================
+
+El sistema soporta dos tipos de eliminación.
+
+SOFT DELETE (recomendado — preserva historial)
+  Vía API:  DELETE /menu/{id}
+  Efecto:   Pone deleted_at = NOW() y deleted_by = usuario actual.
+            El ítem deja de aparecer en el menú pero existe en la BD.
+  SQL equivalente:
+    UPDATE menu SET deleted_at = NOW() WHERE id = 'UUID';
+
+HARD DELETE (elimina físicamente)
+  Vía API:  DELETE /menu/{id}/hard
+  SQL:      DELETE FROM menu WHERE id = 'UUID';
+  Precaución: Si el ítem tiene hijos, eliminar primero los hijos
+              o actualizar su id_parent_menu a NULL.
+
+DESACTIVAR EN VEZ DE ELIMINAR (más seguro)
+  UPDATE menu SET is_active = false WHERE id = 'UUID';
+  El ítem permanece en la BD pero el frontend no lo muestra.
+  Ventaja: reversible sin perder datos.
+
+CONSIDERACIONES AL ELIMINAR
+  - Si el ítem estaba en el Bottom Nav (nav_order != NULL), desaparece automáticamente.
+  - Si era padre de submenús, los hijos quedan huérfanos (id_parent_menu apuntando
+    a un UUID que ya no existe). Reasignar o eliminar hijos primero.
+  - El código Flutter registrado en modules_bootstrap.dart para esa url
+    puede quedarse (no causa errores, simplemente nunca se invoca).
+
+
+================================================================================
+  REFERENCIA RÁPIDA
+================================================================================
+
+  ¿Qué quiero hacer?                    ¿Dónde?
+  ────────────────────────────────────── ──────────────────────────────────────
+  Nuevo menú (módulo existente)          Solo BD + traducciones JSON
+  Nuevo menú (módulo nuevo)              Página Flutter + modules_bootstrap.dart
+                                         + BD + traducciones JSON
+  Cambiar nombre / ícono / orden         Solo BD (o API)
+  Cambiar a un ícono nuevo               menu_item_model.dart + BD
+  Agregar columna a la tabla             Migración Flyway + MenuEntity + DTOs
+  Ocultar temporalmente                  is_active = false en BD
+  Eliminar de forma segura               Soft delete vía API o is_active = false
+  Agregar traducción                     assets/translations/*.json + BD
+
+  COMANDO PARA APLICAR MIGRACIONES FLYWAY
+  ./mvnw spring-boot:run
+  ./mvnw spring-boot:run "-Dspring-boot.run.profiles=dev"
+  (Flyway aplica automáticamente los archivos V{n}__.sql pendientes al arrancar)
+
+================================================================================

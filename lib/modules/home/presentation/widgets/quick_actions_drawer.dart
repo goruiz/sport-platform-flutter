@@ -109,7 +109,7 @@ class QuickActionsDrawer extends StatelessWidget {
             child: ExpansionTile(
               leading: leading,
               title: Text(
-                item.name,
+                item.displayName.tr(),
                 style: const TextStyle(
                   color: AppColors.white,
                   fontSize: 14,
@@ -148,7 +148,7 @@ class QuickActionsDrawer extends StatelessWidget {
                     ),
                   ),
                   title: Text(
-                    child.name,
+                    child.displayName.tr(),
                     style: const TextStyle(color: AppColors.white, fontSize: 13),
                   ),
                   subtitle: child.description != null &&
@@ -174,7 +174,7 @@ class QuickActionsDrawer extends StatelessWidget {
               const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
           leading: leading,
           title: Text(
-            item.name,
+            item.displayName.tr(),
             style: const TextStyle(
               color: AppColors.white,
               fontSize: 14,

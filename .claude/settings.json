@@ -16,10 +16,20 @@
       "Bash(Format-List FullName)",
       "Bash(dart analyze *)",
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\lib\" -Recurse -Filter \"*.dart\")",
-      "PowerShell(head -50)"
+      "PowerShell(head -50)",
+      "Bash(ls \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\backend\")",
+      "Read(//c/Users/WALDO/Documents/Proyectos/Plataforma deportiva/backend/**)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\lib\\\\modules\\\\matches\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\lib\\\\modules\\\\home\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\lib\\\\modules\\\\leagues\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName })"
     ],
     "additionalDirectories": [
-      "c:\\Users\\admseneca\\Documents\\Proyectos\\sports-platform\\Frontend\\sport_platform\\assets"
+      "c:\\Users\\admseneca\\Documents\\Proyectos\\sports-platform\\Frontend\\sport_platform\\assets",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\menu\\domain\\entities",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\menu\\presentation\\responses\\MenuResponse",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\menu\\presentation\\requests\\CreateMenuRequest",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\menu\\presentation\\requests\\UpdateMenuRequest",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\resources\\db\\migration"
     ]
   }
 }

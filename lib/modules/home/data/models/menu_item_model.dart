@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class MenuItemModel {
   final String id;
   final String name;
+  final String? translationKey;
   final String? description;
   final String? icon;
   final String? url;
@@ -14,6 +15,7 @@ class MenuItemModel {
   const MenuItemModel({
     required this.id,
     required this.name,
+    this.translationKey,
     this.description,
     this.icon,
     this.url,
@@ -22,6 +24,10 @@ class MenuItemModel {
     this.idParentMenu,
     this.children = const [],
   });
+
+  /// Returns the translation key when available, otherwise the raw name.
+  /// Call .tr() on this value to get the localized string.
+  String get displayName => translationKey ?? name;
 
   factory MenuItemModel.fromJson(Map<String, dynamic> json) {
     // Handles both nested (submenus/children arrays) and flat (id_parent_menu) responses
@@ -37,6 +43,7 @@ class MenuItemModel {
     return MenuItemModel(
       id: json['id'] as String,
       name: json['name'] as String? ?? '',
+      translationKey: json['translationKey'] as String?,
       description: json['description'] as String?,
       icon: json['icon'] as String?,
       url: json['url'] as String?,
@@ -50,6 +57,7 @@ class MenuItemModel {
   MenuItemModel copyWith({List<MenuItemModel>? children}) => MenuItemModel(
         id: id,
         name: name,
+        translationKey: translationKey,
         description: description,
         icon: icon,
         url: url,
@@ -63,57 +71,58 @@ class MenuItemModel {
   bool get isNavItem   => navOrder != null && navOrder! > 0;
   bool get isTopLevel  => idParentMenu == null;
 
-  // Outlined variant for nav inactive state; falls back to filled when none exists
-  static IconData iconOutlinedFromString(String? name) {
-    switch (name) {
-      case 'home':        return Icons.home_outlined;
-      case 'leaderboard': return Icons.leaderboard_outlined;
-      case 'person':      return Icons.person_outline;
-      case 'group':       return Icons.group_outlined;
-      case 'event':       return Icons.event_outlined;
-      case 'notifications': return Icons.notifications_outlined;
-      case 'settings':    return Icons.settings_outlined;
-      case 'search':      return Icons.search_outlined;
-      case 'star':        return Icons.star_outline;
-      case 'flag':        return Icons.flag_outlined;
-      case 'shield':      return Icons.shield_outlined;
-      default:            return iconFromString(name);
-    }
-  }
+  static const Map<String, IconData> _filledIcons = {
+    'home':              Icons.home,
+    'leaderboard':       Icons.leaderboard,
+    'person':            Icons.person,
+    'group':             Icons.group,
+    'group_add':         Icons.group_add,
+    'event':             Icons.event,
+    'emoji_events':      Icons.emoji_events,
+    'trophy':            Icons.emoji_events,
+    'military_tech':     Icons.military_tech,
+    'notifications':     Icons.notifications,
+    'settings':          Icons.settings,
+    'search':            Icons.search,
+    'star':              Icons.star,
+    'add':               Icons.add,
+    'flag':              Icons.flag,
+    'shield':            Icons.shield,
+    'message':           Icons.message,
+    'chat':              Icons.chat,
+    'location_on':       Icons.location_on,
+    'bar_chart':         Icons.bar_chart,
+    'timeline':          Icons.timeline,
+    'calendar_today':    Icons.calendar_today,
+    'fitness_center':    Icons.fitness_center,
+    'directions_run':    Icons.directions_run,
+    'login':             Icons.login,
+    'workspace_premium': Icons.workspace_premium,
+    'sports':            Icons.sports,
+    'sports_soccer':     Icons.sports_soccer,
+    'sports_basketball': Icons.sports_basketball,
+    'sports_tennis':     Icons.sports_tennis,
+    'sports_volleyball': Icons.sports_volleyball,
+  };
 
-  static IconData iconFromString(String? name) {
-    switch (name) {
-      case 'group_add': return Icons.group_add;
-      case 'emoji_events': return Icons.emoji_events;
-      case 'sports_soccer': return Icons.sports_soccer;
-      case 'workspace_premium': return Icons.workspace_premium;
-      case 'login': return Icons.login;
-      case 'sports': return Icons.sports;
-      case 'home': return Icons.home;
-      case 'group': return Icons.group;
-      case 'event': return Icons.event;
-      case 'leaderboard': return Icons.leaderboard;
-      case 'person': return Icons.person;
-      case 'settings': return Icons.settings;
-      case 'star': return Icons.star;
-      case 'add': return Icons.add;
-      case 'calendar_today': return Icons.calendar_today;
-      case 'notifications': return Icons.notifications;
-      case 'search': return Icons.search;
-      case 'message': return Icons.message;
-      case 'chat': return Icons.chat;
-      case 'location_on': return Icons.location_on;
-      case 'bar_chart': return Icons.bar_chart;
-      case 'timeline': return Icons.timeline;
-      case 'shield': return Icons.shield;
-      case 'flag': return Icons.flag;
-      case 'trophy': return Icons.emoji_events;
-      case 'fitness_center': return Icons.fitness_center;
-      case 'directions_run': return Icons.directions_run;
-      case 'sports_basketball': return Icons.sports_basketball;
-      case 'sports_tennis': return Icons.sports_tennis;
-      case 'sports_volleyball': return Icons.sports_volleyball;
-      default: return Icons.sports;
-    }
-  }
+  static const Map<String, IconData> _outlinedIcons = {
+    'home':          Icons.home_outlined,
+    'leaderboard':   Icons.leaderboard_outlined,
+    'person':        Icons.person_outline,
+    'group':         Icons.group_outlined,
+    'event':         Icons.event_outlined,
+    'notifications': Icons.notifications_outlined,
+    'settings':      Icons.settings_outlined,
+    'search':        Icons.search_outlined,
+    'star':          Icons.star_outline,
+    'flag':          Icons.flag_outlined,
+    'shield':        Icons.shield_outlined,
+    'military_tech': Icons.military_tech_outlined,
+  };
+
+  static IconData iconFromString(String? name) =>
+      _filledIcons[name] ?? Icons.sports;
+
+  static IconData iconOutlinedFromString(String? name) =>
+      _outlinedIcons[name] ?? iconFromString(name);
 }

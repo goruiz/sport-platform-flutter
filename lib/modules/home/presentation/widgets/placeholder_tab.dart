@@ -31,7 +31,7 @@ class PlaceholderTab extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              item.name.tr(),
+              item.displayName.tr(),
               style: const TextStyle(
                 color: AppColors.white,
                 fontSize: 22,

@@ -1,0 +1,549 @@
+================================================================================
+  GUÍA DE ARQUITECTURA - PLATAFORMA DEPORTIVA (FRONTEND)
+  Framework: Flutter  |  Patrón: Clean Architecture + Module Registry
+================================================================================
+
+ÍNDICE
+  1. Visión General
+  2. Estructura de Capas
+  3. Capa Core
+  4. Sistema de Módulos
+  5. Módulos de la Aplicación
+  6. Capa Shared
+  7. Cómo crear un nuevo módulo
+  8. Convenciones y Reglas
+
+================================================================================
+1. VISIÓN GENERAL
+================================================================================
+
+La aplicación sigue Clean Architecture adaptada a Flutter, organizada en
+módulos independientes y cohesivos. Cada módulo agrupa toda su lógica
+verticalmente (datos, dominio, presentación) sin depender de otros módulos.
+
+La navegación es 100% dinámica: el backend envía la estructura del menú y el
+frontend construye el Bottom Navigation Bar, el Drawer y las rutas en tiempo
+de ejecución sin cambios de código.
+
+Flujo de arranque:
+  main.dart
+    → registerModules()           (registra URL → Widget en ModuleRegistry)
+    → verifica token de sesión
+    → muestra LoginPage o HomePage
+
+Flujo de navegación:
+  Backend /menu
+    → MenuService (datasource)
+    → MenuItemModel (model)
+    → HomePage (presentation)
+    → AppRouteFactory → ModuleRegistry → Widget del módulo
+
+================================================================================
+2. ESTRUCTURA DE CAPAS
+================================================================================
+
+lib/
+├── core/          → Infraestructura compartida por toda la app
+├── modules/       → Funcionalidades de negocio (un directorio por módulo)
+└── shared/        → Widgets y utilidades reutilizables entre módulos
+
+Cada módulo dentro de lib/modules/ sigue esta estructura fija:
+
+  nombre_modulo/
+  ├── application/           → Gestión de estado (BLoC / Cubit)
+  │   ├── bloc/              → BLoC completo (evento → estado)
+  │   ├── cubit/             → Cubit simple (método → estado)
+  │   └── state/             → Clases de estado (XState, XLoading, XError...)
+  ├── data/                  → Comunicación con fuentes externas
+  │   ├── datasource/        → Servicios HTTP (llaman a DioClient)
+  │   ├── mapper/            → Convierte Model ↔ Entity
+  │   ├── models/            → DTOs: fromJson / toJson / copyWith
+  │   └── repositories/      → Implementaciones concretas de los repos
+  ├── domain/                → Lógica de negocio pura (sin dependencias externas)
+  │   ├── entities/          → Objetos de dominio inmutables
+  │   ├── repositories/      → Contratos (abstract classes)
+  │   └── usecases/          → Casos de uso: una clase, un método execute()
+  └── presentation/          → UI Flutter
+      ├── pages/             → Pantallas completas (Scaffold)
+      └── widgets/           → Componentes reutilizables del módulo
+
+Capas adicionales en módulos con necesidades especiales (ej. home):
+  presentation/
+  ├── constants/   → Valores constantes de UI (colores específicos del módulo)
+  └── enums/       → Enumeraciones de presentación
+
+Regla de dependencias (solo en esta dirección):
+  presentation → application → domain ← data
+
+================================================================================
+3. CAPA CORE
+================================================================================
+
+lib/core/ contiene la infraestructura que usan TODOS los módulos.
+No contiene lógica de negocio.
+
+  config/
+    app_config.dart          → URL base de la API, environment flags
+
+  constants/
+    app_constants.dart       → Constantes globales de la app
+    strings_constants/       → Claves de traducción organizadas por sección
+      app_strings_constants.dart
+      auth_strings_constants/
+        login_strings_constants.dart
+        register_strings_constants.dart
+      home_strings_constants.dart
+      logout_strings_constants.dart
+      profile_strings_constants.dart
+      social_strings_constants.dart
+
+  modules/
+    module_registry.dart     → Mapa URL → Widget Function(MenuItemModel)
+    modules_bootstrap.dart   → Registra todos los módulos al arrancar
+    MENU_GUIDE.txt           → Guía del sistema de menú dinámico
+    ARCHITECTURE_GUIDE.txt   → Este archivo
+
+  network/
+    dio_client.dart          → Cliente HTTP centralizado (Dio + interceptores)
+    api_endpoints.dart       → Todas las URLs del backend en un solo lugar
+    key_format_interceptor.dart → Normaliza las keys del JSON de respuesta
+
+  routes/
+    app_route_factory.dart   → Navega a módulos usando ModuleRegistry
+
+  services/
+    auth_storage.dart        → Persistencia del token JWT (SharedPreferences)
+
+  theme/
+    app_colors.dart          → Paleta de colores global (AppColors.X)
+    app_theme.dart           → ThemeData de la aplicación
+
+  errors/                    → (Reservado) Clases de error globales
+
+  utils/                     → (Reservado) Extensiones y helpers globales
+
+--- module_registry.dart ---------------------------------------------------
+
+  Permite registrar y resolver módulos por URL sin acoplar páginas entre sí.
+
+  ModuleRegistry.register('/ligas', (item) => LeaguesPage(item: item));
+
+  ModuleRegistry.buildTab(item)   → Widget sin Scaffold (para Bottom Nav)
+  ModuleRegistry.buildPage(item)  → Widget con Scaffold (para navegación push)
+
+  Si la URL no está registrada, devuelve PlaceholderTab (pantalla vacía).
+
+--- api_endpoints.dart ------------------------------------------------------
+
+  class ApiEndpoints {
+    static String get baseUrl => AppConfig.baseUrl;
+
+    // Auth
+    static const String login         = '/users/auth/login';
+    static const String register      = '/users/auth/register';
+    static const String logout        = '/users/auth/logout';
+    static const String refreshToken  = '/users/auth/refresh';
+
+    // Recursos
+    static const String users    = '/users';
+    static const String teams    = '/teams';
+    static const String events   = '/events';
+    static const String matches  = '/matches';
+    static const String menu     = '/menu';
+    static const String rankings = '/rankings';
+    static const String reports  = '/reports';
+    static const String leagues  = '/ligas';
+
+    // Endpoints con ID
+    static String leagueById(String id) => '/ligas/$id';
+  }
+
+  REGLA: Nunca escribir URLs como strings literales en los servicios.
+  Siempre referenciar ApiEndpoints.X
+
+================================================================================
+4. SISTEMA DE MÓDULOS DINÁMICO
+================================================================================
+
+Ver MENU_GUIDE.txt para la referencia completa del sistema de menú.
+
+Resumen del flujo:
+
+  1. Al iniciar la app, registerModules() (modules_bootstrap.dart) registra
+     cada módulo asociando su URL con su widget constructor.
+
+  2. HomePage carga el menú desde el backend via MenuService.
+
+  3. MenuService separa los items:
+       navOrder != null  →  _navItems  (Bottom Navigation Bar)
+       navOrder == null  →  _menuItems (Drawer / Carousel de acciones rápidas)
+
+  4. Cuando el usuario toca un item de navegación:
+       AppRouteFactory.tabForItem(item)
+         → ModuleRegistry.buildTab(item)
+         → Widget del módulo registrado
+
+  5. Cuando el usuario toca un item del menú/drawer:
+       AppRouteFactory.navigateTo(context, item)
+         → ModuleRegistry.buildPage(item)
+         → Navigator.push con el Widget del módulo
+
+  IMPORTANTE: Agregar un módulo existente al menú solo requiere insertar
+  una fila en la base de datos. No se toca código.
+
+================================================================================
+5. MÓDULOS DE LA APLICACIÓN
+================================================================================
+
+--------------------------------------------------------------------------------
+MODULE: auth
+Path:   lib/modules/auth/
+URLs:   /users/auth/login | /users/auth/register
+--------------------------------------------------------------------------------
+
+  Propósito: Autenticación del usuario (login y registro).
+  Estado actual: Implementado con UI completa.
+
+  Estructura implementada:
+    presentation/pages/
+      login_page.dart        → Pantalla de inicio de sesión
+      register_page.dart     → Pantalla de registro
+
+    presentation/widgets/
+      auth_logo.dart         → Logo animado de la app
+      login_body.dart        → Formulario de login
+      register_body.dart     → Formulario de registro
+
+  Notas:
+  - No está registrado en ModuleRegistry (la navegación es directa desde main).
+  - El token JWT se persiste en auth_storage.dart (core/services).
+  - Redirige a HomePage al autenticarse correctamente.
+  - Las capas application/, data/ y domain/ están scaffoldeadas para cuando
+    se migre la lógica de auth a BLoC/Cubit.
+
+--------------------------------------------------------------------------------
+MODULE: home
+Path:   lib/modules/home/
+--------------------------------------------------------------------------------
+
+  Propósito: Shell principal de la aplicación post-login. Orquesta la
+  navegación entre módulos, carga el menú dinámico y gestiona el layout
+  global (Bottom Nav + Drawer/Carousel).
+
+  Estructura implementada:
+    data/
+      datasource/menu_service.dart   → Carga el menú desde /menu
+      models/menu_item_model.dart    → DTO del item de menú (con jerarquía)
+
+    presentation/
+      constants/menu_colors.dart     → Colores específicos del menú
+      enums/menu_style.dart          → HomeMenuStyle { carousel, drawer }
+      pages/home_page.dart           → Página principal con AppBar, Drawer,
+                                        Bottom Nav y tab body dinámico
+      widgets/
+        home_tab.dart                → Contenido del tab "Home"
+        greeting_banner.dart         → Saludo dinámico según hora del día
+        quick_action_card.dart       → Tarjeta de acción rápida individual
+        quick_actions_carousel.dart  → Carrusel paginado de acciones rápidas
+        quick_actions_drawer.dart    → Drawer lateral con items del menú
+        drawer_hint_card.dart        → Hint para abrir el drawer
+        children_sheet.dart          → Bottom sheet con sub-items del menú
+        section_header.dart          → Cabecera de sección reutilizable
+        placeholder_tab.dart         → Placeholder para tabs sin contenido
+        activity_card.dart           → Tarjeta de actividad reciente
+        empty_card.dart              → Estado vacío genérico
+        greeting_banner.dart         → Banner de bienvenida
+        invitations_card.dart        → Invitaciones pendientes
+        next_event_card.dart         → Próximo evento del usuario
+        teams_card.dart              → Equipos activos del usuario
+
+  MenuItemModel - propiedades clave:
+    displayName   → translationKey ?? name (para i18n)
+    hasChildren   → children.isNotEmpty
+    isNavItem     → navOrder != null && navOrder > 0
+    isTopLevel    → idParentMenu == null
+    iconFromString(name)         → IconData filled
+    iconOutlinedFromString(name) → IconData outlined
+
+--------------------------------------------------------------------------------
+MODULE: leagues
+Path:   lib/modules/leagues/
+URL:    /ligas
+--------------------------------------------------------------------------------
+
+  Propósito: CRUD completo de ligas deportivas.
+  Estado actual: Totalmente implementado (Crear, Leer, Actualizar, Eliminar).
+
+  Estructura implementada:
+    data/
+      datasource/league_service.dart  → getAll, create, update, delete
+      models/league_model.dart        → DTO: id, name, description,
+                                         isActive, createdAt, updatedAt
+
+    presentation/
+      pages/leagues_page.dart         → Lista con estados loading/error/empty,
+                                         pull-to-refresh, FAB para crear
+      widgets/
+        league_card.dart              → Item de lista con botones edit/delete
+        league_form_sheet.dart        → Modal bottom sheet create/edit
+
+  Patrones de estado en LeaguesPage:
+    _loading: bool    → muestra CircularProgressIndicator
+    _error: String?   → muestra _ErrorView con retry
+    _leagues.isEmpty  → muestra _EmptyView con botón crear
+
+  Registro en modules_bootstrap.dart:
+    ModuleRegistry.register('/ligas', (item) => LeaguesPage(item: item));
+
+--------------------------------------------------------------------------------
+MODULE: matches
+Path:   lib/modules/matches/
+URL:    /matches
+--------------------------------------------------------------------------------
+
+  Propósito: Gestión de partidos deportivos.
+  Estado actual: Scaffoldeado. Placeholder activo, lógica pendiente.
+
+  Estructura implementada:
+    presentation/pages/matches_page.dart  → PlaceholderTab
+
+  Próximos pasos sugeridos:
+    1. Crear MatchModel en data/models/
+    2. Crear MatchService en data/datasource/
+    3. Implementar MatchesPage con lista de partidos
+    4. Agregar filtros por fecha, equipo y liga
+
+--------------------------------------------------------------------------------
+MODULE: teams
+Path:   lib/modules/teams/
+URL:    /teams
+--------------------------------------------------------------------------------
+
+  Propósito: Gestión de equipos deportivos.
+  Estado actual: Scaffoldeado. Placeholder activo, lógica pendiente.
+
+  Estructura implementada:
+    presentation/pages/teams_page.dart  → PlaceholderTab
+
+  Próximos pasos sugeridos:
+    1. Crear TeamModel en data/models/
+    2. Crear TeamService en data/datasource/
+    3. Implementar TeamsPage (similar a LeaguesPage como referencia)
+
+--------------------------------------------------------------------------------
+MODULE: events
+Path:   lib/modules/events/
+URL:    /events
+--------------------------------------------------------------------------------
+
+  Propósito: Gestión de eventos deportivos (torneos, competencias).
+  Estado actual: Scaffoldeado. Placeholder activo, lógica pendiente.
+
+  Estructura implementada:
+    presentation/pages/events_page.dart  → PlaceholderTab
+
+--------------------------------------------------------------------------------
+MODULE: rankings
+Path:   lib/modules/rankings/
+URL:    /rankings
+--------------------------------------------------------------------------------
+
+  Propósito: Clasificaciones y tablas de posiciones.
+  Estado actual: Scaffoldeado. Placeholder activo, lógica pendiente.
+
+  Estructura implementada:
+    presentation/pages/rankings_page.dart  → PlaceholderTab
+
+--------------------------------------------------------------------------------
+MODULE: reports
+Path:   lib/modules/reports/
+URL:    /reports
+--------------------------------------------------------------------------------
+
+  Propósito: Reportes y estadísticas de la plataforma.
+  Estado actual: Scaffoldeado. Placeholder activo, lógica pendiente.
+
+  Estructura implementada:
+    presentation/pages/reports_page.dart  → PlaceholderTab
+
+--------------------------------------------------------------------------------
+MODULE: users
+Path:   lib/modules/users/
+URL:    /profile
+--------------------------------------------------------------------------------
+
+  Propósito: Perfil de usuario y completar registro.
+  Estado actual: Parcialmente implementado.
+
+  Estructura implementada:
+    domain/entities/user_entity.dart         → Entidad de dominio del usuario
+
+    presentation/pages/
+      profile_page.dart                      → Perfil del usuario autenticado
+      complete_profile_page.dart             → Flujo de completar perfil
+
+    presentation/widgets/
+      complete_profile_body.dart             → Formulario de perfil completo
+
+  Notas:
+  - Es el único módulo con una entidad de dominio implementada.
+  - Sirve como referencia para implementar domain/entities/ en otros módulos.
+
+================================================================================
+6. CAPA SHARED
+================================================================================
+
+lib/shared/ contiene componentes reutilizables por CUALQUIER módulo.
+No pertenece a ningún módulo específico.
+
+  widgets/
+    app_snackbar.dart         → Snackbar estandarizado (success / error)
+    gradient_background.dart  → Fondo degradado de la app
+    language_selector.dart    → Selector de idioma en AppBar
+    logout_button.dart        → Botón de cierre de sesión
+    social_button.dart        → Botón para autenticación social (Google, etc.)
+    sport_text_field.dart     → TextField estilizado de la app
+
+  enums/         → (Reservado) Enums compartidos entre módulos
+  extensions/    → (Reservado) Extension methods (String, DateTime, etc.)
+  models/        → (Reservado) Modelos compartidos entre módulos
+  services/      → (Reservado) Servicios transversales
+
+  REGLA: Un widget va en shared/ solo si lo usan 2 o más módulos distintos.
+  Si solo lo usa un módulo, va en presentation/widgets/ de ese módulo.
+
+================================================================================
+7. CÓMO CREAR UN NUEVO MÓDULO
+================================================================================
+
+CASO A: El módulo existe en el código pero falta en el menú del backend
+  → Solo se inserta en la base de datos. No se toca código.
+  → Ver MENU_GUIDE.txt, sección "Caso A".
+
+CASO B: Módulo completamente nuevo
+  Paso 1 - Crear la estructura de carpetas:
+    lib/modules/nuevo_modulo/
+      application/bloc/
+      application/cubit/
+      application/state/
+      data/datasource/
+      data/mapper/
+      data/models/
+      data/repositories/
+      domain/entities/
+      domain/repositories/
+      domain/usecases/
+      presentation/pages/
+      presentation/widgets/
+
+  Paso 2 - Crear el Model (data/models/nuevo_modulo_model.dart):
+    class NuevoModuloModel {
+      final String id;
+      // ... campos
+
+      factory NuevoModuloModel.fromJson(Map<String, dynamic> json) => ...
+      Map<String, dynamic> toJson() => ...
+      NuevoModuloModel copyWith({...}) => ...
+    }
+
+  Paso 3 - Crear el Service (data/datasource/nuevo_modulo_service.dart):
+    class NuevoModuloService {
+      final DioClient _client = DioClient();
+
+      Future<List<NuevoModuloModel>> getAll() async {
+        final response = await _client.get(ApiEndpoints.nuevoModulo);
+        final List<dynamic> list = response.data is List
+            ? response.data
+            : response.data['data'] as List;
+        return list.map((e) => NuevoModuloModel.fromJson(e)).toList();
+      }
+    }
+
+  Paso 4 - Agregar el endpoint (core/network/api_endpoints.dart):
+    static const String nuevoModulo = '/nuevo-modulo';
+
+  Paso 5 - Crear la Page (presentation/pages/nuevo_modulo_page.dart):
+    class NuevoModuloPage extends StatefulWidget {
+      final MenuItemModel item;    // OBLIGATORIO: recibir el item del menú
+      const NuevoModuloPage({super.key, required this.item});
+      ...
+    }
+
+  Paso 6 - Registrar el módulo (core/modules/modules_bootstrap.dart):
+    ModuleRegistry.register(
+      '/nuevo-modulo',
+      (item) => NuevoModuloPage(item: item),
+    );
+
+  Paso 7 - Agregar traducciones (assets/translations/{es,en,de,fr}.json):
+    "nuevo_modulo": {
+      "title": "Nuevo Módulo",
+      "no_items": "No hay elementos",
+      ...
+    }
+
+  Paso 8 - Insertar en la base de datos del backend (ver MENU_GUIDE.txt).
+
+MÓDULO DE REFERENCIA: leagues
+  El módulo leagues es el más completo y mejor referencia para implementar
+  un CRUD estándar con todos los estados (loading, error, empty, list).
+
+================================================================================
+8. CONVENCIONES Y REGLAS
+================================================================================
+
+NOMENCLATURA
+  Archivos:       snake_case         → league_service.dart
+  Clases:         PascalCase         → LeagueService
+  Variables:      camelCase          → _isLoading
+  Constantes:     UPPER_SNAKE_CASE   → AppColors.primaryDark
+  Keys de i18n:   modulo.clave       → 'leagues.no_leagues'
+
+IMPORTS
+  Siempre usar imports absolutos con el package name:
+    ✓ import 'package:sport_platform/modules/leagues/data/models/league_model.dart';
+    ✗ import '../../../modules/leagues/data/models/league_model.dart';
+
+  Excepción aceptada: imports relativos dentro del mismo directorio.
+
+ESTADO DE UI (en Pages sin BLoC)
+  Patrón estándar con setState():
+    bool _loading = true;
+    String? _error;
+    List<T> _items = [];
+
+  Los tres estados se mapean a tres widgets:
+    _loading == true   → CircularProgressIndicator
+    _error != null     → _ErrorView(message, onRetry)
+    _items.isEmpty     → _EmptyView(onAdd)
+    else               → ListView / RefreshIndicator
+
+HTTP RESPONSES
+  El backend puede devolver la lista directamente o envuelta:
+    final List<dynamic> list = raw is List ? raw : raw['data'] as List;
+
+  Siempre manejar ambos formatos en los datasources.
+
+PÁGINAS
+  - Toda página de módulo DEBE recibir MenuItemModel como parámetro.
+  - El título del AppBar usa: widget.item.displayName.tr()
+  - El Scaffold usa backgroundColor: AppColors.backgroundEnd
+
+TRADUCCIONES
+  Nunca hardcodear strings de UI. Usar .tr() de easy_localization.
+  Agregar la clave en los 4 archivos: es.json, en.json, de.json, fr.json.
+
+COLORES
+  Siempre usar AppColors.X. Nunca usar Color(0xFF...) directamente en widgets,
+  excepto en casos muy específicos y documentados.
+
+WIDGETS COMPARTIDOS
+  Antes de crear un widget en un módulo, verificar si ya existe en:
+    lib/shared/widgets/
+    lib/modules/home/presentation/widgets/ (widgets genéricos como EmptyCard)
+
+================================================================================
+  Última actualización: 2026-05-25
+  Proyecto: Plataforma Deportiva - Frontend
+  Autor: Equipo de Desarrollo
+================================================================================

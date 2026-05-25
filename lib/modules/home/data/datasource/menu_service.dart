@@ -32,28 +32,16 @@ class MenuService {
         .map((e) => MenuItemModel.fromJson(e as Map<String, dynamic>))
         .toList();
 
+    // The API already returns a fully nested structure: submenus are embedded
+    // inside each parent's "submenus" array. MenuItemModel.fromJson handles the
+    // nesting recursively, so no manual tree-building is needed here.
     final navItems = all
         .where((i) => i.isNavItem)
         .toList()
       ..sort((a, b) => a.navOrder!.compareTo(b.navOrder!));
 
-    final nonNav = all.where((i) => !i.isNavItem).toList();
-    final childrenMap = <String, List<MenuItemModel>>{};
-    for (final item in nonNav) {
-      if (item.idParentMenu != null) {
-        childrenMap.putIfAbsent(item.idParentMenu!, () => []).add(item);
-      }
-    }
-
-    MenuItemModel withChildren(MenuItemModel item) {
-      final kids = (childrenMap[item.id] ?? [])
-        ..sort((a, b) => a.order.compareTo(b.order));
-      return item.copyWith(children: kids.map(withChildren).toList());
-    }
-
-    final menuItems = nonNav
-        .where((i) => i.isTopLevel)
-        .map(withChildren)
+    final menuItems = all
+        .where((i) => !i.isNavItem)
         .toList()
       ..sort((a, b) => a.order.compareTo(b.order));
 

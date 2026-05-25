@@ -33,4 +33,8 @@ class ApiEndpoints {
 
   // Reports
   static const String reports = '/reports';
+
+  // Leagues
+  static const String leagues = '/ligas';
+  static String leagueById(String id) => '/ligas/$id';
 }

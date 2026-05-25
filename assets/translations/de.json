@@ -117,5 +117,46 @@
   "settings": {
     "select_language": "Sprache auswählen",
     "language_tooltip": "Sprache ändern"
+  },
+  "leagues": {
+    "title": "Ligen",
+    "new_league": "Neue Liga",
+    "edit_league": "Liga bearbeiten",
+    "delete_league": "Liga löschen",
+    "confirm_delete": "Sind Sie sicher, dass Sie \"{0}\" löschen möchten?",
+    "name": "Name",
+    "description": "Beschreibung",
+    "is_active": "Liga aktiv",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "no_leagues": "Keine Ligen",
+    "no_leagues_subtitle": "Erstellen Sie die erste Liga, um zu beginnen",
+    "name_required": "Name ist erforderlich",
+    "error_load": "Fehler beim Laden der Ligen. Bitte versuchen Sie es erneut.",
+    "error_save": "Fehler beim Speichern der Liga.",
+    "error_delete": "Fehler beim Löschen der Liga.",
+    "success_created": "Liga erfolgreich erstellt",
+    "success_updated": "Liga erfolgreich aktualisiert",
+    "success_deleted": "Liga erfolgreich gelöscht",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "retry": "Erneut versuchen"
+  },
+  "menu": {
+    "home": "Startseite",
+    "rankings": "Ranglisten",
+    "profile": "Profil",
+    "leagues": {
+      "title": "Ligen",
+      "create_league": "Liga erstellen",
+      "tooltip": "Ligen anzeigen"
+    },
+    "tournaments": {
+      "title": "Turniere",
+      "create_tournament": "Turnier erstellen",
+      "tooltip": "Turniere anzeigen"
+    }
   }
 }

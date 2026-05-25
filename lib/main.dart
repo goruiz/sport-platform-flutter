@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
+import 'package:sport_platform/core/modules/modules_bootstrap.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_theme.dart';
@@ -10,6 +11,7 @@ import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  registerModules();
   runApp(
     EasyLocalization(
       supportedLocales: const [
