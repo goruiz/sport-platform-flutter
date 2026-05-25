@@ -120,13 +120,24 @@
   },
   "leagues": {
     "title": "Leagues",
+    "tab_mine": "My leagues",
+    "tab_all": "All",
+    "new_item": "New league",
+    "edit_item": "Edit league",
+    "delete_item": "Delete league",
+    "no_items": "No leagues",
+    "no_items_subtitle": "Create the first league to get started",
+    "no_items_mine": "You have no leagues yet",
+    "no_items_mine_subtitle": "Create your first league with the + button",
     "new_league": "New league",
     "edit_league": "Edit league",
     "delete_league": "Delete league",
     "confirm_delete": "Are you sure you want to delete \"{0}\"?",
     "name": "Name",
-    "description": "Description",
-    "is_active": "Active league",
+    "format": "Format",
+    "status": "Status",
+    "start_date": "Start date",
+    "end_date": "End date",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -134,14 +145,21 @@
     "no_leagues": "No leagues",
     "no_leagues_subtitle": "Create the first league to get started",
     "name_required": "Name is required",
+    "format_required": "Format is required",
+    "status_required": "Status is required",
+    "start_date_required": "Start date is required",
+    "end_date_required": "End date is required",
+    "date_order_error": "End date must be after start date",
     "error_load": "Error loading leagues. Please try again.",
     "error_save": "Error saving league.",
     "error_delete": "Error deleting league.",
     "success_created": "League created successfully",
     "success_updated": "League updated successfully",
     "success_deleted": "League deleted successfully",
-    "active": "Active",
-    "inactive": "Inactive",
+    "status_active": "Active",
+    "status_upcoming": "Upcoming",
+    "status_finished": "Finished",
+    "status_cancelled": "Cancelled",
     "retry": "Retry"
   },
   "menu": {
@@ -161,7 +179,18 @@
   },
     "events": {
     "event_league": {
-      "title": "League"
-    }
+      "name": "League",
+      "description": "League"
+    },
+    "status_active": "Active",
+    "status_upcoming": "Upcoming",
+    "status_finished": "Finished",
+    "status_cancelled": "Cancelled"
+  },
+  "common": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "retry": "Retry",
+    "create": "Create"
   }
 }

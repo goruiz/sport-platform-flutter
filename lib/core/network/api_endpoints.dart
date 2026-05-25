@@ -20,6 +20,7 @@ class ApiEndpoints {
   // Events
   static const String events = '/events';
   static String eventById(String id) => '/events/$id';
+  static String eventsByType(String typeId) => '/events/by-event-type/$typeId';
 
   // Matches
   static const String matches = '/matches';

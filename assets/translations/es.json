@@ -120,13 +120,24 @@
   },
   "leagues": {
     "title": "Ligas",
+    "tab_mine": "Mis ligas",
+    "tab_all": "Todas",
+    "new_item": "Nueva liga",
+    "edit_item": "Editar liga",
+    "delete_item": "Eliminar liga",
+    "no_items": "Sin ligas",
+    "no_items_subtitle": "Crea la primera liga para comenzar",
+    "no_items_mine": "Aún no tienes ligas",
+    "no_items_mine_subtitle": "Crea tu primera liga con el botón +",
     "new_league": "Nueva liga",
     "edit_league": "Editar liga",
     "delete_league": "Eliminar liga",
     "confirm_delete": "¿Estás seguro de que deseas eliminar \"{0}\"?",
     "name": "Nombre",
-    "description": "Descripción",
-    "is_active": "Liga activa",
+    "format": "Formato",
+    "status": "Estado",
+    "start_date": "Fecha de inicio",
+    "end_date": "Fecha de fin",
     "save": "Guardar",
     "cancel": "Cancelar",
     "delete": "Eliminar",
@@ -134,14 +145,21 @@
     "no_leagues": "Sin ligas",
     "no_leagues_subtitle": "Crea la primera liga para comenzar",
     "name_required": "El nombre es requerido",
+    "format_required": "El formato es requerido",
+    "status_required": "El estado es requerido",
+    "start_date_required": "La fecha de inicio es requerida",
+    "end_date_required": "La fecha de fin es requerida",
+    "date_order_error": "La fecha de fin debe ser posterior al inicio",
     "error_load": "Error al cargar las ligas. Intenta de nuevo.",
     "error_save": "Error al guardar la liga.",
     "error_delete": "Error al eliminar la liga.",
     "success_created": "Liga creada exitosamente",
     "success_updated": "Liga actualizada exitosamente",
     "success_deleted": "Liga eliminada exitosamente",
-    "active": "Activa",
-    "inactive": "Inactiva",
+    "status_active": "Activa",
+    "status_upcoming": "Por iniciar",
+    "status_finished": "Finalizada",
+    "status_cancelled": "Cancelada",
     "retry": "Reintentar"
   },
   "menu": {
@@ -161,7 +179,18 @@
   },
   "events": {
     "event_league": {
-      "title": "Liga"
-    }
+      "name": "Liga",
+      "description": "Liga"
+    },
+    "status_active": "Activa",
+    "status_upcoming": "Por iniciar",
+    "status_finished": "Finalizada",
+    "status_cancelled": "Cancelada"
+  },
+  "common": {
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "retry": "Reintentar",
+    "create": "Crear"
   }
 }

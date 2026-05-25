@@ -21,7 +21,9 @@
       "Read(//c/Users/WALDO/Documents/Proyectos/Plataforma deportiva/backend/**)",
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\lib\\\\modules\\\\matches\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName })",
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\lib\\\\modules\\\\home\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName })",
-      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\lib\\\\modules\\\\leagues\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName })"
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\lib\\\\modules\\\\leagues\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName })",
+      "Bash(Remove-Item -Recurse -Force \"c:/Users/WALDO/Documents/Proyectos/Plataforma deportiva/frontend/lib/modules/leagues\")",
+      "Bash(Write-Output \"Done\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\admseneca\\Documents\\Proyectos\\sports-platform\\Frontend\\sport_platform\\assets",

@@ -120,13 +120,24 @@
   },
   "leagues": {
     "title": "Ligen",
+    "tab_mine": "Meine Ligen",
+    "tab_all": "Alle",
+    "new_item": "Neue Liga",
+    "edit_item": "Liga bearbeiten",
+    "delete_item": "Liga löschen",
+    "no_items": "Keine Ligen",
+    "no_items_subtitle": "Erstellen Sie die erste Liga, um zu beginnen",
+    "no_items_mine": "Sie haben noch keine Ligen",
+    "no_items_mine_subtitle": "Erstellen Sie Ihre erste Liga mit der Schaltfläche +",
     "new_league": "Neue Liga",
     "edit_league": "Liga bearbeiten",
     "delete_league": "Liga löschen",
     "confirm_delete": "Sind Sie sicher, dass Sie \"{0}\" löschen möchten?",
     "name": "Name",
-    "description": "Beschreibung",
-    "is_active": "Liga aktiv",
+    "format": "Format",
+    "status": "Status",
+    "start_date": "Startdatum",
+    "end_date": "Enddatum",
     "save": "Speichern",
     "cancel": "Abbrechen",
     "delete": "Löschen",
@@ -134,14 +145,21 @@
     "no_leagues": "Keine Ligen",
     "no_leagues_subtitle": "Erstellen Sie die erste Liga, um zu beginnen",
     "name_required": "Name ist erforderlich",
+    "format_required": "Format ist erforderlich",
+    "status_required": "Status ist erforderlich",
+    "start_date_required": "Startdatum ist erforderlich",
+    "end_date_required": "Enddatum ist erforderlich",
+    "date_order_error": "Enddatum muss nach dem Startdatum liegen",
     "error_load": "Fehler beim Laden der Ligen. Bitte versuchen Sie es erneut.",
     "error_save": "Fehler beim Speichern der Liga.",
     "error_delete": "Fehler beim Löschen der Liga.",
     "success_created": "Liga erfolgreich erstellt",
     "success_updated": "Liga erfolgreich aktualisiert",
     "success_deleted": "Liga erfolgreich gelöscht",
-    "active": "Aktiv",
-    "inactive": "Inaktiv",
+    "status_active": "Aktiv",
+    "status_upcoming": "Bevorstehend",
+    "status_finished": "Abgeschlossen",
+    "status_cancelled": "Abgebrochen",
     "retry": "Erneut versuchen"
   },
   "menu": {
@@ -161,7 +179,18 @@
   },
   "events": {
     "event_league": {
-      "title": "Liga"
-    }
+      "name": "Liga",
+      "description": "Liga"
+    },
+    "status_active": "Aktiv",
+    "status_upcoming": "Bevorstehend",
+    "status_finished": "Abgeschlossen",
+    "status_cancelled": "Abgebrochen"
+  },
+  "common": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "retry": "Erneut versuchen",
+    "create": "Erstellen"
   }
 }
