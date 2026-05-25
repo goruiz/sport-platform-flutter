@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/modules/modules_bootstrap.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
+import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_theme.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
@@ -48,10 +49,16 @@ class SportsPlatform extends StatelessWidget {
 class _AppRouter extends StatelessWidget {
   const _AppRouter();
 
+  Future<bool> _initSession() async {
+    final hasToken = await AuthStorage.hasToken();
+    if (hasToken) await UserSession.loadFromStorage();
+    return hasToken;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
-      future: AuthStorage.hasToken(),
+      future: _initSession(),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return const Scaffold(

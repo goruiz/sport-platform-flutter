@@ -158,5 +158,10 @@
       "create_tournament": "View available tournaments",
       "tooltip": "View available tournaments"
     }
+  },
+    "events": {
+    "event_league": {
+      "title": "League"
+    }
   }
 }

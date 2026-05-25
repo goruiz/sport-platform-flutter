@@ -158,5 +158,10 @@
       "create_tournament": "Turnier erstellen",
       "tooltip": "Turniere anzeigen"
     }
+  },
+  "events": {
+    "event_league": {
+      "title": "Liga"
+    }
   }
 }

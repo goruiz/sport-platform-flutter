@@ -158,5 +158,10 @@
       "create_tournament": "Ver torneos disponibles",
       "tooltip": "Ver torneos disponibles"
     }
+  },
+  "events": {
+    "event_league": {
+      "title": "Liga"
+    }
   }
 }

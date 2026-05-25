@@ -4,6 +4,7 @@ import 'package:sport_platform/core/constants/strings_constants/auth_strings_con
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
+import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/register_page.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/login_body.dart';
 import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
@@ -47,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
       );
       final token = response.data['data']['token'] as String;
       await AuthStorage.saveToken(token);
+      await UserSession.loadFromToken(token);
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const HomePage()),
