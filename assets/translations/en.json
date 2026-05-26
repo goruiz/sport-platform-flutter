@@ -179,8 +179,12 @@
   },
     "events": {
     "event_league": {
-      "name": "League",
-      "description": "League"
+      "name": "Leagues",
+      "description": "Leagues"
+    },
+    "event_tournament": {
+      "name": "Tournament",
+      "description": "Tournament"
     },
     "status_active": "Active",
     "status_upcoming": "Upcoming",

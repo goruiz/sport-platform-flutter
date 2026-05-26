@@ -182,6 +182,10 @@
       "name": "Ligue",
       "description": "Ligue"
     },
+    "event_tournament": {
+      "name": "Tournoi",
+      "description": "Tournoi"
+    },
     "status_active": "Active",
     "status_upcoming": "À venir",
     "status_finished": "Terminée",

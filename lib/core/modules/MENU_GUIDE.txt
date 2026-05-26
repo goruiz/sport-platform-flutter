@@ -22,7 +22,7 @@ ARCHIVOS CLAVE
 ──────────────
   Flutter
   ├── lib/core/modules/module_registry.dart      Mapa url → widget builder
-  ├── lib/core/modules/modules_bootstrap.dart    ÚNICO lugar para registrar módulos
+  ├── lib/core/modules/modules_setup.dart    ÚNICO lugar para registrar módulos
   ├── lib/core/routes/app_route_factory.dart     Navegación (usa el registry)
   ├── lib/modules/home/data/models/
   │       menu_item_model.dart                   Modelo + mapa de íconos
@@ -55,7 +55,7 @@ COLUMNAS IMPORTANTES DE LA TABLA menu
 Hay dos sub-casos según si la página del módulo ya existe o no.
 
 ────────────────────────────────────────────────────────────────────────────────
-SUB-CASO A: El módulo ya está registrado (url ya existe en modules_bootstrap.dart)
+SUB-CASO A: El módulo ya está registrado (url ya existe en modules_setup.dart)
 ────────────────────────────────────────────────────────────────────────────────
 Ejemplo: agregar "Partidos" en el drawer apuntando a /matches (ya registrado).
 
@@ -105,7 +105,7 @@ PASO 1 — Crear la página Flutter
     }
 
 PASO 2 — Registrar el módulo (UNA línea)
-  Archivo: lib/core/modules/modules_bootstrap.dart
+  Archivo: lib/core/modules/modules_setup.dart
     ModuleRegistry.register('/leagues', (item) => LeaguesPage(item: item));
 
 PASO 3 — Insertar en BD (igual que Sub-caso A, con url '/leagues')
@@ -167,7 +167,7 @@ CAMBIOS QUE SÍ REQUIEREN CÓDIGO FLUTTER
     → Agregar la entrada en menu_item_model.dart
 
   - Cambiar la URL a un módulo cuya página no existe
-    → Crear la página + registrar en modules_bootstrap.dart (Sub-caso B)
+    → Crear la página + registrar en modules_setup.dart (Sub-caso B)
 
 AGREGAR NUEVA COLUMNA A LA TABLA (cambio estructural)
   1. Crear migración Flyway: src/main/resources/db/migration/V{n}__descripcion.sql
@@ -207,7 +207,7 @@ CONSIDERACIONES AL ELIMINAR
   - Si el ítem estaba en el Bottom Nav (nav_order != NULL), desaparece automáticamente.
   - Si era padre de submenús, los hijos quedan huérfanos (id_parent_menu apuntando
     a un UUID que ya no existe). Reasignar o eliminar hijos primero.
-  - El código Flutter registrado en modules_bootstrap.dart para esa url
+  - El código Flutter registrado en modules_setup.dart para esa url
     puede quedarse (no causa errores, simplemente nunca se invoca).
 
 
@@ -218,7 +218,7 @@ CONSIDERACIONES AL ELIMINAR
   ¿Qué quiero hacer?                    ¿Dónde?
   ────────────────────────────────────── ──────────────────────────────────────
   Nuevo menú (módulo existente)          Solo BD + traducciones JSON
-  Nuevo menú (módulo nuevo)              Página Flutter + modules_bootstrap.dart
+  Nuevo menú (módulo nuevo)              Página Flutter + modules_setup.dart
                                          + BD + traducciones JSON
   Cambiar nombre / ícono / orden         Solo BD (o API)
   Cambiar a un ícono nuevo               menu_item_model.dart + BD

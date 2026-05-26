@@ -10,7 +10,7 @@ class ModuleRegistry {
   static final Map<String, Widget Function(MenuItemModel)> _builders = {};
 
   /// Registers a widget builder for a given URL path.
-  /// Call this once per module from modules_bootstrap.dart.
+  /// Call this once per module from modules_setup.dart.
   static void register(String url, Widget Function(MenuItemModel) builder) {
     _builders[_normalize(url)] = builder;
   }

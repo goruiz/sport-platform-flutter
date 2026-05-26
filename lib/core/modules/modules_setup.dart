@@ -17,5 +17,5 @@ void registerModules() {
   ModuleRegistry.register('/matches',  (item) => MatchesPage(item: item));
   ModuleRegistry.register('/reports',  (item) => ReportsPage(item: item));
   ModuleRegistry.register('/profile',  (item) => ProfilePage(item: item));
-  ModuleRegistry.register('/ligas',    (item) => LeaguesPage(item: item));
+  ModuleRegistry.register('/leagues',    (item) => LeaguesPage(item: item));
 }

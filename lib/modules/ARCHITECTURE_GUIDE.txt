@@ -99,7 +99,7 @@ No contiene lógica de negocio.
 
   modules/
     module_registry.dart     → Mapa URL → Widget Function(MenuItemModel)
-    modules_bootstrap.dart   → Registra todos los módulos al arrancar
+    modules_setup.dart   → Registra todos los módulos al arrancar
     MENU_GUIDE.txt           → Guía del sistema de menú dinámico
     ARCHITECTURE_GUIDE.txt   → Este archivo
 
@@ -169,7 +169,7 @@ Ver MENU_GUIDE.txt para la referencia completa del sistema de menú.
 
 Resumen del flujo:
 
-  1. Al iniciar la app, registerModules() (modules_bootstrap.dart) registra
+  1. Al iniciar la app, registerModules() (modules_setup.dart) registra
      cada módulo asociando su URL con su widget constructor.
 
   2. HomePage carga el menú desde el backend via MenuService.
@@ -292,7 +292,7 @@ URL:    /ligas
     _error: String?   → muestra _ErrorView con retry
     _leagues.isEmpty  → muestra _EmptyView con botón crear
 
-  Registro en modules_bootstrap.dart:
+  Registro en modules_setup.dart:
     ModuleRegistry.register('/ligas', (item) => LeaguesPage(item: item));
 
 --------------------------------------------------------------------------------
@@ -469,7 +469,7 @@ CASO B: Módulo completamente nuevo
       ...
     }
 
-  Paso 6 - Registrar el módulo (core/modules/modules_bootstrap.dart):
+  Paso 6 - Registrar el módulo (core/modules/modules_setup.dart):
     ModuleRegistry.register(
       '/nuevo-modulo',
       (item) => NuevoModuloPage(item: item),

@@ -182,6 +182,10 @@
       "name": "Liga",
       "description": "Liga"
     },
+    "event_tournament": {
+      "name": "Tournament",
+      "description": "Tournament"
+    },
     "status_active": "Aktiv",
     "status_upcoming": "Bevorstehend",
     "status_finished": "Abgeschlossen",

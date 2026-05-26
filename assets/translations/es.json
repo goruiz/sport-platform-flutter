@@ -179,8 +179,12 @@
   },
   "events": {
     "event_league": {
-      "name": "Liga",
-      "description": "Liga"
+      "name": "Ligas",
+      "description": "Ligas"
+    },
+    "event_tournament": {
+      "name": "Torneo",
+      "description": "Torneo"
     },
     "status_active": "Activa",
     "status_upcoming": "Por iniciar",

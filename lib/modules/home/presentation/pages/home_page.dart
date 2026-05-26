@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildBottomNav() {
-    if (_navItems.isEmpty) return const SizedBox.shrink();
+    if (_navItems.length < 2) return const SizedBox.shrink();
 
     final safeIndex = _currentIndex.clamp(0, _navItems.length - 1);
 
