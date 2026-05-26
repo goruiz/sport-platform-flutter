@@ -5,9 +5,9 @@ import 'package:sport_platform/modules/events/shared/data/models/event_model.dar
 
 /// Generic form sheet for creating / editing any event type.
 /// All labels are derived from [translationPrefix], e.g. 'leagues'.
-/// Required keys: name, format, status, start_date, end_date, save, cancel,
-/// new_item, edit_item, name_required, format_required, status_required,
-/// start_date_required, end_date_required, date_order_error.
+/// Required keys: name, start_date, end_date, save, cancel,
+/// new_item, edit_item, name_required, start_date_required,
+/// end_date_required, date_order_error.
 class EventFormSheet extends StatefulWidget {
   final EventModel? event;
   final String translationPrefix;
@@ -43,14 +43,10 @@ class EventFormSheet extends StatefulWidget {
 }
 
 class _EventFormSheetState extends State<EventFormSheet> {
-  static const _statusOptions = ['ACTIVE', 'UPCOMING', 'FINISHED', 'CANCELLED'];
-
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameCtrl;
-  late final TextEditingController _formatCtrl;
   late final TextEditingController _startDateCtrl;
   late final TextEditingController _endDateCtrl;
-  String? _status;
   DateTime? _startDate;
   DateTime? _endDate;
   bool _saving = false;
@@ -63,8 +59,6 @@ class _EventFormSheetState extends State<EventFormSheet> {
     super.initState();
     final e = widget.event;
     _nameCtrl = TextEditingController(text: e?.name ?? '');
-    _formatCtrl = TextEditingController(text: e?.format ?? '');
-    _status = e?.status;
     _startDate = e?.startDate;
     _endDate = e?.endDate;
     _startDateCtrl =
@@ -76,7 +70,6 @@ class _EventFormSheetState extends State<EventFormSheet> {
   @override
   void dispose() {
     _nameCtrl.dispose();
-    _formatCtrl.dispose();
     _startDateCtrl.dispose();
     _endDateCtrl.dispose();
     super.dispose();
@@ -110,8 +103,6 @@ class _EventFormSheetState extends State<EventFormSheet> {
     try {
       await widget.onSave({
         'name': _nameCtrl.text.trim(),
-        'format': _formatCtrl.text.trim(),
-        'status': _status,
         'startDate': _apiDate(_startDate!),
         'endDate': _apiDate(_endDate!),
       });
@@ -164,16 +155,6 @@ class _EventFormSheetState extends State<EventFormSheet> {
                     ? '$_prefix.name_required'.tr()
                     : null,
               ),
-              const SizedBox(height: 14),
-              _buildField(
-                controller: _formatCtrl,
-                label: '$_prefix.format'.tr(),
-                validator: (v) => (v == null || v.trim().isEmpty)
-                    ? '$_prefix.format_required'.tr()
-                    : null,
-              ),
-              const SizedBox(height: 14),
-              _buildStatusDropdown(),
               const SizedBox(height: 14),
               Row(
                 children: [
@@ -249,27 +230,6 @@ class _EventFormSheetState extends State<EventFormSheet> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildStatusDropdown() {
-    return DropdownButtonFormField<String>(
-      initialValue: _status,
-      dropdownColor: const Color(0xFF0F2A0F),
-      style: const TextStyle(color: AppColors.white),
-      decoration: _decoration('$_prefix.status'.tr()),
-      items: _statusOptions
-          .map((s) => DropdownMenuItem(
-                value: s,
-                child: Text(
-                  'events.status_${s.toLowerCase()}'.tr(),
-                  style: const TextStyle(color: AppColors.white),
-                ),
-              ))
-          .toList(),
-      onChanged: (v) => setState(() => _status = v),
-      validator: (v) =>
-          (v == null || v.isEmpty) ? '$_prefix.status_required'.tr() : null,
     );
   }
 
