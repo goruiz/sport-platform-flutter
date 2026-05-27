@@ -1,7 +1,6 @@
+import 'package:sport_platform/core/constants/event_type_ids.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/event_service.dart';
 
 class LeagueService extends EventService {
-  static const _eventTypeId = '30ab7965-8990-46b1-a6b0-71377b62655f';
-
-  LeagueService() : super(eventTypeId: _eventTypeId);
+  LeagueService() : super(eventTypeId: EventTypeIds.league);
 }

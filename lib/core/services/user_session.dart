@@ -71,7 +71,7 @@ class UserSession {
       final claims = jsonDecode(decoded) as Map<String, dynamic>;
 
       return _fromMap({
-        'id': claims['sub'] ?? claims['id'] ?? '',
+        'id':  claims['id'] ?? claims['sub'] ?? '',
         'idRole': claims['idRole'] ?? claims['role'],
         'firstName': claims['firstName'],
         'middleName': claims['middleName'],

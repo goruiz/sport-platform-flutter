@@ -21,6 +21,8 @@ class ApiEndpoints {
   static const String events = '/events';
   static String eventById(String id) => '/events/$id';
   static String eventsByType(String typeId) => '/events/by-event-type/$typeId';
+  static String eventsByTypeAndUser(String typeId, String userId) =>
+      '/events/by-event-type/$typeId/by-user/$userId';
 
   // Matches
   static const String matches = '/matches';

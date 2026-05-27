@@ -84,6 +84,22 @@ class _EventTypePageState extends State<EventTypePage> {
         }
       },
     );
+    if (mounted) _silentReload();
+  }
+
+  Future<void> _silentReload() async {
+    try {
+      final results = await Future.wait([
+        widget.service.getAll(),
+        widget.service.getMyIds(),
+      ]);
+      if (mounted) {
+        setState(() {
+          _allEvents = results[0] as List<EventModel>;
+          _myEventIds = results[1] as Set<String>;
+        });
+      }
+    } catch (_) {}
   }
 
   Future<void> _openEdit(EventModel event) async {

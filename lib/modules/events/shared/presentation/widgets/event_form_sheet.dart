@@ -107,6 +107,8 @@ class _EventFormSheetState extends State<EventFormSheet> {
         'endDate': _apiDate(_endDate!),
       });
       if (mounted) Navigator.of(context).pop();
+    } catch (_) {
+      // onSave falló: el form permanece abierto para que el usuario reintente
     } finally {
       if (mounted) setState(() => _saving = false);
     }
