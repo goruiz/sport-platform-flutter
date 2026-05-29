@@ -132,7 +132,7 @@
     "new_league": "Neue Liga",
     "edit_league": "Liga bearbeiten",
     "delete_league": "Liga löschen",
-    "confirm_delete": "Sind Sie sicher, dass Sie \"{0}\" löschen möchten?",
+    "confirm_delete": "Sind Sie sicher, dass Sie \"{}\" löschen möchten?",
     "name": "Name",
     "format": "Format",
     "status": "Status",

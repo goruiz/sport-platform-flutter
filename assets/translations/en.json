@@ -132,7 +132,7 @@
     "new_league": "New league",
     "edit_league": "Edit league",
     "delete_league": "Delete league",
-    "confirm_delete": "Are you sure you want to delete \"{0}\"?",
+    "confirm_delete": "Are you sure you want to delete \"{}\"?",
     "name": "Name",
     "format": "Format",
     "status": "Status",
