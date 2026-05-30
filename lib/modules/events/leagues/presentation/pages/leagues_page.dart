@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sport_platform/modules/events/leagues/data/datasource/league_service.dart';
+import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/modules/events/leagues/presentation/pages/league_detail_page.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
@@ -14,8 +14,8 @@ class LeaguesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => EventsNotifier(LeagueService()),
+    return ChangeNotifierProvider.value(
+      value: getIt<EventsNotifier>(instanceName: 'leagues'),
       child: EventTypePage(
         menuItem: item,
         translationPrefix: 'leagues',

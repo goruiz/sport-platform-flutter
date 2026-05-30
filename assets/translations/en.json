@@ -190,6 +190,7 @@
     "success_match_deleted": "Match deleted",
     "error_load_teams": "Error loading teams",
     "error_load_matches": "Error loading matches",
+    "error_load_courts": "Error loading courts",
     "error_team_action": "Error managing team",
     "error_match_action": "Error managing match",
     "no_courts": "No courts available",

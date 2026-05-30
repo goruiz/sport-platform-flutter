@@ -83,13 +83,27 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
     return available.where((t) => t.name.toLowerCase().contains(q)).toList();
   }
 
+  void _showSnack(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? AppColors.error : AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
   Future<void> _add(TeamModel team) async {
     setState(() => _addingTeamId = team.id);
     try {
       await widget.onAdd(team.id);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
-      if (mounted) setState(() => _addingTeamId = null);
+      if (mounted) {
+        setState(() => _addingTeamId = null);
+        _showSnack('leagues.error_team_action'.tr(), isError: true);
+      }
     }
   }
 

@@ -114,7 +114,7 @@ class _EventTypePageState extends State<EventTypePage> {
             Consumer<EventsNotifier>(
               builder: (context, notifier, child) => IconButton(
                 icon: const Icon(Icons.refresh, color: AppColors.white),
-                onPressed: notifier.loading ? null : notifier.load,
+                onPressed: notifier.loading ? null : () => notifier.load(force: true),
                 tooltip: '$_prefix.retry'.tr(),
               ),
             ),
@@ -162,7 +162,7 @@ class _EventTypePageState extends State<EventTypePage> {
           events: notifier.mine,
           myEventIds: notifier.myIds,
           typeIcon: widget.typeIcon,
-          onRefresh: notifier.load,
+          onRefresh: () => notifier.load(force: true),
           onEdit: _openEdit,
           onDelete: _confirmDelete,
           emptyTitle: '$_prefix.no_items_mine'.tr(),
@@ -174,7 +174,7 @@ class _EventTypePageState extends State<EventTypePage> {
           events: notifier.all.toList(),
           myEventIds: notifier.myIds,
           typeIcon: widget.typeIcon,
-          onRefresh: notifier.load,
+          onRefresh: () => notifier.load(force: true),
           onEdit: _openEdit,
           onDelete: _confirmDelete,
           emptyTitle: '$_prefix.no_items'.tr(),

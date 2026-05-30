@@ -9,6 +9,9 @@ class EventsNotifier extends ChangeNotifier {
   Set<String> _myIds = {};
   bool _loading = false;
   String? _error;
+  DateTime? _lastFetched;
+
+  static const _ttl = Duration(minutes: 3);
 
   EventsNotifier(this._service);
 
@@ -19,7 +22,12 @@ class EventsNotifier extends ChangeNotifier {
   List<EventModel> get mine =>
       _all.where((e) => _myIds.contains(e.id)).toList();
 
-  Future<void> load() async {
+  bool get _isFresh =>
+      _lastFetched != null &&
+      DateTime.now().difference(_lastFetched!) < _ttl;
+
+  Future<void> load({bool force = false}) async {
+    if (!force && _isFresh) return;
     _loading = true;
     _error = null;
     notifyListeners();
@@ -30,6 +38,7 @@ class EventsNotifier extends ChangeNotifier {
       ]);
       _all = results[0] as List<EventModel>;
       _myIds = results[1] as Set<String>;
+      _lastFetched = DateTime.now();
     } catch (_) {
       _error = 'error';
     } finally {

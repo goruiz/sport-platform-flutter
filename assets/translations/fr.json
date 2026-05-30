@@ -190,6 +190,7 @@
     "success_match_deleted": "Match supprimé",
     "error_load_teams": "Erreur lors du chargement des équipes",
     "error_load_matches": "Erreur lors du chargement des matchs",
+    "error_load_courts": "Erreur lors du chargement des terrains",
     "error_team_action": "Erreur lors de la gestion de l'équipe",
     "error_match_action": "Erreur lors de la gestion du match",
     "no_courts": "Aucun terrain disponible",

@@ -190,6 +190,7 @@
     "success_match_deleted": "Spiel gelöscht",
     "error_load_teams": "Fehler beim Laden der Teams",
     "error_load_matches": "Fehler beim Laden der Spiele",
+    "error_load_courts": "Fehler beim Laden der Courts",
     "error_team_action": "Fehler bei der Team-Verwaltung",
     "error_match_action": "Fehler bei der Spiel-Verwaltung",
     "no_courts": "Keine Plätze verfügbar",

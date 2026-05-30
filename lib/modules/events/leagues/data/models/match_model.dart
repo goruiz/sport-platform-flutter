@@ -44,4 +44,47 @@ class MatchModel {
           : DateTime.now(),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'homeTeamId': homeTeamId,
+        'awayTeamId': awayTeamId,
+        'matchDate': _apiDateTime(matchDate),
+        'status': status,
+        'eventId': eventId,
+        if (location != null) 'location': location,
+        if (courtId != null) 'courtId': courtId,
+        if (homeScore != null) 'homeScore': homeScore,
+        if (awayScore != null) 'awayScore': awayScore,
+      };
+
+  MatchModel copyWith({
+    String? id,
+    String? homeTeamId,
+    String? awayTeamId,
+    DateTime? matchDate,
+    String? location,
+    String? status,
+    int? homeScore,
+    int? awayScore,
+    String? courtId,
+    String? eventId,
+    DateTime? createdAt,
+  }) =>
+      MatchModel(
+        id: id ?? this.id,
+        homeTeamId: homeTeamId ?? this.homeTeamId,
+        awayTeamId: awayTeamId ?? this.awayTeamId,
+        matchDate: matchDate ?? this.matchDate,
+        location: location ?? this.location,
+        status: status ?? this.status,
+        homeScore: homeScore ?? this.homeScore,
+        awayScore: awayScore ?? this.awayScore,
+        courtId: courtId ?? this.courtId,
+        eventId: eventId ?? this.eventId,
+        createdAt: createdAt ?? this.createdAt,
+      );
+
+  static String _apiDateTime(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}'
+      'T${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}:00';
 }

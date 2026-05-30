@@ -69,6 +69,17 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
 
   static const _statuses = ['SCHEDULED', 'IN_PROGRESS', 'FINISHED', 'CANCELLED'];
 
+  void _showSnack(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? AppColors.error : AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -100,6 +111,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
       final courts = await _courtsService.getAll();
       if (mounted) setState(() => _courts = courts);
     } catch (_) {
+      if (mounted) _showSnack('leagues.error_load_courts'.tr(), isError: true);
     } finally {
       if (mounted) setState(() => _loadingCourts = false);
     }
@@ -146,6 +158,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
       await widget.onSave(data);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
+      if (mounted) _showSnack('leagues.error_match_action'.tr(), isError: true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
