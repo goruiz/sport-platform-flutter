@@ -23,7 +23,9 @@
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\lib\\\\modules\\\\home\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName })",
       "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\lib\\\\modules\\\\leagues\" -Recurse | Select-Object FullName | ForEach-Object { $_.FullName })",
       "Bash(Remove-Item -Recurse -Force \"c:/Users/WALDO/Documents/Proyectos/Plataforma deportiva/frontend/lib/modules/leagues\")",
-      "Bash(Write-Output \"Done\")"
+      "Bash(Write-Output \"Done\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\backend\\\\src\\\\main\\\\java\\\\com\\\\platform\\\\backend\\\\modules\" -Directory)",
+      "Bash(Select-Object -ExpandProperty Name)"
     ],
     "additionalDirectories": [
       "c:\\Users\\admseneca\\Documents\\Proyectos\\sports-platform\\Frontend\\sport_platform\\assets",
@@ -31,7 +33,18 @@
       "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\menu\\presentation\\responses\\MenuResponse",
       "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\menu\\presentation\\requests\\CreateMenuRequest",
       "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\menu\\presentation\\requests\\UpdateMenuRequest",
-      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\resources\\db\\migration"
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\resources\\db\\migration",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\domain\\entities",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\domain\\irepositories",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\presentation\\responses\\SportComplexResponse",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\infrastructure\\persistence\\jpa",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\infrastructure\\persistence\\repositories",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\presentation\\requests\\CreateSportComplexRequest",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\presentation\\requests\\UpdateSportComplexRequest",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\application\\iservices",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\application\\mappers",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\application\\services",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\presentation\\controllers"
     ]
   }
 }

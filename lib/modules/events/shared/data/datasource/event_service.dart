@@ -28,8 +28,6 @@ class EventService {
     await UserSession.loadFromStorage();
     final userId = UserSession.current?.id;
     final u = UserSession.current;
-    print('UserSession.current: id=${u?.id}, idRole=${u?.idRole}, username=${u?.username}, email=${u?.email}, firstName=${u?.firstName}, lastName=${u?.lastName}');
-    print('URL llamada: ${ApiEndpoints.eventsByTypeAndUser(eventTypeId, userId ?? 'NULL')}');
     if (userId == null || userId.isEmpty) return {};
 
     final response = await _client.get(

@@ -16,6 +16,7 @@ class EventTypePage extends StatefulWidget {
   final EventService service;
   final String translationPrefix;
   final IconData typeIcon;
+  final void Function(EventModel event, bool isOwner)? onEventTap;
 
   const EventTypePage({
     super.key,
@@ -23,6 +24,7 @@ class EventTypePage extends StatefulWidget {
     required this.service,
     required this.translationPrefix,
     this.typeIcon = Icons.sports,
+    this.onEventTap,
   });
 
   @override
@@ -240,6 +242,7 @@ class _EventTypePageState extends State<EventTypePage> {
           emptyTitle: '$_prefix.no_items_mine'.tr(),
           emptySubtitle: '$_prefix.no_items_mine_subtitle'.tr(),
           onAdd: _openCreate,
+          onEventTap: widget.onEventTap,
         ),
         _EventListView(
           events: _allEvents,
@@ -251,6 +254,7 @@ class _EventTypePageState extends State<EventTypePage> {
           emptyTitle: '$_prefix.no_items'.tr(),
           emptySubtitle: '$_prefix.no_items_subtitle'.tr(),
           onAdd: _openCreate,
+          onEventTap: widget.onEventTap,
         ),
       ],
     );
@@ -269,6 +273,7 @@ class _EventListView extends StatelessWidget {
   final String emptyTitle;
   final String emptySubtitle;
   final VoidCallback onAdd;
+  final void Function(EventModel event, bool isOwner)? onEventTap;
 
   const _EventListView({
     required this.events,
@@ -280,6 +285,7 @@ class _EventListView extends StatelessWidget {
     required this.emptyTitle,
     required this.emptySubtitle,
     required this.onAdd,
+    this.onEventTap,
   });
 
   @override
@@ -305,6 +311,9 @@ class _EventListView extends StatelessWidget {
           return EventCard(
             event: event,
             typeIcon: typeIcon,
+            onTap: onEventTap != null
+                ? () => onEventTap!(event, isOwned)
+                : null,
             onEdit: isOwned ? () => onEdit(event) : null,
             onDelete: isOwned ? () => onDelete(event) : null,
           );

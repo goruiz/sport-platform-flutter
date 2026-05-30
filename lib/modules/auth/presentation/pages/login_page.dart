@@ -49,7 +49,6 @@ class _LoginPageState extends State<LoginPage> {
       final token = response.data['data']['token'] as String;
       await AuthStorage.saveToken(token);
       await UserSession.loadFromToken(token);
-      print('token: $token');
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const HomePage()),

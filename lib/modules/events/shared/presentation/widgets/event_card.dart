@@ -6,6 +6,7 @@ import 'package:sport_platform/modules/events/shared/data/models/event_model.dar
 class EventCard extends StatelessWidget {
   final EventModel event;
   final IconData typeIcon;
+  final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
@@ -13,6 +14,7 @@ class EventCard extends StatelessWidget {
     super.key,
     required this.event,
     this.typeIcon = Icons.sports,
+    this.onTap,
     this.onEdit,
     this.onDelete,
   });
@@ -20,7 +22,12 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasActions = onEdit != null || onDelete != null;
-    return Container(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.inputFill,
@@ -101,6 +108,8 @@ class EventCard extends StatelessWidget {
               ),
             ],
           ],
+        ),
+      ),
         ),
       ),
     );
