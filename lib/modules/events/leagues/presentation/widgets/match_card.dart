@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/leagues/data/models/match_model.dart';
+import 'package:sport_platform/shared/widgets/status_badge.dart';
 
 class MatchCard extends StatelessWidget {
   final MatchModel match;
@@ -50,35 +52,25 @@ class MatchCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          const Icon(
-                            Icons.calendar_today,
-                            color: AppColors.whiteSubtle,
-                            size: 13,
-                          ),
+                          const Icon(Icons.calendar_today,
+                              color: AppColors.whiteSubtle, size: 13),
                           const SizedBox(width: 4),
                           Text(
-                            _fmtDateTime(match.matchDate),
+                            DateFormatters.dateTime(match.matchDate),
                             style: const TextStyle(
-                              color: AppColors.whiteSubtle,
-                              fontSize: 12,
-                            ),
+                                color: AppColors.whiteSubtle, fontSize: 12),
                           ),
                           if (match.location != null &&
                               match.location!.isNotEmpty) ...[
                             const SizedBox(width: 10),
-                            const Icon(
-                              Icons.location_on_outlined,
-                              color: AppColors.whiteSubtle,
-                              size: 13,
-                            ),
+                            const Icon(Icons.location_on_outlined,
+                                color: AppColors.whiteSubtle, size: 13),
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
                                 match.location!,
                                 style: const TextStyle(
-                                  color: AppColors.whiteSubtle,
-                                  fontSize: 12,
-                                ),
+                                    color: AppColors.whiteSubtle, fontSize: 12),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -86,7 +78,7 @@ class MatchCard extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 6),
-                      _MatchStatusBadge(status: match.status),
+                      StatusBadge.forMatch(match.status),
                     ],
                   ),
                 ),
@@ -97,11 +89,8 @@ class MatchCard extends StatelessWidget {
                       if (onEdit != null)
                         IconButton(
                           onPressed: onEdit,
-                          icon: const Icon(
-                            Icons.edit_outlined,
-                            color: AppColors.primaryLight,
-                            size: 20,
-                          ),
+                          icon: const Icon(Icons.edit_outlined,
+                              color: AppColors.primaryLight, size: 20),
                           tooltip: 'common.edit'.tr(),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(
@@ -110,11 +99,8 @@ class MatchCard extends StatelessWidget {
                       if (onDelete != null)
                         IconButton(
                           onPressed: onDelete,
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: AppColors.error,
-                            size: 20,
-                          ),
+                          icon: const Icon(Icons.delete_outline,
+                              color: AppColors.error, size: 20),
                           tooltip: 'common.delete'.tr(),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(
@@ -129,10 +115,6 @@ class MatchCard extends StatelessWidget {
       ),
     );
   }
-
-  static String _fmtDateTime(DateTime dt) =>
-      '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year} '
-      '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
 }
 
 class _TeamsRow extends StatelessWidget {
@@ -189,69 +171,5 @@ class _TeamsRow extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class _MatchStatusBadge extends StatelessWidget {
-  final String status;
-  const _MatchStatusBadge({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _colorFor(status);
-    final label = _labelFor(status);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 6,
-            height: 6,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static String _labelFor(String status) {
-    const map = {
-      'SCHEDULED': 'leagues.match_status_scheduled',
-      'IN_PROGRESS': 'leagues.match_status_in_progress',
-      'FINISHED': 'leagues.match_status_finished',
-      'CANCELLED': 'leagues.match_status_cancelled',
-    };
-    final key = map[status.toUpperCase()];
-    return key != null ? key.tr() : status;
-  }
-
-  static Color _colorFor(String status) {
-    switch (status.toUpperCase()) {
-      case 'SCHEDULED':
-        return AppColors.primaryLight;
-      case 'IN_PROGRESS':
-        return AppColors.warning;
-      case 'FINISHED':
-        return AppColors.whiteSubtle;
-      case 'CANCELLED':
-        return AppColors.error;
-      default:
-        return AppColors.whiteSubtle;
-    }
   }
 }

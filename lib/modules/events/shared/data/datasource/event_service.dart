@@ -27,7 +27,6 @@ class EventService {
   Future<Set<String>> getMyIds() async {
     await UserSession.loadFromStorage();
     final userId = UserSession.current?.id;
-    final u = UserSession.current;
     if (userId == null || userId.isEmpty) return {};
 
     final response = await _client.get(

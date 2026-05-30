@@ -1,10 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_input_decoration.dart';
+import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/leagues/data/datasource/courts_service.dart';
 import 'package:sport_platform/modules/events/leagues/data/models/court_model.dart';
 import 'package:sport_platform/modules/events/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/leagues/data/models/team_event_model.dart';
+import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
 class MatchFormSheet extends StatefulWidget {
   final List<TeamEventModel> enrolledTeams;
@@ -46,7 +50,7 @@ class MatchFormSheet extends StatefulWidget {
 
 class _MatchFormSheetState extends State<MatchFormSheet> {
   final _formKey = GlobalKey<FormState>();
-  final _courtsService = CourtsService();
+  late final CourtsService _courtsService;
 
   String? _homeTeamId;
   String? _awayTeamId;
@@ -63,22 +67,18 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
 
   bool get _isEditing => widget.match != null;
 
-  static const _statuses = [
-    'SCHEDULED',
-    'IN_PROGRESS',
-    'FINISHED',
-    'CANCELLED'
-  ];
+  static const _statuses = ['SCHEDULED', 'IN_PROGRESS', 'FINISHED', 'CANCELLED'];
 
   @override
   void initState() {
     super.initState();
+    _courtsService = getIt<CourtsService>();
     final m = widget.match;
     if (m != null) {
       _homeTeamId = m.homeTeamId;
       _awayTeamId = m.awayTeamId;
       _matchDate = m.matchDate;
-      _matchDateCtrl.text = _fmtDateTime(m.matchDate);
+      _matchDateCtrl.text = DateFormatters.dateTime(m.matchDate);
       _courtId = m.courtId;
       _status = m.status;
       _homeScoreCtrl.text = m.homeScore?.toString() ?? '';
@@ -121,9 +121,9 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
     );
     if (time == null || !mounted) return;
     setState(() {
-      _matchDate = DateTime(
-          date.year, date.month, date.day, time.hour, time.minute);
-      _matchDateCtrl.text = _fmtDateTime(_matchDate!);
+      _matchDate =
+          DateTime(date.year, date.month, date.day, time.hour, time.minute);
+      _matchDateCtrl.text = DateFormatters.dateTime(_matchDate!);
     });
   }
 
@@ -134,7 +134,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
       final data = <String, dynamic>{
         'homeTeamId': _homeTeamId,
         'awayTeamId': _awayTeamId,
-        'matchDate': _apiDateTime(_matchDate!),
+        'matchDate': DateFormatters.apiDateTime(_matchDate!),
         'status': _status,
         'eventId': widget.eventId,
         if (_courtId != null) 'courtId': _courtId,
@@ -156,7 +156,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
     final bottom = MediaQuery.of(context).viewInsets.bottom;
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF0F2A0F),
+        color: AppColors.sheetBackground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.fromLTRB(24, 16, 24, 24 + bottom),
@@ -167,21 +167,10 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.inputBorder,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
+              const SheetHandle(),
               const SizedBox(height: 20),
               Text(
-                _isEditing
-                    ? 'leagues.edit_match'.tr()
-                    : 'leagues.new_match'.tr(),
+                _isEditing ? 'leagues.edit_match'.tr() : 'leagues.new_match'.tr(),
                 style: const TextStyle(
                   color: AppColors.white,
                   fontSize: 18,
@@ -208,13 +197,13 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
                 readOnly: true,
                 onTap: _pickDateTime,
                 style: const TextStyle(color: AppColors.white),
-                decoration: _decoration('leagues.match_date'.tr()).copyWith(
+                decoration: AppInputDecoration.standard('leagues.match_date'.tr())
+                    .copyWith(
                   suffixIcon: const Icon(Icons.schedule,
                       color: AppColors.whiteSubtle, size: 18),
                 ),
-                validator: (_) => _matchDate == null
-                    ? 'leagues.match_date'.tr()
-                    : null,
+                validator: (_) =>
+                    _matchDate == null ? 'leagues.match_date'.tr() : null,
               ),
               const SizedBox(height: 14),
               _buildCourtDropdown(),
@@ -229,7 +218,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
                         controller: _homeScoreCtrl,
                         keyboardType: TextInputType.number,
                         style: const TextStyle(color: AppColors.white),
-                        decoration: _decoration(
+                        decoration: AppInputDecoration.standard(
                             '${'leagues.score'.tr()} (local)'),
                       ),
                     ),
@@ -239,7 +228,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
                         controller: _awayScoreCtrl,
                         keyboardType: TextInputType.number,
                         style: const TextStyle(color: AppColors.white),
-                        decoration: _decoration(
+                        decoration: AppInputDecoration.standard(
                             '${'leagues.score'.tr()} (visitante)'),
                       ),
                     ),
@@ -247,46 +236,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
                 ),
               ],
               const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed:
-                          _saving ? null : () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.inputBorder),
-                        foregroundColor: AppColors.whiteSubtle,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      child: Text('leagues.cancel'.tr()),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: _saving ? null : _submit,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primaryLight,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      child: _saving
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: AppColors.white),
-                            )
-                          : Text('leagues.save'.tr(),
-                              style:
-                                  const TextStyle(color: AppColors.white)),
-                    ),
-                  ),
-                ],
-              ),
+              _buildActions(),
             ],
           ),
         ),
@@ -310,14 +260,14 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
         .toList();
 
     return DropdownButtonFormField<String>(
+      // ignore: deprecated_member_use
       value: value,
       items: items,
       onChanged: onChanged,
-      dropdownColor: const Color(0xFF0F2A0F),
+      dropdownColor: AppColors.sheetBackground,
       style: const TextStyle(color: AppColors.white),
-      decoration: _decoration(label),
-      validator: (v) =>
-          (v == null || v.isEmpty) ? label : null,
+      decoration: AppInputDecoration.standard(label),
+      validator: (v) => (v == null || v.isEmpty) ? label : null,
     );
   }
 
@@ -339,10 +289,8 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
     final items = <DropdownMenuItem<String?>>[
       DropdownMenuItem(
         value: null,
-        child: Text(
-          'leagues.no_courts'.tr(),
-          style: const TextStyle(color: AppColors.whiteSubtle),
-        ),
+        child: Text('leagues.no_courts'.tr(),
+            style: const TextStyle(color: AppColors.whiteSubtle)),
       ),
       ..._courts.map((c) => DropdownMenuItem(
             value: c.id,
@@ -352,17 +300,19 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
     ];
 
     return DropdownButtonFormField<String?>(
+      // ignore: deprecated_member_use
       value: _courtId,
       items: items,
       onChanged: (v) => setState(() => _courtId = v),
-      dropdownColor: const Color(0xFF0F2A0F),
+      dropdownColor: AppColors.sheetBackground,
       style: const TextStyle(color: AppColors.white),
-      decoration: _decoration('leagues.court'.tr()),
+      decoration: AppInputDecoration.standard('leagues.court'.tr()),
     );
   }
 
   Widget _buildStatusDropdown() {
     return DropdownButtonFormField<String>(
+      // ignore: deprecated_member_use
       value: _status,
       items: _statuses
           .map((s) => DropdownMenuItem(
@@ -372,38 +322,52 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
               ))
           .toList(),
       onChanged: (v) => setState(() => _status = v ?? 'SCHEDULED'),
-      dropdownColor: const Color(0xFF0F2A0F),
+      dropdownColor: AppColors.sheetBackground,
       style: const TextStyle(color: AppColors.white),
-      decoration: _decoration('leagues.match_status_scheduled'.tr()),
+      decoration: AppInputDecoration.standard('leagues.match_status_scheduled'.tr()),
     );
   }
 
-  InputDecoration _decoration(String label) => InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: AppColors.whiteSubtle),
-        filled: true,
-        fillColor: AppColors.inputFill,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.inputBorder),
+  Widget _buildActions() {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: _saving ? null : () => Navigator.of(context).pop(),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppColors.inputBorder),
+              foregroundColor: AppColors.whiteSubtle,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            child: Text('leagues.cancel'.tr()),
+          ),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.inputBorder),
+        const SizedBox(width: 12),
+        Expanded(
+          child: FilledButton(
+            onPressed: _saving ? null : _submit,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primaryLight,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            child: _saving
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: AppColors.white),
+                  )
+                : Text('leagues.save'.tr(),
+                    style: const TextStyle(color: AppColors.white)),
+          ),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primaryLight),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.error),
-        ),
-      );
+      ],
+    );
+  }
 
   static String _statusLabel(String status) {
     const map = {
@@ -414,12 +378,4 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
     };
     return (map[status] ?? status).tr();
   }
-
-  static String _fmtDateTime(DateTime dt) =>
-      '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year} '
-      '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-
-  static String _apiDateTime(DateTime dt) =>
-      '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}'
-      'T${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:00';
 }

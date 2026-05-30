@@ -1,8 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/events/leagues/data/datasource/teams_service.dart';
 import 'package:sport_platform/modules/events/leagues/data/models/team_model.dart';
+import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
 class AddTeamSheet extends StatefulWidget {
   final Set<String> enrolledTeamIds;
@@ -35,7 +38,7 @@ class AddTeamSheet extends StatefulWidget {
 }
 
 class _AddTeamSheetState extends State<AddTeamSheet> {
-  final _teamsService = TeamsService();
+  late final TeamsService _teamsService;
   final _searchCtrl = TextEditingController();
 
   List<TeamModel> _allTeams = [];
@@ -47,6 +50,7 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
   @override
   void initState() {
     super.initState();
+    _teamsService = getIt<TeamsService>();
     _loadTeams();
   }
 
@@ -72,9 +76,8 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
   }
 
   List<TeamModel> get _filtered {
-    final available = _allTeams
-        .where((t) => !widget.enrolledTeamIds.contains(t.id))
-        .toList();
+    final available =
+        _allTeams.where((t) => !widget.enrolledTeamIds.contains(t.id)).toList();
     if (_query.isEmpty) return available;
     final q = _query.toLowerCase();
     return available.where((t) => t.name.toLowerCase().contains(q)).toList();
@@ -98,23 +101,14 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.75,
       ),
       decoration: const BoxDecoration(
-        color: Color(0xFF0F2A0F),
+        color: AppColors.sheetBackground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.fromLTRB(24, 16, 24, 24 + bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.inputBorder,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
+          const SheetHandle(),
           const SizedBox(height: 20),
           Text(
             'leagues.add_team'.tr(),
@@ -128,24 +122,10 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
           TextField(
             controller: _searchCtrl,
             style: const TextStyle(color: AppColors.white),
-            decoration: InputDecoration(
-              hintText: 'leagues.search_team'.tr(),
-              hintStyle: const TextStyle(color: AppColors.whiteSubtle),
-              prefixIcon: const Icon(Icons.search, color: AppColors.whiteSubtle),
-              filled: true,
-              fillColor: AppColors.inputFill,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.inputBorder),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.inputBorder),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.primaryLight),
-              ),
+            decoration: AppInputDecoration.standard('leagues.search_team'.tr())
+                .copyWith(
+              prefixIcon:
+                  const Icon(Icons.search, color: AppColors.whiteSubtle),
             ),
             onChanged: (v) => setState(() => _query = v),
           ),
@@ -197,7 +177,8 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
           padding: const EdgeInsets.all(24),
           child: Text(
             'leagues.teams_empty'.tr(),
-            style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+            style:
+                const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
           ),
         ),
       );

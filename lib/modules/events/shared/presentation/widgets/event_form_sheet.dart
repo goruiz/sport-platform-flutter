@@ -1,13 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_input_decoration.dart';
+import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
+import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
-/// Generic form sheet for creating / editing any event type.
-/// All labels are derived from [translationPrefix], e.g. 'leagues'.
-/// Required keys: name, start_date, end_date, save, cancel,
-/// new_item, edit_item, name_required, start_date_required,
-/// end_date_required, date_order_error.
 class EventFormSheet extends StatefulWidget {
   final EventModel? event;
   final String translationPrefix;
@@ -61,10 +59,10 @@ class _EventFormSheetState extends State<EventFormSheet> {
     _nameCtrl = TextEditingController(text: e?.name ?? '');
     _startDate = e?.startDate;
     _endDate = e?.endDate;
-    _startDateCtrl =
-        TextEditingController(text: e != null ? _fmtDisplay(e.startDate) : '');
-    _endDateCtrl =
-        TextEditingController(text: e != null ? _fmtDisplay(e.endDate) : '');
+    _startDateCtrl = TextEditingController(
+        text: e != null ? DateFormatters.date(e.startDate) : '');
+    _endDateCtrl = TextEditingController(
+        text: e != null ? DateFormatters.date(e.endDate) : '');
   }
 
   @override
@@ -89,10 +87,10 @@ class _EventFormSheetState extends State<EventFormSheet> {
     setState(() {
       if (isStart) {
         _startDate = date;
-        _startDateCtrl.text = _fmtDisplay(date);
+        _startDateCtrl.text = DateFormatters.date(date);
       } else {
         _endDate = date;
-        _endDateCtrl.text = _fmtDisplay(date);
+        _endDateCtrl.text = DateFormatters.date(date);
       }
     });
   }
@@ -103,12 +101,12 @@ class _EventFormSheetState extends State<EventFormSheet> {
     try {
       await widget.onSave({
         'name': _nameCtrl.text.trim(),
-        'startDate': _apiDate(_startDate!),
-        'endDate': _apiDate(_endDate!),
+        'startDate': DateFormatters.apiDate(_startDate!),
+        'endDate': DateFormatters.apiDate(_endDate!),
       });
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
-      // onSave falló: el form permanece abierto para que el usuario reintente
+      // El form permanece abierto para que el usuario reintente
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -119,7 +117,7 @@ class _EventFormSheetState extends State<EventFormSheet> {
     final bottom = MediaQuery.of(context).viewInsets.bottom;
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF0F2A0F),
+        color: AppColors.sheetBackground,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.fromLTRB(24, 16, 24, 24 + bottom),
@@ -130,16 +128,7 @@ class _EventFormSheetState extends State<EventFormSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.inputBorder,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
+              const SheetHandle(),
               const SizedBox(height: 20),
               Text(
                 _isEditing ? '$_prefix.edit_item'.tr() : '$_prefix.new_item'.tr(),
@@ -150,9 +139,10 @@ class _EventFormSheetState extends State<EventFormSheet> {
                 ),
               ),
               const SizedBox(height: 20),
-              _buildField(
+              TextFormField(
                 controller: _nameCtrl,
-                label: '$_prefix.name'.tr(),
+                style: const TextStyle(color: AppColors.white),
+                decoration: AppInputDecoration.standard('$_prefix.name'.tr()),
                 validator: (v) => (v == null || v.trim().isEmpty)
                     ? '$_prefix.name_required'.tr()
                     : null,
@@ -161,10 +151,16 @@ class _EventFormSheetState extends State<EventFormSheet> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildDateField(
+                    child: TextFormField(
                       controller: _startDateCtrl,
-                      label: '$_prefix.start_date'.tr(),
+                      readOnly: true,
                       onTap: () => _pickDate(isStart: true),
+                      style: const TextStyle(color: AppColors.white),
+                      decoration: AppInputDecoration.standard('$_prefix.start_date'.tr())
+                          .copyWith(
+                        suffixIcon: const Icon(Icons.calendar_today,
+                            color: AppColors.whiteSubtle, size: 18),
+                      ),
                       validator: (_) => _startDate == null
                           ? '$_prefix.start_date_required'.tr()
                           : null,
@@ -172,13 +168,22 @@ class _EventFormSheetState extends State<EventFormSheet> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _buildDateField(
+                    child: TextFormField(
                       controller: _endDateCtrl,
-                      label: '$_prefix.end_date'.tr(),
+                      readOnly: true,
                       onTap: () => _pickDate(isStart: false),
+                      style: const TextStyle(color: AppColors.white),
+                      decoration: AppInputDecoration.standard('$_prefix.end_date'.tr())
+                          .copyWith(
+                        suffixIcon: const Icon(Icons.calendar_today,
+                            color: AppColors.whiteSubtle, size: 18),
+                      ),
                       validator: (_) {
-                        if (_endDate == null) return '$_prefix.end_date_required'.tr();
-                        if (_startDate != null && _endDate!.isBefore(_startDate!)) {
+                        if (_endDate == null) {
+                          return '$_prefix.end_date_required'.tr();
+                        }
+                        if (_startDate != null &&
+                            _endDate!.isBefore(_startDate!)) {
                           return '$_prefix.date_order_error'.tr();
                         }
                         return null;
@@ -188,46 +193,7 @@ class _EventFormSheetState extends State<EventFormSheet> {
                 ],
               ),
               const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed:
-                          _saving ? null : () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.inputBorder),
-                        foregroundColor: AppColors.whiteSubtle,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      child: Text('$_prefix.cancel'.tr()),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: _saving ? null : _submit,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.primaryLight,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      child: _saving
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: AppColors.white),
-                            )
-                          : Text('$_prefix.save'.tr(),
-                              style:
-                                  const TextStyle(color: AppColors.white)),
-                    ),
-                  ),
-                ],
-              ),
+              _buildActions(),
             ],
           ),
         ),
@@ -235,70 +201,44 @@ class _EventFormSheetState extends State<EventFormSheet> {
     );
   }
 
-  Widget _buildField({
-    required TextEditingController controller,
-    required String label,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      validator: validator,
-      style: const TextStyle(color: AppColors.white),
-      decoration: _decoration(label),
+  Widget _buildActions() {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: _saving ? null : () => Navigator.of(context).pop(),
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: AppColors.inputBorder),
+              foregroundColor: AppColors.whiteSubtle,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            child: Text('$_prefix.cancel'.tr()),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: FilledButton(
+            onPressed: _saving ? null : _submit,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primaryLight,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
+            ),
+            child: _saving
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: AppColors.white),
+                  )
+                : Text('$_prefix.save'.tr(),
+                    style: const TextStyle(color: AppColors.white)),
+          ),
+        ),
+      ],
     );
   }
-
-  Widget _buildDateField({
-    required TextEditingController controller,
-    required String label,
-    required VoidCallback onTap,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: true,
-      onTap: onTap,
-      validator: validator,
-      style: const TextStyle(color: AppColors.white),
-      decoration: _decoration(label).copyWith(
-        suffixIcon: const Icon(Icons.calendar_today,
-            color: AppColors.whiteSubtle, size: 18),
-      ),
-    );
-  }
-
-  InputDecoration _decoration(String label) => InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: AppColors.whiteSubtle),
-        filled: true,
-        fillColor: AppColors.inputFill,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.inputBorder),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.inputBorder),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primaryLight),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.error),
-        ),
-      );
-
-  static String _fmtDisplay(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')}/'
-      '${d.month.toString().padLeft(2, '0')}/'
-      '${d.year}';
-
-  static String _apiDate(DateTime d) =>
-      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }

@@ -1,6 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/leagues/data/datasource/league_detail_service.dart';
 import 'package:sport_platform/modules/events/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/leagues/data/models/team_event_model.dart';
@@ -8,20 +11,22 @@ import 'package:sport_platform/modules/events/leagues/presentation/widgets/add_t
 import 'package:sport_platform/modules/events/leagues/presentation/widgets/match_card.dart';
 import 'package:sport_platform/modules/events/leagues/presentation/widgets/match_form_sheet.dart';
 import 'package:sport_platform/modules/events/leagues/presentation/widgets/team_event_card.dart';
-import 'package:sport_platform/modules/events/shared/data/datasource/event_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
+import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/event_form_sheet.dart';
+import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
+import 'package:sport_platform/shared/widgets/empty_state.dart';
+import 'package:sport_platform/shared/widgets/error_retry.dart';
+import 'package:sport_platform/shared/widgets/status_badge.dart';
 
 class LeagueDetailPage extends StatefulWidget {
   final EventModel event;
   final bool isOwner;
-  final EventService eventService;
 
   const LeagueDetailPage({
     super.key,
     required this.event,
     required this.isOwner,
-    required this.eventService,
   });
 
   @override
@@ -41,11 +46,12 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
   bool _loadingMatches = true;
   String? _matchesError;
 
-  final _detailService = LeagueDetailService();
+  late final LeagueDetailService _detailService;
 
   @override
   void initState() {
     super.initState();
+    _detailService = getIt<LeagueDetailService>();
     _event = widget.event;
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() => setState(() {}));
@@ -68,9 +74,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       final teams = await _detailService.getTeamsByEvent(_event.id);
       if (mounted) setState(() => _teams = teams);
     } catch (_) {
-      if (mounted) {
-        setState(() => _teamsError = 'leagues.error_load_teams'.tr());
-      }
+      if (mounted) setState(() => _teamsError = 'leagues.error_load_teams'.tr());
     } finally {
       if (mounted) setState(() => _loadingTeams = false);
     }
@@ -85,21 +89,20 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       final matches = await _detailService.getMatchesByEvent(_event.id);
       if (mounted) setState(() => _matches = matches);
     } catch (_) {
-      if (mounted) {
-        setState(() => _matchesError = 'leagues.error_load_matches'.tr());
-      }
+      if (mounted) setState(() => _matchesError = 'leagues.error_load_matches'.tr());
     } finally {
       if (mounted) setState(() => _loadingMatches = false);
     }
   }
 
   Future<void> _openEditEvent() async {
+    final notifier = context.read<EventsNotifier>();
     await EventFormSheet.show(
       context: context,
       translationPrefix: 'leagues',
       event: _event,
       onSave: (data) async {
-        final updated = await widget.eventService.update(_event.id, data);
+        final updated = await notifier.update(_event.id, data);
         if (mounted) {
           setState(() => _event = updated);
           _showSnack('leagues.success_updated'.tr());
@@ -124,34 +127,14 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
   }
 
   Future<void> _confirmRemoveTeam(TeamEventModel team) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0F2A0F),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'leagues.remove_team'.tr(),
-          style: const TextStyle(color: AppColors.white),
-        ),
-        content: Text(
-          'leagues.confirm_remove_team'.tr(args: [team.teamName]),
-          style: const TextStyle(color: AppColors.whiteSubtle),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text('leagues.cancel'.tr(),
-                style: const TextStyle(color: AppColors.whiteSubtle)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('leagues.delete'.tr(),
-                style: const TextStyle(color: AppColors.error)),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmationDialog(
+      context,
+      title: 'leagues.remove_team'.tr(),
+      content: 'leagues.confirm_remove_team'.tr(args: [team.teamName]),
+      confirmLabel: 'leagues.delete'.tr(),
+      cancelLabel: 'leagues.cancel'.tr(),
     );
-    if (confirmed != true || !mounted) return;
+    if (!confirmed || !mounted) return;
     try {
       await _detailService.removeTeam(team.id);
       setState(() => _teams.removeWhere((t) => t.id == team.id));
@@ -196,30 +179,13 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
   }
 
   Future<void> _confirmDeleteMatch(MatchModel match) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0F2A0F),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'leagues.confirm_delete_match'.tr(),
-          style: const TextStyle(color: AppColors.white),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text('leagues.cancel'.tr(),
-                style: const TextStyle(color: AppColors.whiteSubtle)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('leagues.delete'.tr(),
-                style: const TextStyle(color: AppColors.error)),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmationDialog(
+      context,
+      title: 'leagues.confirm_delete_match'.tr(),
+      confirmLabel: 'leagues.delete'.tr(),
+      cancelLabel: 'leagues.cancel'.tr(),
     );
-    if (confirmed != true || !mounted) return;
+    if (!confirmed || !mounted) return;
     try {
       await _detailService.deleteMatch(match.id);
       setState(() => _matches.removeWhere((m) => m.id == match.id));
@@ -246,10 +212,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       backgroundColor: AppColors.backgroundEnd,
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
-        title: Text(
-          _event.name,
-          style: const TextStyle(color: AppColors.white),
-        ),
+        title: Text(_event.name, style: const TextStyle(color: AppColors.white)),
         iconTheme: const IconThemeData(color: AppColors.white),
         elevation: 0,
         bottom: TabBar(
@@ -336,10 +299,10 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
           child: CircularProgressIndicator(color: AppColors.primaryLight));
     }
     if (_teamsError != null) {
-      return _ErrorRetry(message: _teamsError!, onRetry: _loadTeams);
+      return ErrorRetry(message: _teamsError!, onRetry: _loadTeams);
     }
     if (_teams.isEmpty) {
-      return _EmptyState(
+      return EmptyState(
         icon: Icons.groups_outlined,
         title: 'leagues.teams_empty'.tr(),
         subtitle: 'leagues.teams_empty_subtitle'.tr(),
@@ -353,8 +316,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
         itemCount: _teams.length,
         itemBuilder: (_, i) => TeamEventCard(
           team: _teams[i],
-          onRemove:
-              widget.isOwner ? () => _confirmRemoveTeam(_teams[i]) : null,
+          onRemove: widget.isOwner ? () => _confirmRemoveTeam(_teams[i]) : null,
         ),
       ),
     );
@@ -366,10 +328,10 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
           child: CircularProgressIndicator(color: AppColors.primaryLight));
     }
     if (_matchesError != null) {
-      return _ErrorRetry(message: _matchesError!, onRetry: _loadMatches);
+      return ErrorRetry(message: _matchesError!, onRetry: _loadMatches);
     }
     if (_matches.isEmpty) {
-      return _EmptyState(
+      return EmptyState(
         icon: Icons.sports_score_outlined,
         title: 'leagues.matches_empty'.tr(),
         subtitle: 'leagues.matches_empty_subtitle'.tr(),
@@ -430,47 +392,39 @@ class _InfoCard extends StatelessWidget {
                   ),
                 ),
               ),
-              _StatusChip(status: event.status),
+              StatusBadge.forEventChip(event.status),
             ],
           ),
-          if (event.description != null &&
-              event.description!.isNotEmpty) ...[
+          if (event.description != null && event.description!.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
               event.description!,
-              style: const TextStyle(
-                  color: AppColors.whiteSubtle, fontSize: 14),
+              style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
             ),
           ],
           const SizedBox(height: 16),
           _InfoRow(
             icon: Icons.calendar_today,
             label:
-                '${_fmt(event.startDate)} — ${_fmt(event.endDate)}',
+                '${DateFormatters.date(event.startDate)} — ${DateFormatters.date(event.endDate)}',
           ),
           if (event.format.isNotEmpty) ...[
             const SizedBox(height: 8),
             _InfoRow(icon: Icons.format_list_bulleted, label: event.format),
           ],
-          if (event.eventTypeName != null &&
-              event.eventTypeName!.isNotEmpty) ...[
+          if (event.eventTypeName != null && event.eventTypeName!.isNotEmpty) ...[
             const SizedBox(height: 8),
-            _InfoRow(
-                icon: Icons.military_tech, label: event.eventTypeName!),
+            _InfoRow(icon: Icons.military_tech, label: event.eventTypeName!),
           ],
           const SizedBox(height: 8),
           _InfoRow(
             icon: Icons.access_time,
-            label: _fmt(event.createdAt),
+            label: DateFormatters.date(event.createdAt),
           ),
         ],
       ),
     );
   }
-
-  static String _fmt(DateTime d) =>
-      '${d.day.toString().padLeft(2, '0')}/'
-      '${d.month.toString().padLeft(2, '0')}/${d.year}';
 }
 
 class _InfoRow extends StatelessWidget {
@@ -487,145 +441,10 @@ class _InfoRow extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(
-                color: AppColors.whiteSubtle, fontSize: 13),
+            style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
           ),
         ),
       ],
-    );
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  final String status;
-  const _StatusChip({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _colorFor(status);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
-      ),
-      child: Text(
-        _labelFor(status),
-        style: TextStyle(
-            color: color, fontSize: 12, fontWeight: FontWeight.w500),
-      ),
-    );
-  }
-
-  static String _labelFor(String s) {
-    const known = {'ACTIVE', 'UPCOMING', 'FINISHED', 'CANCELLED'};
-    final key = s.toUpperCase();
-    return known.contains(key)
-        ? 'events.status_${key.toLowerCase()}'.tr()
-        : s;
-  }
-
-  static Color _colorFor(String s) {
-    switch (s.toUpperCase()) {
-      case 'ACTIVE':
-        return AppColors.success;
-      case 'UPCOMING':
-        return AppColors.primaryLight;
-      case 'FINISHED':
-        return AppColors.whiteSubtle;
-      case 'CANCELLED':
-        return AppColors.error;
-      default:
-        return AppColors.whiteSubtle;
-    }
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  const _EmptyState(
-      {required this.icon, required this.title, required this.subtitle});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: AppColors.primaryLight.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-                border: Border.all(
-                    color: AppColors.primaryLight.withValues(alpha: 0.3)),
-              ),
-              child: Icon(icon, color: AppColors.primaryLight, size: 36),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              title,
-              style: const TextStyle(
-                  color: AppColors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: const TextStyle(
-                  color: AppColors.whiteSubtle, fontSize: 14),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ErrorRetry extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-  const _ErrorRetry({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, color: AppColors.error, size: 48),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              style: const TextStyle(
-                  color: AppColors.whiteSubtle, fontSize: 14),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            OutlinedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: Text('leagues.retry'.tr()),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primaryLight,
-                side: const BorderSide(color: AppColors.primaryLight),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
