@@ -1,13 +1,13 @@
-import 'package:easy_localization/easy_localization.dart';
+﻿import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
-import 'package:sport_platform/modules/events/leagues/data/datasource/courts_service.dart';
-import 'package:sport_platform/modules/events/leagues/data/models/court_model.dart';
-import 'package:sport_platform/modules/events/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/leagues/data/models/team_event_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/courts_service.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
 import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
 class MatchFormSheet extends StatefulWidget {

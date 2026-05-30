@@ -1,8 +1,8 @@
-import 'package:easy_localization/easy_localization.dart';
+﻿import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
-import 'package:sport_platform/modules/events/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/shared/widgets/status_badge.dart';
 
 class MatchCard extends StatelessWidget {
@@ -149,7 +149,7 @@ class _TeamsRow extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Text(
-            hasScore ? '$homeScore — $awayScore' : 'vs',
+            hasScore ? '$homeScore â€” $awayScore' : 'vs',
             style: TextStyle(
               color: hasScore ? AppColors.primaryLight : AppColors.whiteSubtle,
               fontSize: hasScore ? 16 : 13,

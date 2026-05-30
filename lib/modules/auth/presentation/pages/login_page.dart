@@ -21,8 +21,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  // DEV: prefilled credentials — remove these two lines to return to normal
+  final _emailController = TextEditingController(text: 'test1@test.com');
+  final _passwordController = TextEditingController(text: 'test1@test.comA');
   bool _obscurePassword = true;
   bool _isLoading = false;
   final _client = DioClient();

@@ -833,7 +833,7 @@ PASO 1 — Crear el archivo de la página
     const TeamDetailPage({
       super.key,
       required this.team,
-      required this.isOwner,
+      required this.isOwner,2
     });
 
     @override

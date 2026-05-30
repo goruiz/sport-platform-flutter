@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
-import 'package:sport_platform/shared/widgets/status_badge.dart';
 
 class EventCard extends StatelessWidget {
   final EventModel event;
@@ -77,8 +76,7 @@ class EventCard extends StatelessWidget {
                         style: const TextStyle(
                             color: AppColors.whiteSubtle, fontSize: 12),
                       ),
-                      const SizedBox(height: 8),
-                      StatusBadge.forEvent(event.status),
+
                     ],
                   ),
                 ),

@@ -1,7 +1,7 @@
-import 'package:sport_platform/core/modules/module_registry.dart';
+﻿import 'package:sport_platform/core/modules/module_registry.dart';
 import 'package:sport_platform/core/modules/module_urls.dart';
 import 'package:sport_platform/modules/events/presentation/pages/events_page.dart';
-import 'package:sport_platform/modules/events/leagues/presentation/pages/leagues_page.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/presentation/pages/leagues_page.dart';
 import 'package:sport_platform/modules/matches/presentation/pages/matches_page.dart';
 import 'package:sport_platform/modules/rankings/presentation/pages/rankings_page.dart';
 import 'package:sport_platform/modules/reports/presentation/pages/reports_page.dart';

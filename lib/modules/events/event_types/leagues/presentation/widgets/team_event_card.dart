@@ -1,7 +1,7 @@
-import 'package:easy_localization/easy_localization.dart';
+﻿import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/events/leagues/data/models/team_event_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
 
 class TeamEventCard extends StatelessWidget {
   final TeamEventModel team;
