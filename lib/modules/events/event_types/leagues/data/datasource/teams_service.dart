@@ -14,4 +14,20 @@ class TeamsService {
         .map((e) => TeamModel.fromJson(e as Map<String, dynamic>))
         .toList();
   }
+
+  Future<TeamModel> create(String name, {String? logoUrl}) async {
+    final response = await _client.post(
+      ApiEndpoints.teams,
+      data: {
+        'name': name,
+        if (logoUrl != null && logoUrl.isNotEmpty) 'logoUrl': logoUrl,
+      },
+    );
+    final dynamic raw = response.data;
+    final Map<String, dynamic> data =
+        raw is Map<String, dynamic> && raw.containsKey('data')
+            ? raw['data'] as Map<String, dynamic>
+            : raw as Map<String, dynamic>;
+    return TeamModel.fromJson(data);
+  }
 }

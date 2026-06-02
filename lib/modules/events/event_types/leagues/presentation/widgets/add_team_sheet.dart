@@ -5,6 +5,7 @@ import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/teams_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/create_team_sheet.dart';
 import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
 class AddTeamSheet extends StatefulWidget {
@@ -107,6 +108,14 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
     }
   }
 
+  void _openCreateTeam() {
+    CreateTeamSheet.show(
+      context: context,
+      initialName: _query,
+      onCreated: _add,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bottom = MediaQuery.of(context).viewInsets.bottom;
@@ -145,7 +154,26 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
           ),
           const SizedBox(height: 12),
           Flexible(child: _buildList()),
+          const SizedBox(height: 8),
+          _buildCreateFooter(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCreateFooter() {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: _openCreateTeam,
+        icon: const Icon(Icons.add, size: 18),
+        label: Text('leagues.create_team'.tr()),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primaryLight,
+          side: const BorderSide(color: AppColors.primaryLight),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
       ),
     );
   }
@@ -189,10 +217,32 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: Text(
-            'leagues.teams_empty'.tr(),
-            style:
-                const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _query.isEmpty
+                    ? 'leagues.teams_empty'.tr()
+                    : 'leagues.no_team_found'.tr(args: [_query]),
+                style: const TextStyle(
+                    color: AppColors.whiteSubtle, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
+              if (_query.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                FilledButton.icon(
+                  onPressed: _openCreateTeam,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: Text('leagues.create_team_named'.tr(args: [_query])),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primaryLight,
+                    foregroundColor: AppColors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
       );

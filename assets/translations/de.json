@@ -194,7 +194,15 @@
     "error_team_action": "Fehler bei der Team-Verwaltung",
     "error_match_action": "Fehler bei der Spiel-Verwaltung",
     "no_courts": "Keine Plätze verfügbar",
-    "search_team": "Team suchen..."
+    "search_team": "Team suchen...",
+    "create_team": "Neues Team erstellen",
+    "create_team_named": "\"{}\" erstellen",
+    "no_team_found": "Kein Team gefunden für \"{}\"",
+    "team_name": "Teamname",
+    "team_logo_url": "Logo-URL (optional)",
+    "team_name_required": "Teamname ist erforderlich",
+    "success_team_created": "Team erstellt und zur Liga hinzugefügt",
+    "error_create_team": "Fehler beim Erstellen des Teams"
   },
   "menu": {
     "home": "Startseite",

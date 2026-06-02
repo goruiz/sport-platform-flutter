@@ -194,7 +194,15 @@
     "error_team_action": "Erreur lors de la gestion de l'équipe",
     "error_match_action": "Erreur lors de la gestion du match",
     "no_courts": "Aucun terrain disponible",
-    "search_team": "Rechercher une équipe..."
+    "search_team": "Rechercher une équipe...",
+    "create_team": "Créer une nouvelle équipe",
+    "create_team_named": "Créer \"{}\"",
+    "no_team_found": "Aucune équipe trouvée pour \"{}\"",
+    "team_name": "Nom de l'équipe",
+    "team_logo_url": "URL du logo (optionnel)",
+    "team_name_required": "Le nom de l'équipe est requis",
+    "success_team_created": "Équipe créée et ajoutée à la ligue",
+    "error_create_team": "Erreur lors de la création de l'équipe"
   },
   "menu": {
     "home": "Accueil",
