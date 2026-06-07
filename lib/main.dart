@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:app_links/app_links.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
@@ -76,6 +77,17 @@ class _AppRouterState extends State<_AppRouter> {
   }
 
   Future<void> _initDeepLinks() async {
+    // On web, app_links does not intercept the browser URL.
+    // Read Uri.base directly to extract any invite token from the address bar.
+    if (kIsWeb) {
+      final webUri = Uri.base;
+      // Normalize path: collapse any leading double-slash (e.g. //register → /register)
+      final normalizedPath = '/${webUri.path.replaceAll(RegExp(r'^/+'), '')}';
+      final normalized = webUri.replace(path: normalizedPath);
+      _handleLink(normalized, isInitial: true);
+      return;
+    }
+
     final appLinks = AppLinks();
 
     // Cold start: check if the app was launched from an invite link.
