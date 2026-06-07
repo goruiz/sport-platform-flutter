@@ -34,6 +34,7 @@ class ApiEndpoints {
       '/teams-events/by-event/$eventId';
   static const String teamsEvents = '/teams-events';
   static String teamsEventsById(String id) => '/teams-events/$id';
+  static String teamsEventsHardDelete(String id) => '/teams-events/$id/hard';
 
   // Courts
   static const String courts = '/courts';

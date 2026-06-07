@@ -26,7 +26,7 @@ class LeagueDetailService {
   }
 
   Future<void> removeTeam(String teamsEventsId) async {
-    await _client.delete(ApiEndpoints.teamsEventsById(teamsEventsId));
+    await _client.delete(ApiEndpoints.teamsEventsHardDelete(teamsEventsId));
   }
 
   Future<List<MatchModel>> getMatchesByEvent(String eventId) async {

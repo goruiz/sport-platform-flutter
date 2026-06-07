@@ -200,6 +200,9 @@
     "no_team_found": "Kein Team gefunden für \"{}\"",
     "team_name": "Teamname",
     "team_logo_url": "Logo-URL (optional)",
+    "team_logo": "Teamlogo (optional)",
+    "pick_image_gallery": "Galerie",
+    "pick_image_camera": "Kamera",
     "team_name_required": "Teamname ist erforderlich",
     "success_team_created": "Team erstellt und zur Liga hinzugefügt",
     "error_create_team": "Fehler beim Erstellen des Teams"

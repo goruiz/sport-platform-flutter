@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
@@ -40,7 +43,8 @@ class CreateTeamSheet extends StatefulWidget {
 class _CreateTeamSheetState extends State<CreateTeamSheet> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameCtrl;
-  final _logoUrlCtrl = TextEditingController();
+  final _picker = ImagePicker();
+  File? _pickedImage;
   bool _saving = false;
   late final TeamsService _teamsService;
 
@@ -54,7 +58,6 @@ class _CreateTeamSheetState extends State<CreateTeamSheet> {
   @override
   void dispose() {
     _nameCtrl.dispose();
-    _logoUrlCtrl.dispose();
     super.dispose();
   }
 
@@ -69,14 +72,78 @@ class _CreateTeamSheetState extends State<CreateTeamSheet> {
     );
   }
 
+  Future<void> _pickImage(ImageSource source) async {
+    final XFile? picked = await _picker.pickImage(
+      source: source,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 85,
+    );
+    if (picked != null && mounted) {
+      setState(() => _pickedImage = File(picked.path));
+    }
+  }
+
+  void _showImageSourceSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.sheetBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(
+                Icons.photo_library_outlined,
+                color: AppColors.white,
+              ),
+              title: Text(
+                'leagues.pick_image_gallery'.tr(),
+                style: const TextStyle(color: AppColors.white),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.camera_alt_outlined,
+                color: AppColors.white,
+              ),
+              title: Text(
+                'leagues.pick_image_camera'.tr(),
+                style: const TextStyle(color: AppColors.white),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                _pickImage(ImageSource.camera);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
     try {
-      final logoUrl = _logoUrlCtrl.text.trim();
+      String? logoUrl;
+
+      // TODO: Uncomment when cloud storage (TeamLogoStorageService) is configured.
+      // if (_pickedImage != null) {
+      //   final storageService = getIt<TeamLogoStorageService>();
+      //   logoUrl = await storageService.uploadLogo(_pickedImage!);
+      // }
+
       final team = await _teamsService.create(
         _nameCtrl.text.trim(),
-        logoUrl: logoUrl.isEmpty ? null : logoUrl,
+        logoUrl: logoUrl,
       );
       if (!mounted) return;
       Navigator.of(context).pop();
@@ -133,18 +200,51 @@ class _CreateTeamSheetState extends State<CreateTeamSheet> {
                     : null,
               ),
               const SizedBox(height: 14),
-              TextFormField(
-                controller: _logoUrlCtrl,
-                style: const TextStyle(color: AppColors.white),
-                decoration: AppInputDecoration.standard(
-                  'leagues.team_logo_url'.tr(),
-                ).copyWith(
-                  prefixIcon: const Icon(
-                    Icons.image_outlined,
-                    color: AppColors.whiteSubtle,
-                  ),
+              Text(
+                'leagues.team_logo'.tr(),
+                style: const TextStyle(
+                  color: AppColors.whiteSubtle,
+                  fontSize: 13,
                 ),
-                keyboardType: TextInputType.url,
+              ),
+              const SizedBox(height: 8),
+              GestureDetector(
+                onTap: _saving ? null : _showImageSourceSheet,
+                child: Container(
+                  width: double.infinity,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: AppColors.inputFill,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.inputBorder),
+                  ),
+                  child: _pickedImage != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.file(
+                            _pickedImage!,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.add_photo_alternate_outlined,
+                              color: AppColors.whiteSubtle,
+                              size: 32,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'leagues.team_logo'.tr(),
+                              style: const TextStyle(
+                                color: AppColors.whiteSubtle,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
               ),
               const SizedBox(height: 24),
               Row(
