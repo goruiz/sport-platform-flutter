@@ -8,6 +8,7 @@ import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/teams_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_players_sheet.dart';
 import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
 class CreateTeamSheet extends StatefulWidget {
@@ -145,6 +146,12 @@ class _CreateTeamSheetState extends State<CreateTeamSheet> {
         _nameCtrl.text.trim(),
         logoUrl: logoUrl,
       );
+      if (!mounted) return;
+      setState(() => _saving = false);
+
+      // Show players form on top before closing this sheet
+      await AddPlayersSheet.show(context: context, team: team);
+
       if (!mounted) return;
       Navigator.of(context).pop();
       await widget.onCreated(team);

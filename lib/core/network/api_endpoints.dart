@@ -17,6 +17,13 @@ class ApiEndpoints {
   static const String teams = '/teams';
   static String teamById(String id) => '/teams/$id';
 
+  // Players
+  static const String players = '/players';
+  static String playerById(String id) => '/players/$id';
+  static const String playersSearch = '/players/search';
+  static const String playersInvite = '/players/invite';
+  static const String playersInviteRegister = '/players/invite-register';
+
   // Events
   static const String events = '/events';
   static String eventById(String id) => '/events/$id';
