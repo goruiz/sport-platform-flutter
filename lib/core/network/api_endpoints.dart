@@ -23,6 +23,9 @@ class ApiEndpoints {
   static const String playersSearch = '/players/search';
   static const String playersInvite = '/players/invite';
   static const String playersInviteRegister = '/players/invite-register';
+  static const String playersAuthRegister = '/players/auth/register';
+  static String playersByTeam(String teamId) => '/players/by-team/$teamId';
+  static String playerRemoveFromTeam(String id) => '/players/$id/remove-from-team';
 
   // Events
   static const String events = '/events';

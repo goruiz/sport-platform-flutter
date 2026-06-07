@@ -67,6 +67,53 @@ class PlayersService {
     );
   }
 
+  Future<PlayerModel> updatePlayer(
+    String playerId, {
+    String? firstName,
+    String? lastName,
+    String? phone,
+  }) async {
+    final body = <String, dynamic>{
+      if (firstName case final v?) 'firstName': v,
+      if (lastName case final v?) 'lastName': v,
+      if (phone case final v?) 'phone': v,
+    };
+    final response = await _client.put(
+      ApiEndpoints.playerById(playerId),
+      data: body,
+    );
+    final dynamic raw = response.data;
+    final Map<String, dynamic> data =
+        raw is Map<String, dynamic> && raw.containsKey('data')
+            ? raw['data'] as Map<String, dynamic>
+            : raw as Map<String, dynamic>;
+    return PlayerModel.fromJson(data);
+  }
+
+  Future<PlayerModel> removeFromTeam(String playerId) async {
+    final response = await _client.patch(
+      ApiEndpoints.playerRemoveFromTeam(playerId),
+    );
+    final dynamic raw = response.data;
+    final Map<String, dynamic> data =
+        raw is Map<String, dynamic> && raw.containsKey('data')
+            ? raw['data'] as Map<String, dynamic>
+            : raw as Map<String, dynamic>;
+    return PlayerModel.fromJson(data);
+  }
+
+  Future<List<PlayerModel>> getByTeamId(String teamId) async {
+    final response = await _client.get(ApiEndpoints.playersByTeam(teamId));
+    final dynamic raw = response.data;
+    final List<dynamic> list =
+        raw is Map<String, dynamic> && raw.containsKey('data')
+            ? raw['data'] as List<dynamic>
+            : raw as List<dynamic>;
+    return list
+        .map((e) => PlayerModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
   /// Sends a registration link to an unregistered email.
   /// Once the user registers, they are automatically added to the team.
   Future<void> inviteNewUser({

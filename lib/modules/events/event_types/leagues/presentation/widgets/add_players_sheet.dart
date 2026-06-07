@@ -14,20 +14,26 @@ class AddPlayersSheet extends StatefulWidget {
   static const int maxPlayers = 30;
 
   final TeamModel team;
+  final bool isEditMode;
 
-  const AddPlayersSheet({super.key, required this.team});
+  const AddPlayersSheet({
+    super.key,
+    required this.team,
+    this.isEditMode = false,
+  });
 
   static Future<void> show({
     required BuildContext context,
     required TeamModel team,
+    bool isEditMode = false,
   }) {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      isDismissible: false,
-      enableDrag: false,
+      isDismissible: isEditMode,
+      enableDrag: isEditMode,
       backgroundColor: Colors.transparent,
-      builder: (_) => AddPlayersSheet(team: team),
+      builder: (_) => AddPlayersSheet(team: team, isEditMode: isEditMode),
     );
   }
 
@@ -41,14 +47,15 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
 
   bool _searching = false;
   bool _sendingInvitation = false;
+  bool _loadingExisting = false;
+  String? _loadError;
 
-  /// null  = no search done yet
-  /// value = last search result (found user or null = not found)
   PlayerModel? _foundUser;
   bool _searchPerformed = false;
   String? _searchError;
   String? _inviteError;
 
+  final List<PlayerModel> _existingPlayers = [];
   final List<PlayerInvitation> _addedPlayers = [];
   late final PlayersService _playersService;
 
@@ -56,6 +63,7 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
   void initState() {
     super.initState();
     _playersService = getIt<PlayersService>();
+    if (widget.isEditMode) _loadExistingPlayers();
   }
 
   @override
@@ -64,16 +72,48 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
     super.dispose();
   }
 
-  // ── Search ──────────────────────────────────────────────────────────────────
+  // ── Load existing ────────────────────────────────────────────────────────────
+
+  Future<void> _loadExistingPlayers() async {
+    setState(() {
+      _loadingExisting = true;
+      _loadError = null;
+    });
+    try {
+      final players = await _playersService.getByTeamId(widget.team.id);
+      if (mounted) {
+        setState(() {
+          _existingPlayers
+            ..clear()
+            ..addAll(players);
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _loadError = 'players.error_load'.tr());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _loadingExisting = false);
+      }
+    }
+  }
+
+  // ── Search ───────────────────────────────────────────────────────────────────
 
   Future<void> _searchUser() async {
     if (!_searchFormKey.currentState!.validate()) return;
 
     final email = _emailCtrl.text.trim();
 
-    if (_addedPlayers.any(
+    final alreadyAdded = _addedPlayers.any(
       (p) => p.email.toLowerCase() == email.toLowerCase(),
-    )) {
+    );
+    final alreadyExists = _existingPlayers.any(
+      (p) => p.email.toLowerCase() == email.toLowerCase(),
+    );
+
+    if (alreadyAdded || alreadyExists) {
       setState(() => _searchError = 'players.already_added'.tr());
       return;
     }
@@ -130,9 +170,7 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
         );
         _sendingInvitation = false;
       });
-      _showSuccessSnackbar(
-        'players.invitation_sent'.tr(args: [email]),
-      );
+      _showSuccessSnackbar('players.invitation_sent'.tr(args: [email]));
       _clearSearch();
     } catch (_) {
       if (!mounted) return;
@@ -171,8 +209,7 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
         _sendingInvitation = false;
       });
       _showSuccessSnackbar(
-        'players.registration_link_sent'.tr(args: [email]),
-      );
+          'players.registration_link_sent'.tr(args: [email]));
       _clearSearch();
     } catch (_) {
       if (!mounted) return;
@@ -184,6 +221,67 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  Future<void> _editPlayer(PlayerModel player) async {
+    await _EditPlayerDialog.show(
+      context: context,
+      player: player,
+      onSave: (firstName, lastName, phone) async {
+        final updated = await _playersService.updatePlayer(
+          player.id,
+          firstName: firstName,
+          lastName: lastName,
+          phone: phone,
+        );
+        if (mounted) {
+          setState(() {
+            final idx = _existingPlayers.indexWhere((p) => p.id == player.id);
+            if (idx != -1) _existingPlayers[idx] = updated;
+          });
+        }
+      },
+    );
+  }
+
+  Future<void> _removePlayerFromTeam(PlayerModel player) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.sheetBackground,
+        title: Text(
+          'players.confirm_remove_title'.tr(),
+          style: const TextStyle(color: AppColors.white),
+        ),
+        content: Text(
+          'players.confirm_remove_body'.tr(args: [player.fullName]),
+          style: const TextStyle(color: AppColors.whiteSubtle),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('leagues.cancel'.tr(),
+                style: const TextStyle(color: AppColors.whiteSubtle)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('leagues.delete'.tr(),
+                style: const TextStyle(color: AppColors.error)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      await _playersService.removeFromTeam(player.id);
+      if (mounted) {
+        setState(() => _existingPlayers.removeWhere((p) => p.id == player.id));
+      }
+    } catch (_) {
+      if (mounted) {
+        _showSuccessSnackbar('players.error_remove'.tr());
+      }
+    }
+  }
 
   void _clearSearch() {
     _emailCtrl.clear();
@@ -208,7 +306,8 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
   }
 
   void _finish() {
-    if (_addedPlayers.length < AddPlayersSheet.minPlayers) {
+    if (!widget.isEditMode &&
+        _addedPlayers.length < AddPlayersSheet.minPlayers) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -228,13 +327,14 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
 
   void _skip() => Navigator.of(context).pop();
 
+  int get _totalCount => _existingPlayers.length + _addedPlayers.length;
+
   // ── Build ────────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final bottom = MediaQuery.of(context).viewInsets.bottom;
-    final count = _addedPlayers.length;
-    final atMax = count >= AddPlayersSheet.maxPlayers;
+    final atMax = _totalCount >= AddPlayersSheet.maxPlayers;
 
     return Container(
       constraints: BoxConstraints(
@@ -251,7 +351,7 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
         children: [
           const SheetHandle(),
           const SizedBox(height: 16),
-          _buildHeader(count),
+          _buildHeader(),
           const SizedBox(height: 16),
           Flexible(child: _buildPlayerList()),
           if (!atMax) ...[
@@ -286,7 +386,10 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
 
   // ── Header ───────────────────────────────────────────────────────────────────
 
-  Widget _buildHeader(int count) {
+  Widget _buildHeader() {
+    final titleKey = widget.isEditMode
+        ? 'players.manage_players_title'
+        : 'players.add_players_title';
     return Row(
       children: [
         Expanded(
@@ -294,7 +397,7 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'players.add_players_title'.tr(args: [widget.team.name]),
+                titleKey.tr(args: [widget.team.name]),
                 style: const TextStyle(
                   color: AppColors.white,
                   fontSize: 17,
@@ -304,11 +407,12 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
               const SizedBox(height: 4),
               Text(
                 'players.count_hint'.tr(args: [
-                  count.toString(),
+                  _totalCount.toString(),
                   AddPlayersSheet.maxPlayers.toString(),
                 ]),
                 style: TextStyle(
-                  color: count < AddPlayersSheet.minPlayers
+                  color: (!widget.isEditMode &&
+                          _totalCount < AddPlayersSheet.minPlayers)
                       ? AppColors.warning
                       : AppColors.primaryLight,
                   fontSize: 13,
@@ -317,15 +421,16 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
             ],
           ),
         ),
-        _buildCountBadge(count),
+        _buildCountBadge(),
       ],
     );
   }
 
-  Widget _buildCountBadge(int count) {
-    final color = count < AddPlayersSheet.minPlayers
-        ? AppColors.warning
-        : AppColors.primaryLight;
+  Widget _buildCountBadge() {
+    final insufficient =
+        !widget.isEditMode && _totalCount < AddPlayersSheet.minPlayers;
+    final color =
+        insufficient ? AppColors.warning : AppColors.primaryLight;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -334,9 +439,9 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
         border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Text(
-        '$count / ${AddPlayersSheet.maxPlayers}',
-        style:
-            TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w600),
+        '$_totalCount / ${AddPlayersSheet.maxPlayers}',
+        style: TextStyle(
+            color: color, fontSize: 13, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -344,82 +449,87 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
   // ── Player list ──────────────────────────────────────────────────────────────
 
   Widget _buildPlayerList() {
-    if (_addedPlayers.isEmpty) {
+    if (_loadingExisting) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 24),
+          child: CircularProgressIndicator(color: AppColors.primaryLight),
+        ),
+      );
+    }
+
+    if (_loadError != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_loadError!,
+                  style: const TextStyle(
+                      color: AppColors.error, fontSize: 13)),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: _loadExistingPlayers,
+                child: Text('common.retry'.tr(),
+                    style: const TextStyle(color: AppColors.primaryLight)),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final hasAny =
+        _existingPlayers.isNotEmpty || _addedPlayers.isNotEmpty;
+
+    if (!hasAny) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Text(
-            'players.empty_hint'
-                .tr(args: [AddPlayersSheet.minPlayers.toString()]),
-            style:
-                const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+            widget.isEditMode
+                ? 'players.no_players_yet'.tr()
+                : 'players.empty_hint'
+                    .tr(args: [AddPlayersSheet.minPlayers.toString()]),
+            style: const TextStyle(
+                color: AppColors.whiteSubtle, fontSize: 13),
             textAlign: TextAlign.center,
           ),
         ),
       );
     }
-    return ListView.separated(
-      shrinkWrap: true,
-      itemCount: _addedPlayers.length,
-      separatorBuilder: (_, _) =>
-          const Divider(height: 1, color: AppColors.inputBorder),
-      itemBuilder: (_, i) {
-        final p = _addedPlayers[i];
-        return ListTile(
-          dense: true,
-          contentPadding: EdgeInsets.zero,
-          leading: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppColors.primaryLight.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                '${i + 1}',
-                style: const TextStyle(
-                  color: AppColors.primaryLight,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ),
-          title: Text(
-            p.displayName,
-            style: const TextStyle(color: AppColors.white, fontSize: 14),
-          ),
-          subtitle: p.isExisting
-              ? null
-              : Text(
-                  p.email,
-                  style: const TextStyle(
-                      color: AppColors.whiteSubtle, fontSize: 12),
-                ),
-          trailing: _buildStatusBadge(p.isExisting),
-        );
-      },
-    );
-  }
 
-  Widget _buildStatusBadge(bool isExisting) {
-    final label = isExisting
-        ? 'players.status_invited'.tr()
-        : 'players.status_pending_registration'.tr();
-    final color =
-        isExisting ? AppColors.primaryLight : AppColors.warning;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w500),
-      ),
+    final allItems = <Widget>[];
+
+    for (var i = 0; i < _existingPlayers.length; i++) {
+      final p = _existingPlayers[i];
+      allItems.add(_ExistingPlayerTile(
+        index: i + 1,
+        player: p,
+        onEdit: widget.isEditMode ? () => _editPlayer(p) : null,
+        onRemove: widget.isEditMode ? () => _removePlayerFromTeam(p) : null,
+      ));
+      if (i < _existingPlayers.length - 1 || _addedPlayers.isNotEmpty) {
+        allItems.add(const Divider(height: 1, color: AppColors.inputBorder));
+      }
+    }
+
+    for (var i = 0; i < _addedPlayers.length; i++) {
+      final p = _addedPlayers[i];
+      final globalIndex = _existingPlayers.length + i + 1;
+      allItems.add(_NewInvitationTile(
+        index: globalIndex,
+        invitation: p,
+      ));
+      if (i < _addedPlayers.length - 1) {
+        allItems.add(const Divider(height: 1, color: AppColors.inputBorder));
+      }
+    }
+
+    return ListView(
+      shrinkWrap: true,
+      children: allItems,
     );
   }
 
@@ -433,8 +543,8 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
             'players.add_player'.tr(),
-            style:
-                const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+            style: const TextStyle(
+                color: AppColors.whiteSubtle, fontSize: 12),
           ),
         ),
         const Expanded(child: Divider(color: AppColors.inputBorder)),
@@ -458,7 +568,8 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
                   controller: _emailCtrl,
                   style: const TextStyle(color: AppColors.white),
                   keyboardType: TextInputType.emailAddress,
-                  onFieldSubmitted: (_) => _searching ? null : _searchUser(),
+                  onFieldSubmitted: (_) =>
+                      _searching ? null : _searchUser(),
                   decoration: AppInputDecoration.standard(
                     'players.search_placeholder'.tr(),
                   ).copyWith(
@@ -471,7 +582,8 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
                     if (v == null || v.trim().isEmpty) {
                       return 'players.email_required'.tr();
                     }
-                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v.trim())) {
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$')
+                        .hasMatch(v.trim())) {
                       return 'players.email_invalid'.tr();
                     }
                     return null;
@@ -485,7 +597,8 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
                   onPressed: _searching ? null : _searchUser,
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -501,7 +614,8 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
                         )
                       : Text(
                           'players.search_button'.tr(),
-                          style: const TextStyle(color: AppColors.white),
+                          style: const TextStyle(
+                              color: AppColors.white),
                         ),
                 ),
               ),
@@ -511,7 +625,8 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
             const SizedBox(height: 6),
             Text(
               _searchError!,
-              style: const TextStyle(color: AppColors.error, fontSize: 12),
+              style: const TextStyle(
+                  color: AppColors.error, fontSize: 12),
             ),
           ],
         ],
@@ -546,42 +661,37 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
         children: [
           Row(
             children: [
-              const Icon(
-                Icons.person_outline,
-                color: AppColors.primaryLight,
-                size: 20,
-              ),
+              const Icon(Icons.person_outline,
+                  color: AppColors.primaryLight, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      user.fullName,
-                      style: const TextStyle(
-                        color: AppColors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      user.email,
-                      style: const TextStyle(
-                        color: AppColors.whiteSubtle,
-                        fontSize: 12,
-                      ),
-                    ),
+                    Text(user.fullName,
+                        style: const TextStyle(
+                          color: AppColors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        )),
+                    Text(user.email,
+                        style: const TextStyle(
+                          color: AppColors.whiteSubtle,
+                          fontSize: 12,
+                        )),
                   ],
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withValues(alpha: 0.12),
+                  color:
+                      AppColors.success.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: AppColors.success.withValues(alpha: 0.35),
+                    color: AppColors.success
+                        .withValues(alpha: 0.35),
                   ),
                 ),
                 child: Text(
@@ -597,20 +707,20 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
           ),
           if (_inviteError != null) ...[
             const SizedBox(height: 6),
-            Text(
-              _inviteError!,
-              style:
-                  const TextStyle(color: AppColors.error, fontSize: 12),
-            ),
+            Text(_inviteError!,
+                style: const TextStyle(
+                    color: AppColors.error, fontSize: 12)),
           ],
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: _sendingInvitation ? null : _inviteExistingUser,
+              onPressed:
+                  _sendingInvitation ? null : _inviteExistingUser,
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.primaryLight,
-                padding: const EdgeInsets.symmetric(vertical: 11),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 11),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -624,11 +734,8 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
                         color: AppColors.white,
                       ),
                     )
-                  : const Icon(
-                      Icons.mark_email_unread_outlined,
-                      size: 18,
-                      color: AppColors.white,
-                    ),
+                  : const Icon(Icons.mark_email_unread_outlined,
+                      size: 18, color: AppColors.white),
               label: Text(
                 'players.invite_existing'.tr(),
                 style: const TextStyle(color: AppColors.white),
@@ -657,11 +764,8 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
-                Icons.info_outline,
-                color: AppColors.warning,
-                size: 18,
-              ),
+              const Icon(Icons.info_outline,
+                  color: AppColors.warning, size: 18),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(
@@ -690,20 +794,21 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
           ),
           if (_inviteError != null) ...[
             const SizedBox(height: 6),
-            Text(
-              _inviteError!,
-              style:
-                  const TextStyle(color: AppColors.error, fontSize: 12),
-            ),
+            Text(_inviteError!,
+                style: const TextStyle(
+                    color: AppColors.error, fontSize: 12)),
           ],
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: _sendingInvitation ? null : _sendRegistrationLink,
+              onPressed: _sendingInvitation
+                  ? null
+                  : _sendRegistrationLink,
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.warning,
-                padding: const EdgeInsets.symmetric(vertical: 11),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 11),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -717,11 +822,8 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
                         color: AppColors.white,
                       ),
                     )
-                  : const Icon(
-                      Icons.outgoing_mail,
-                      size: 18,
-                      color: AppColors.white,
-                    ),
+                  : const Icon(Icons.outgoing_mail,
+                      size: 18, color: AppColors.white),
               label: Text(
                 'players.invite_new'.tr(),
                 style: const TextStyle(color: AppColors.white),
@@ -736,6 +838,26 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
   // ── Bottom actions ───────────────────────────────────────────────────────────
 
   Widget _buildActions() {
+    if (widget.isEditMode) {
+      return SizedBox(
+        width: double.infinity,
+        child: FilledButton(
+          onPressed: _skip,
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.primaryLight,
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          child: Text(
+            'players.close'.tr(),
+            style: const TextStyle(color: AppColors.white),
+          ),
+        ),
+      );
+    }
+
     final canFinish = _addedPlayers.length >= AddPlayersSheet.minPlayers;
     return Row(
       children: [
@@ -773,6 +895,321 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ── Tile widgets ─────────────────────────────────────────────────────────────
+
+class _ExistingPlayerTile extends StatelessWidget {
+  final int index;
+  final PlayerModel player;
+  final VoidCallback? onEdit;
+  final VoidCallback? onRemove;
+
+  const _ExistingPlayerTile({
+    required this.index,
+    required this.player,
+    this.onEdit,
+    this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      onTap: onEdit,
+      leading: _IndexBadge(index: index, color: AppColors.primaryLight),
+      title: Text(
+        player.fullName,
+        style: const TextStyle(color: AppColors.white, fontSize: 14),
+      ),
+      subtitle: Text(
+        player.email,
+        style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+      ),
+      trailing: onEdit != null
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.edit_outlined,
+                      color: AppColors.primaryLight, size: 18),
+                  tooltip: 'common.edit'.tr(),
+                  padding: EdgeInsets.zero,
+                  constraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
+                ),
+                IconButton(
+                  onPressed: onRemove,
+                  icon: const Icon(Icons.person_remove_outlined,
+                      color: AppColors.error, size: 18),
+                  tooltip: 'players.remove_from_team'.tr(),
+                  padding: EdgeInsets.zero,
+                  constraints:
+                      const BoxConstraints(minWidth: 32, minHeight: 32),
+                ),
+              ],
+            )
+          : _StatusBadge(
+              label: 'players.status_active'.tr(),
+              color: AppColors.success,
+            ),
+    );
+  }
+}
+
+class _NewInvitationTile extends StatelessWidget {
+  final int index;
+  final PlayerInvitation invitation;
+
+  const _NewInvitationTile(
+      {required this.index, required this.invitation});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.zero,
+      leading: _IndexBadge(index: index, color: AppColors.primaryLight),
+      title: Text(
+        invitation.displayName,
+        style: const TextStyle(color: AppColors.white, fontSize: 14),
+      ),
+      subtitle: invitation.isExisting
+          ? null
+          : Text(
+              invitation.email,
+              style: const TextStyle(
+                  color: AppColors.whiteSubtle, fontSize: 12),
+            ),
+      trailing: _StatusBadge(
+        label: invitation.isExisting
+            ? 'players.status_invited'.tr()
+            : 'players.status_pending_registration'.tr(),
+        color: invitation.isExisting
+            ? AppColors.primaryLight
+            : AppColors.warning,
+      ),
+    );
+  }
+}
+
+class _IndexBadge extends StatelessWidget {
+  final int index;
+  final Color color;
+
+  const _IndexBadge({required this.index, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Text(
+          '$index',
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _StatusBadge({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+            color: color, fontSize: 11, fontWeight: FontWeight.w500),
+      ),
+    );
+  }
+}
+
+// ── Edit player dialog ────────────────────────────────────────────────────────
+
+class _EditPlayerDialog extends StatefulWidget {
+  final PlayerModel player;
+  final Future<void> Function(String? firstName, String? lastName, String? phone)
+      onSave;
+
+  const _EditPlayerDialog({required this.player, required this.onSave});
+
+  static Future<void> show({
+    required BuildContext context,
+    required PlayerModel player,
+    required Future<void> Function(
+            String? firstName, String? lastName, String? phone)
+        onSave,
+  }) {
+    return showDialog(
+      context: context,
+      builder: (_) => _EditPlayerDialog(player: player, onSave: onSave),
+    );
+  }
+
+  @override
+  State<_EditPlayerDialog> createState() => _EditPlayerDialogState();
+}
+
+class _EditPlayerDialogState extends State<_EditPlayerDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _firstNameCtrl;
+  late final TextEditingController _lastNameCtrl;
+  late final TextEditingController _phoneCtrl;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _firstNameCtrl =
+        TextEditingController(text: widget.player.firstName);
+    _lastNameCtrl =
+        TextEditingController(text: widget.player.lastName);
+    _phoneCtrl =
+        TextEditingController(text: widget.player.phone ?? '');
+  }
+
+  @override
+  void dispose() {
+    _firstNameCtrl.dispose();
+    _lastNameCtrl.dispose();
+    _phoneCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _saving = true);
+    try {
+      final phone = _phoneCtrl.text.trim();
+      await widget.onSave(
+        _firstNameCtrl.text.trim(),
+        _lastNameCtrl.text.trim(),
+        phone.isEmpty ? null : phone,
+      );
+      if (mounted) Navigator.of(context).pop();
+    } catch (_) {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: AppColors.sheetBackground,
+      title: Text(
+        'players.edit_player_title'.tr(),
+        style: const TextStyle(
+            color: AppColors.white, fontWeight: FontWeight.bold),
+      ),
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _field(
+              controller: _firstNameCtrl,
+              label: 'players.first_name'.tr(),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'players.first_name_required'.tr()
+                  : null,
+            ),
+            const SizedBox(height: 12),
+            _field(
+              controller: _lastNameCtrl,
+              label: 'players.last_name'.tr(),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'players.last_name_required'.tr()
+                  : null,
+            ),
+            const SizedBox(height: 12),
+            _field(
+              controller: _phoneCtrl,
+              label: 'players.phone'.tr(),
+              keyboardType: TextInputType.phone,
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(),
+          child: Text('leagues.cancel'.tr(),
+              style: const TextStyle(color: AppColors.whiteSubtle)),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _submit,
+          style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primaryLight),
+          child: _saving
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.white),
+                )
+              : Text('leagues.save'.tr(),
+                  style: const TextStyle(color: AppColors.white)),
+        ),
+      ],
+    );
+  }
+
+  Widget _field({
+    required TextEditingController controller,
+    required String label,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      style: const TextStyle(color: AppColors.white),
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle:
+            const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+        filled: true,
+        fillColor: AppColors.inputFill,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.inputBorder),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.inputBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.primaryLight),
+        ),
+      ),
+      validator: validator,
     );
   }
 }

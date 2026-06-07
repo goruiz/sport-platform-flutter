@@ -7,6 +7,8 @@ import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/league_detail_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_players_sheet.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_team_sheet.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_card.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_form_sheet.dart';
@@ -91,6 +93,14 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     } finally {
       if (mounted) setState(() => _loadingMatches = false);
     }
+  }
+
+  Future<void> _openManagePlayers(TeamEventModel team) async {
+    await AddPlayersSheet.show(
+      context: context,
+      team: TeamModel(id: team.teamId, name: team.teamName),
+      isEditMode: true,
+    );
   }
 
   Future<void> _openAddTeam() async {
@@ -287,6 +297,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
         itemCount: _teams.length,
         itemBuilder: (_, i) => TeamEventCard(
           team: _teams[i],
+          onManagePlayers: () => _openManagePlayers(_teams[i]),
           onRemove: widget.isOwner ? () => _confirmRemoveTeam(_teams[i]) : null,
         ),
       ),
