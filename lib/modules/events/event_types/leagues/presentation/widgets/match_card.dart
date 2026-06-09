@@ -149,7 +149,7 @@ class _TeamsRow extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Text(
-            hasScore ? '$homeScore â€” $awayScore' : 'vs',
+            hasScore ? '$homeScore - $awayScore' : 'vs',
             style: TextStyle(
               color: hasScore ? AppColors.primaryLight : AppColors.whiteSubtle,
               fontSize: hasScore ? 16 : 13,

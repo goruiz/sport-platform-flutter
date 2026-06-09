@@ -207,7 +207,16 @@
     "success_team_created": "Team created and added to the league",
     "error_create_team": "Error creating team",
     "tap_to_manage_players": "Tap to manage players",
-    "manage_players": "Manage players"
+    "manage_players": "Manage players",
+    "detail_tab_standings": "Standings",
+    "standings_empty": "No finished matches yet",
+    "standings_empty_subtitle": "Standings will appear once matches are completed",
+    "standings_col_team": "Team",
+    "standings_col_played": "MP",
+    "standings_col_won": "W",
+    "standings_col_drawn": "D",
+    "standings_col_lost": "L",
+    "standings_col_pts": "Pts"
   },
   "menu": {
     "home": "Home",

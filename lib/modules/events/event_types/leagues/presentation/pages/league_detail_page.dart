@@ -12,6 +12,7 @@ import 'package:sport_platform/modules/events/event_types/leagues/presentation/w
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_team_sheet.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_card.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_form_sheet.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/standings_tab.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/team_event_card.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
@@ -53,7 +54,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     super.initState();
     _detailService = getIt<LeagueDetailService>();
     _event = widget.event;
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() => setState(() {}));
     _loadTeams();
     _loadMatches();
@@ -217,6 +218,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
             Tab(text: 'leagues.detail_tab_info'.tr()),
             Tab(text: 'leagues.detail_tab_teams'.tr()),
             Tab(text: 'leagues.detail_tab_matches'.tr()),
+            Tab(text: 'leagues.detail_tab_standings'.tr()),
           ],
         ),
       ),
@@ -226,6 +228,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
           _buildInfoTab(),
           _buildTeamsTab(),
           _buildMatchesTab(),
+          _buildStandingsTab(),
         ],
       ),
       floatingActionButton: widget.isOwner ? _buildFab() : null,
@@ -340,6 +343,14 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
         },
       ),
     );
+  }
+
+  Widget _buildStandingsTab() {
+    if (_loadingTeams || _loadingMatches) {
+      return const Center(
+          child: CircularProgressIndicator(color: AppColors.primaryLight));
+    }
+    return StandingsTab(teams: _teams, matches: _matches);
   }
 }
 

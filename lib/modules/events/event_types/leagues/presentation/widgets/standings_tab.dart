@@ -1,0 +1,285 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
+import 'package:sport_platform/shared/widgets/empty_state.dart';
+
+class StandingsTab extends StatelessWidget {
+  final List<TeamEventModel> teams;
+  final List<MatchModel> matches;
+
+  const StandingsTab({
+    super.key,
+    required this.teams,
+    required this.matches,
+  });
+
+  List<_Standing> _compute() {
+    final acc = <String, _Standing>{};
+    for (final t in teams) {
+      acc[t.teamId] = _Standing(teamId: t.teamId, teamName: t.teamName);
+    }
+    for (final m in matches) {
+      if (m.status != 'FINISHED') continue;
+      final hs = m.homeScore;
+      final as_ = m.awayScore;
+      if (hs == null || as_ == null) continue;
+      final home = acc[m.homeTeamId];
+      final away = acc[m.awayTeamId];
+      if (home == null || away == null) continue;
+      home.mp++;
+      away.mp++;
+      home.gf += hs;
+      home.ga += as_;
+      away.gf += as_;
+      away.ga += hs;
+      if (hs > as_) {
+        home.w++;
+        away.l++;
+      } else if (hs < as_) {
+        away.w++;
+        home.l++;
+      } else {
+        home.d++;
+        away.d++;
+      }
+    }
+    return acc.values.toList()
+      ..sort((a, b) {
+        final byPts = b.pts.compareTo(a.pts);
+        if (byPts != 0) return byPts;
+        final byGD = b.gd.compareTo(a.gd);
+        if (byGD != 0) return byGD;
+        final byGF = b.gf.compareTo(a.gf);
+        if (byGF != 0) return byGF;
+        return a.teamName.compareTo(b.teamName);
+      });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final standings = _compute();
+    final hasData = standings.any((s) => s.mp > 0);
+    if (!hasData) {
+      return EmptyState(
+        icon: Icons.leaderboard_outlined,
+        title: 'leagues.standings_empty'.tr(),
+        subtitle: 'leagues.standings_empty_subtitle'.tr(),
+      );
+    }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          children: [
+            _buildHeader(),
+            ...standings.asMap().entries.map(
+              (e) => _buildRow(e.key + 1, e.value),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      color: AppColors.primaryDark,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      child: Row(
+        children: [
+          _HeaderCell('#', width: 28),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'leagues.standings_col_team'.tr(),
+              style: const TextStyle(
+                color: AppColors.whiteSubtle,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          _HeaderCell('leagues.standings_col_played'.tr(), width: 30),
+          _HeaderCell('leagues.standings_col_won'.tr(), width: 28),
+          _HeaderCell('leagues.standings_col_drawn'.tr(), width: 28),
+          _HeaderCell('leagues.standings_col_lost'.tr(), width: 28),
+          _HeaderCell(
+            'leagues.standings_col_pts'.tr(),
+            width: 36,
+            highlight: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRow(int pos, _Standing s) {
+    final isTop3 = pos <= 3;
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.sheetBackground,
+        border: Border(
+          bottom: BorderSide(color: AppColors.inputBorder, width: 0.5),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
+      child: Row(
+        children: [
+          _PosBadge(pos: pos),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              s.teamName,
+              style: TextStyle(
+                color: isTop3 ? AppColors.white : AppColors.white,
+                fontSize: 13,
+                fontWeight:
+                    isTop3 ? FontWeight.w600 : FontWeight.normal,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          _DataCell('${s.mp}', width: 30, color: AppColors.whiteSubtle),
+          _DataCell('${s.w}', width: 28, color: AppColors.success),
+          _DataCell('${s.d}', width: 28, color: AppColors.whiteSubtle),
+          _DataCell('${s.l}', width: 28, color: AppColors.error),
+          _DataCell(
+            '${s.pts}',
+            width: 36,
+            color: AppColors.primaryLight,
+            bold: true,
+            fontSize: 15,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Private helpers ───────────────────────────────────────────────────────────
+
+class _HeaderCell extends StatelessWidget {
+  final String text;
+  final double width;
+  final bool highlight;
+
+  const _HeaderCell(this.text, {required this.width, this.highlight = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: highlight ? AppColors.primaryLight : AppColors.whiteSubtle,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+}
+
+class _DataCell extends StatelessWidget {
+  final String text;
+  final double width;
+  final Color color;
+  final bool bold;
+  final double fontSize;
+
+  const _DataCell(
+    this.text, {
+    required this.width,
+    required this.color,
+    this.bold = false,
+    this.fontSize = 13,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: color,
+          fontSize: fontSize,
+          fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+    );
+  }
+}
+
+class _PosBadge extends StatelessWidget {
+  final int pos;
+  const _PosBadge({required this.pos});
+
+  static const _gold = Color(0xFFFFD700);
+  static const _silver = Color(0xFFB0B8C1);
+  static const _bronze = Color(0xFFCD7F32);
+
+  @override
+  Widget build(BuildContext context) {
+    final Color? badgeColor = switch (pos) {
+      1 => _gold,
+      2 => _silver,
+      3 => _bronze,
+      _ => null,
+    };
+
+    if (badgeColor != null) {
+      return SizedBox(
+        width: 28,
+        child: Center(
+          child: Container(
+            width: 22,
+            height: 22,
+            decoration:
+                BoxDecoration(color: badgeColor, shape: BoxShape.circle),
+            child: Center(
+              child: Text(
+                '$pos',
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SizedBox(
+      width: 28,
+      child: Text(
+        '$pos',
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+      ),
+    );
+  }
+}
+
+// ── Data accumulator (internal) ───────────────────────────────────────────────
+
+class _Standing {
+  final String teamId;
+  final String teamName;
+  int mp = 0, w = 0, d = 0, l = 0, gf = 0, ga = 0;
+
+  _Standing({required this.teamId, required this.teamName});
+
+  int get pts => w * 3 + d;
+  int get gd => gf - ga;
+}

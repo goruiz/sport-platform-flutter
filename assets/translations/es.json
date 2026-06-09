@@ -207,7 +207,16 @@
     "success_team_created": "Equipo creado y añadido a la liga",
     "error_create_team": "Error al crear el equipo",
     "tap_to_manage_players": "Toca para gestionar jugadores",
-    "manage_players": "Gestionar jugadores"
+    "manage_players": "Gestionar jugadores",
+    "detail_tab_standings": "Tabla",
+    "standings_empty": "Sin partidos finalizados",
+    "standings_empty_subtitle": "La tabla aparecerá cuando finalicen los partidos",
+    "standings_col_team": "Equipo",
+    "standings_col_played": "PJ",
+    "standings_col_won": "G",
+    "standings_col_drawn": "E",
+    "standings_col_lost": "P",
+    "standings_col_pts": "Pts"
   },
   "menu": {
     "home": "Inicio",
