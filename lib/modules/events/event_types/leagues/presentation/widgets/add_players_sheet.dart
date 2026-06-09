@@ -222,27 +222,6 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
 
-  Future<void> _editPlayer(PlayerModel player) async {
-    await _EditPlayerDialog.show(
-      context: context,
-      player: player,
-      onSave: (firstName, lastName, phone) async {
-        final updated = await _playersService.updatePlayer(
-          player.id,
-          firstName: firstName,
-          lastName: lastName,
-          phone: phone,
-        );
-        if (mounted) {
-          setState(() {
-            final idx = _existingPlayers.indexWhere((p) => p.id == player.id);
-            if (idx != -1) _existingPlayers[idx] = updated;
-          });
-        }
-      },
-    );
-  }
-
   Future<void> _removePlayerFromTeam(PlayerModel player) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -507,7 +486,6 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
       allItems.add(_ExistingPlayerTile(
         index: i + 1,
         player: p,
-        onEdit: widget.isEditMode ? () => _editPlayer(p) : null,
         onRemove: widget.isEditMode ? () => _removePlayerFromTeam(p) : null,
       ));
       if (i < _existingPlayers.length - 1 || _addedPlayers.isNotEmpty) {
@@ -904,13 +882,11 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
 class _ExistingPlayerTile extends StatelessWidget {
   final int index;
   final PlayerModel player;
-  final VoidCallback? onEdit;
   final VoidCallback? onRemove;
 
   const _ExistingPlayerTile({
     required this.index,
     required this.player,
-    this.onEdit,
     this.onRemove,
   });
 
@@ -919,7 +895,6 @@ class _ExistingPlayerTile extends StatelessWidget {
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.zero,
-      onTap: onEdit,
       leading: _IndexBadge(index: index, color: AppColors.primaryLight),
       title: Text(
         player.fullName,
@@ -929,29 +904,14 @@ class _ExistingPlayerTile extends StatelessWidget {
         player.email,
         style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
       ),
-      trailing: onEdit != null
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  onPressed: onEdit,
-                  icon: const Icon(Icons.edit_outlined,
-                      color: AppColors.primaryLight, size: 18),
-                  tooltip: 'common.edit'.tr(),
-                  padding: EdgeInsets.zero,
-                  constraints:
-                      const BoxConstraints(minWidth: 32, minHeight: 32),
-                ),
-                IconButton(
-                  onPressed: onRemove,
-                  icon: const Icon(Icons.person_remove_outlined,
-                      color: AppColors.error, size: 18),
-                  tooltip: 'players.remove_from_team'.tr(),
-                  padding: EdgeInsets.zero,
-                  constraints:
-                      const BoxConstraints(minWidth: 32, minHeight: 32),
-                ),
-              ],
+      trailing: onRemove != null
+          ? IconButton(
+              onPressed: onRemove,
+              icon: const Icon(Icons.person_remove_outlined,
+                  color: AppColors.error, size: 18),
+              tooltip: 'players.remove_from_team'.tr(),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             )
           : _StatusBadge(
               label: 'players.status_active'.tr(),
@@ -1050,166 +1010,3 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
-// ── Edit player dialog ────────────────────────────────────────────────────────
-
-class _EditPlayerDialog extends StatefulWidget {
-  final PlayerModel player;
-  final Future<void> Function(String? firstName, String? lastName, String? phone)
-      onSave;
-
-  const _EditPlayerDialog({required this.player, required this.onSave});
-
-  static Future<void> show({
-    required BuildContext context,
-    required PlayerModel player,
-    required Future<void> Function(
-            String? firstName, String? lastName, String? phone)
-        onSave,
-  }) {
-    return showDialog(
-      context: context,
-      builder: (_) => _EditPlayerDialog(player: player, onSave: onSave),
-    );
-  }
-
-  @override
-  State<_EditPlayerDialog> createState() => _EditPlayerDialogState();
-}
-
-class _EditPlayerDialogState extends State<_EditPlayerDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _firstNameCtrl;
-  late final TextEditingController _lastNameCtrl;
-  late final TextEditingController _phoneCtrl;
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _firstNameCtrl =
-        TextEditingController(text: widget.player.firstName);
-    _lastNameCtrl =
-        TextEditingController(text: widget.player.lastName);
-    _phoneCtrl =
-        TextEditingController(text: widget.player.phone ?? '');
-  }
-
-  @override
-  void dispose() {
-    _firstNameCtrl.dispose();
-    _lastNameCtrl.dispose();
-    _phoneCtrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _saving = true);
-    try {
-      final phone = _phoneCtrl.text.trim();
-      await widget.onSave(
-        _firstNameCtrl.text.trim(),
-        _lastNameCtrl.text.trim(),
-        phone.isEmpty ? null : phone,
-      );
-      if (mounted) Navigator.of(context).pop();
-    } catch (_) {
-      if (mounted) setState(() => _saving = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: AppColors.sheetBackground,
-      title: Text(
-        'players.edit_player_title'.tr(),
-        style: const TextStyle(
-            color: AppColors.white, fontWeight: FontWeight.bold),
-      ),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _field(
-              controller: _firstNameCtrl,
-              label: 'players.first_name'.tr(),
-              validator: (v) => (v == null || v.trim().isEmpty)
-                  ? 'players.first_name_required'.tr()
-                  : null,
-            ),
-            const SizedBox(height: 12),
-            _field(
-              controller: _lastNameCtrl,
-              label: 'players.last_name'.tr(),
-              validator: (v) => (v == null || v.trim().isEmpty)
-                  ? 'players.last_name_required'.tr()
-                  : null,
-            ),
-            const SizedBox(height: 12),
-            _field(
-              controller: _phoneCtrl,
-              label: 'players.phone'.tr(),
-              keyboardType: TextInputType.phone,
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: _saving ? null : () => Navigator.of(context).pop(),
-          child: Text('leagues.cancel'.tr(),
-              style: const TextStyle(color: AppColors.whiteSubtle)),
-        ),
-        FilledButton(
-          onPressed: _saving ? null : _submit,
-          style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primaryLight),
-          child: _saving
-              ? const SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: AppColors.white),
-                )
-              : Text('leagues.save'.tr(),
-                  style: const TextStyle(color: AppColors.white)),
-        ),
-      ],
-    );
-  }
-
-  Widget _field({
-    required TextEditingController controller,
-    required String label,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      style: const TextStyle(color: AppColors.white),
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle:
-            const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
-        filled: true,
-        fillColor: AppColors.inputFill,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.inputBorder),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.inputBorder),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primaryLight),
-        ),
-      ),
-      validator: validator,
-    );
-  }
-}

@@ -74,9 +74,9 @@ class PlayersService {
     String? phone,
   }) async {
     final body = <String, dynamic>{
-      if (firstName case final v?) 'firstName': v,
-      if (lastName case final v?) 'lastName': v,
-      if (phone case final v?) 'phone': v,
+      'firstName': ?firstName,
+      'lastName': ?lastName,
+      'phone': ?phone,
     };
     final response = await _client.put(
       ApiEndpoints.playerById(playerId),
