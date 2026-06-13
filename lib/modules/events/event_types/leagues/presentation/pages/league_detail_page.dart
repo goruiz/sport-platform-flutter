@@ -10,7 +10,8 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/models/te
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_players_sheet.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_team_sheet.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_card.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/auto_schedule_sheet.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_day_section.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_form_sheet.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/standings_tab.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/team_event_card.dart';
@@ -42,6 +43,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
   List<TeamEventModel> _teams = [];
   bool _loadingTeams = true;
   String? _teamsError;
+  bool _matchFabExpanded = false;
 
   List<MatchModel> _matches = [];
   bool _loadingMatches = true;
@@ -152,6 +154,18 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     );
   }
 
+  Future<void> _openAutoSchedule() async {
+    await AutoScheduleSheet.show(
+      context: context,
+      eventId: _event.id,
+      onGenerated: (generated) async {
+        if (mounted) {
+          setState(() => _matches.addAll(generated));
+        }
+      },
+    );
+  }
+
   Future<void> _openEditMatch(MatchModel match) async {
     await MatchFormSheet.show(
       context: context,
@@ -186,6 +200,41 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     } catch (_) {
       _showSnack('leagues.error_match_action'.tr(), isError: true);
     }
+  }
+
+  Future<void> _onRescheduleDay(DateTime fromDate, DateTime? toDate) async {
+    try {
+      final updated = await _detailService.rescheduleDateMatches(
+          _event.id, fromDate,
+          toDate: toDate);
+      if (mounted) {
+        setState(() {
+          for (final u in updated) {
+            final idx = _matches.indexWhere((m) => m.id == u.id);
+            if (idx != -1) _matches[idx] = u;
+          }
+        });
+        _showSnack(toDate != null
+            ? 'leagues.match_day_rescheduled'.tr()
+            : 'leagues.match_day_postponed'.tr());
+      }
+    } catch (_) {
+      if (mounted) _showSnack('leagues.match_day_error'.tr(), isError: true);
+    }
+  }
+
+  List<(DateTime, List<MatchModel>)> _groupByDate(List<MatchModel> matches) {
+    final sorted = [...matches]
+      ..sort((a, b) => a.matchDate.compareTo(b.matchDate));
+    final keys = <String>[];
+    final groups = <String, List<MatchModel>>{};
+    for (final m in sorted) {
+      final key =
+          '${m.matchDate.year}-${m.matchDate.month.toString().padLeft(2, '0')}-${m.matchDate.day.toString().padLeft(2, '0')}';
+      if (!groups.containsKey(key)) keys.add(key);
+      groups.putIfAbsent(key, () => []).add(m);
+    }
+    return keys.map((k) => (groups[k]!.first.matchDate, groups[k]!)).toList();
   }
 
   void _showSnack(String message, {bool isError = false}) {
@@ -246,16 +295,50 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
           child: const Icon(Icons.group_add),
         );
       case 2:
-        return FloatingActionButton(
-          onPressed: _openCreateMatch,
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.white,
-          tooltip: 'leagues.new_match'.tr(),
-          child: const Icon(Icons.add),
-        );
+        return _buildMatchFab();
       default:
         return null;
     }
+  }
+
+  Widget _buildMatchFab() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        if (_matchFabExpanded) ...[
+          _MiniActionButton(
+            label: 'leagues.auto_schedule_title'.tr(),
+            icon: Icons.auto_awesome,
+            onTap: () {
+              setState(() => _matchFabExpanded = false);
+              _openAutoSchedule();
+            },
+          ),
+          const SizedBox(height: 8),
+          _MiniActionButton(
+            label: 'leagues.new_match'.tr(),
+            icon: Icons.edit_calendar_outlined,
+            onTap: () {
+              setState(() => _matchFabExpanded = false);
+              _openCreateMatch();
+            },
+          ),
+          const SizedBox(height: 12),
+        ],
+        FloatingActionButton(
+          onPressed: () => setState(() => _matchFabExpanded = !_matchFabExpanded),
+          backgroundColor: AppColors.primaryLight,
+          foregroundColor: AppColors.white,
+          tooltip: 'leagues.new_match'.tr(),
+          child: AnimatedRotation(
+            turns: _matchFabExpanded ? 0.125 : 0,
+            duration: const Duration(milliseconds: 200),
+            child: const Icon(Icons.add),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildInfoTab() {
@@ -324,21 +407,25 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     }
 
     final teamMap = {for (final t in _teams) t.teamId: t.teamName};
+    final groups = _groupByDate(_matches);
 
     return RefreshIndicator(
       onRefresh: _loadMatches,
       color: AppColors.primaryLight,
       child: ListView.builder(
-        padding: const EdgeInsets.only(top: 12, bottom: 100),
-        itemCount: _matches.length,
+        padding: const EdgeInsets.only(top: 4, bottom: 100),
+        itemCount: groups.length,
         itemBuilder: (_, i) {
-          final match = _matches[i];
-          return MatchCard(
-            match: match,
-            homeTeamName: teamMap[match.homeTeamId] ?? match.homeTeamId,
-            awayTeamName: teamMap[match.awayTeamId] ?? match.awayTeamId,
-            onEdit: widget.isOwner ? () => _openEditMatch(match) : null,
-            onDelete: widget.isOwner ? () => _confirmDeleteMatch(match) : null,
+          final (date, dayMatches) = groups[i];
+          return MatchDaySection(
+            dayIndex: i + 1,
+            date: date,
+            matches: dayMatches,
+            teamMap: teamMap,
+            isOwner: widget.isOwner,
+            onEdit: _openEditMatch,
+            onDelete: _confirmDeleteMatch,
+            onRescheduleDay: _onRescheduleDay,
           );
         },
       ),
@@ -647,6 +734,45 @@ class _InfoCardState extends State<_InfoCard> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _MiniActionButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _MiniActionButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.primaryDark,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.inputBorder),
+          ),
+          child: Text(label,
+              style: const TextStyle(color: AppColors.white, fontSize: 13)),
+        ),
+        const SizedBox(width: 8),
+        FloatingActionButton.small(
+          heroTag: label,
+          onPressed: onTap,
+          backgroundColor: AppColors.primaryLight,
+          foregroundColor: AppColors.white,
+          child: Icon(icon, size: 18),
+        ),
+      ],
     );
   }
 }

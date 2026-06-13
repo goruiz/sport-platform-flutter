@@ -103,6 +103,7 @@ class StatusBadge extends StatelessWidget {
       'IN_PROGRESS': 'leagues.match_status_in_progress',
       'FINISHED': 'leagues.match_status_finished',
       'CANCELLED': 'leagues.match_status_cancelled',
+      'POSTPONED': 'leagues.match_status_postponed',
     };
     final key = map[status.toUpperCase()];
     return key != null ? key.tr() : status;
@@ -118,6 +119,8 @@ class StatusBadge extends StatelessWidget {
         return AppColors.whiteSubtle;
       case 'CANCELLED':
         return AppColors.error;
+      case 'POSTPONED':
+        return const Color(0xFFFFB347);
       default:
         return AppColors.whiteSubtle;
     }

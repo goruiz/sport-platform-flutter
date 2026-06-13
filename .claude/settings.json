@@ -25,7 +25,8 @@
       "Bash(Remove-Item -Recurse -Force \"c:/Users/WALDO/Documents/Proyectos/Plataforma deportiva/frontend/lib/modules/leagues\")",
       "Bash(Write-Output \"Done\")",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\backend\\\\src\\\\main\\\\java\\\\com\\\\platform\\\\backend\\\\modules\" -Directory)",
-      "Bash(Select-Object -ExpandProperty Name)"
+      "Bash(Select-Object -ExpandProperty Name)",
+      "Bash(mkdir -p \"C:/Users/WALDO/Documents/Proyectos/Plataforma deportiva/backend/src/main/java/com/platform/backend/modules/matches/presentation/requests/RescheduleDateRequest\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\admseneca\\Documents\\Proyectos\\sports-platform\\Frontend\\sport_platform\\assets",
@@ -44,7 +45,11 @@
       "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\application\\iservices",
       "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\application\\mappers",
       "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\application\\services",
-      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\presentation\\controllers"
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\sportcomplexes\\presentation\\controllers",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\matches\\domain\\entities",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\matches\\presentation\\requests\\SaveScheduleConfigRequest",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\matches\\presentation\\responses\\EventScheduleConfigResponse",
+      "C:\\Users\\WALDO\\Documents\\Proyectos\\Plataforma deportiva\\backend\\src\\main\\java\\com\\platform\\backend\\modules\\matches\\presentation\\requests"
     ]
   }
 }

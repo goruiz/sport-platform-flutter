@@ -67,7 +67,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
 
   bool get _isEditing => widget.match != null;
 
-  static const _statuses = ['SCHEDULED', 'IN_PROGRESS', 'FINISHED', 'CANCELLED'];
+  static const _statuses = ['SCHEDULED', 'IN_PROGRESS', 'FINISHED', 'CANCELLED', 'POSTPONED'];
 
   void _showSnack(String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -388,6 +388,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
       'IN_PROGRESS': 'leagues.match_status_in_progress',
       'FINISHED': 'leagues.match_status_finished',
       'CANCELLED': 'leagues.match_status_cancelled',
+      'POSTPONED': 'leagues.match_status_postponed',
     };
     return (map[status] ?? status).tr();
   }

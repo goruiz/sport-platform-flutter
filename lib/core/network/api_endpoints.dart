@@ -61,6 +61,16 @@ class ApiEndpoints {
   // Reports
   static const String reports = '/reports';
 
+  // Schedule config
+  static String scheduleConfig(String eventId) =>
+      '/events/$eventId/schedule-config';
+  static String generateSchedule(String eventId) =>
+      '/events/$eventId/schedule-config/generate';
+
+  // Match day batch operations
+  static String rescheduleDateMatches(String eventId) =>
+      '/matches/by-event/$eventId/reschedule-date';
+
   // Leagues
   static const String leagues = '/ligas';
   static String leagueById(String id) => '/ligas/$id';
