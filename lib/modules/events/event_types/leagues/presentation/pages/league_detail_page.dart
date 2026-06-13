@@ -2,24 +2,21 @@
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/core/theme/app_input_decoration.dart';
-import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/league_detail_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_players_sheet.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/league_info_card.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/league_matches_tab.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/league_teams_tab.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_team_sheet.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/auto_schedule_sheet.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_day_section.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_form_sheet.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/standings_tab.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/team_event_card.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
 import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
-import 'package:sport_platform/shared/widgets/empty_state.dart';
-import 'package:sport_platform/shared/widgets/error_retry.dart';
 
 class LeagueDetailPage extends StatefulWidget {
   final EventModel event;
@@ -43,9 +40,8 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
   List<TeamEventModel> _teams = [];
   bool _loadingTeams = true;
   String? _teamsError;
-  bool _matchFabExpanded = false;
-
   List<MatchModel> _matches = [];
+  List<(DateTime, List<MatchModel>)> _groupedMatches = [];
   bool _loadingMatches = true;
   String? _matchesError;
 
@@ -57,7 +53,6 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     _detailService = getIt<LeagueDetailService>();
     _event = widget.event;
     _tabController = TabController(length: 4, vsync: this);
-    _tabController.addListener(() => setState(() {}));
     _loadTeams();
     _loadMatches();
   }
@@ -90,7 +85,12 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     });
     try {
       final matches = await _detailService.getMatchesByEvent(_event.id);
-      if (mounted) setState(() => _matches = matches);
+      if (mounted) {
+        setState(() {
+          _matches = matches;
+          _groupedMatches = _groupByDate(matches);
+        });
+      }
     } catch (_) {
       if (mounted) setState(() => _matchesError = 'leagues.error_load_matches'.tr());
     } finally {
@@ -147,7 +147,10 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       onSave: (data) async {
         final created = await _detailService.createMatch(data);
         if (mounted) {
-          setState(() => _matches.insert(0, created));
+          setState(() {
+            _matches.insert(0, created);
+            _groupedMatches = _groupByDate(_matches);
+          });
           _showSnack('leagues.success_match_created'.tr());
         }
       },
@@ -160,7 +163,10 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       eventId: _event.id,
       onGenerated: (generated) async {
         if (mounted) {
-          setState(() => _matches.addAll(generated));
+          setState(() {
+            _matches.addAll(generated);
+            _groupedMatches = _groupByDate(_matches);
+          });
         }
       },
     );
@@ -178,6 +184,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
           setState(() {
             final idx = _matches.indexWhere((m) => m.id == match.id);
             if (idx != -1) _matches[idx] = updated;
+            _groupedMatches = _groupByDate(_matches);
           });
           _showSnack('leagues.success_match_updated'.tr());
         }
@@ -195,7 +202,10 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     if (!confirmed || !mounted) return;
     try {
       await _detailService.deleteMatch(match.id);
-      setState(() => _matches.removeWhere((m) => m.id == match.id));
+      setState(() {
+        _matches.removeWhere((m) => m.id == match.id);
+        _groupedMatches = _groupByDate(_matches);
+      });
       _showSnack('leagues.success_match_deleted'.tr());
     } catch (_) {
       _showSnack('leagues.error_match_action'.tr(), isError: true);
@@ -213,6 +223,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
             final idx = _matches.indexWhere((m) => m.id == u.id);
             if (idx != -1) _matches[idx] = u;
           }
+          _groupedMatches = _groupByDate(_matches);
         });
         _showSnack(toDate != null
             ? 'leagues.match_day_rescheduled'.tr()
@@ -275,76 +286,44 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
         controller: _tabController,
         children: [
           _buildInfoTab(),
-          _buildTeamsTab(),
-          _buildMatchesTab(),
+          LeagueTeamsTab(
+            teams: _teams,
+            isLoading: _loadingTeams,
+            error: _teamsError,
+            isOwner: widget.isOwner,
+            onRetry: _loadTeams,
+            onManagePlayers: _openManagePlayers,
+            onRemove: _confirmRemoveTeam,
+          ),
+          LeagueMatchesTab(
+            groupedMatches: _groupedMatches,
+            teamMap: {for (final t in _teams) t.teamId: t.teamName},
+            isLoading: _loadingMatches,
+            error: _matchesError,
+            isOwner: widget.isOwner,
+            onRetry: _loadMatches,
+            onEdit: _openEditMatch,
+            onDelete: _confirmDeleteMatch,
+            onRescheduleDay: _onRescheduleDay,
+          ),
           _buildStandingsTab(),
         ],
       ),
-      floatingActionButton: widget.isOwner ? _buildFab() : null,
-    );
-  }
-
-  Widget? _buildFab() {
-    switch (_tabController.index) {
-      case 1:
-        return FloatingActionButton(
-          onPressed: _openAddTeam,
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.white,
-          tooltip: 'leagues.add_team'.tr(),
-          child: const Icon(Icons.group_add),
-        );
-      case 2:
-        return _buildMatchFab();
-      default:
-        return null;
-    }
-  }
-
-  Widget _buildMatchFab() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        if (_matchFabExpanded) ...[
-          _MiniActionButton(
-            label: 'leagues.auto_schedule_title'.tr(),
-            icon: Icons.auto_awesome,
-            onTap: () {
-              setState(() => _matchFabExpanded = false);
-              _openAutoSchedule();
-            },
-          ),
-          const SizedBox(height: 8),
-          _MiniActionButton(
-            label: 'leagues.new_match'.tr(),
-            icon: Icons.edit_calendar_outlined,
-            onTap: () {
-              setState(() => _matchFabExpanded = false);
-              _openCreateMatch();
-            },
-          ),
-          const SizedBox(height: 12),
-        ],
-        FloatingActionButton(
-          onPressed: () => setState(() => _matchFabExpanded = !_matchFabExpanded),
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.white,
-          tooltip: 'leagues.new_match'.tr(),
-          child: AnimatedRotation(
-            turns: _matchFabExpanded ? 0.125 : 0,
-            duration: const Duration(milliseconds: 200),
-            child: const Icon(Icons.add),
-          ),
-        ),
-      ],
+      floatingActionButton: widget.isOwner
+          ? _LeagueFab(
+              tabController: _tabController,
+              onAddTeam: _openAddTeam,
+              onCreateMatch: _openCreateMatch,
+              onAutoSchedule: _openAutoSchedule,
+            )
+          : null,
     );
   }
 
   Widget _buildInfoTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: _InfoCard(
+      child: LeagueInfoCard(
         event: _event,
         isOwner: widget.isOwner,
         onSave: (data) async {
@@ -360,78 +339,6 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     );
   }
 
-  Widget _buildTeamsTab() {
-    if (_loadingTeams) {
-      return const Center(
-          child: CircularProgressIndicator(color: AppColors.primaryLight));
-    }
-    if (_teamsError != null) {
-      return ErrorRetry(message: _teamsError!, onRetry: _loadTeams);
-    }
-    if (_teams.isEmpty) {
-      return EmptyState(
-        icon: Icons.groups_outlined,
-        title: 'leagues.teams_empty'.tr(),
-        subtitle: 'leagues.teams_empty_subtitle'.tr(),
-      );
-    }
-    return RefreshIndicator(
-      onRefresh: _loadTeams,
-      color: AppColors.primaryLight,
-      child: ListView.builder(
-        padding: const EdgeInsets.only(top: 12, bottom: 100),
-        itemCount: _teams.length,
-        itemBuilder: (_, i) => TeamEventCard(
-          team: _teams[i],
-          onManagePlayers: () => _openManagePlayers(_teams[i]),
-          onRemove: widget.isOwner ? () => _confirmRemoveTeam(_teams[i]) : null,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMatchesTab() {
-    if (_loadingMatches) {
-      return const Center(
-          child: CircularProgressIndicator(color: AppColors.primaryLight));
-    }
-    if (_matchesError != null) {
-      return ErrorRetry(message: _matchesError!, onRetry: _loadMatches);
-    }
-    if (_matches.isEmpty) {
-      return EmptyState(
-        icon: Icons.sports_score_outlined,
-        title: 'leagues.matches_empty'.tr(),
-        subtitle: 'leagues.matches_empty_subtitle'.tr(),
-      );
-    }
-
-    final teamMap = {for (final t in _teams) t.teamId: t.teamName};
-    final groups = _groupByDate(_matches);
-
-    return RefreshIndicator(
-      onRefresh: _loadMatches,
-      color: AppColors.primaryLight,
-      child: ListView.builder(
-        padding: const EdgeInsets.only(top: 4, bottom: 100),
-        itemCount: groups.length,
-        itemBuilder: (_, i) {
-          final (date, dayMatches) = groups[i];
-          return MatchDaySection(
-            dayIndex: i + 1,
-            date: date,
-            matches: dayMatches,
-            teamMap: teamMap,
-            isOwner: widget.isOwner,
-            onEdit: _openEditMatch,
-            onDelete: _confirmDeleteMatch,
-            onRescheduleDay: _onRescheduleDay,
-          );
-        },
-      ),
-    );
-  }
-
   Widget _buildStandingsTab() {
     if (_loadingTeams || _loadingMatches) {
       return const Center(
@@ -443,297 +350,82 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
 
 // ---------------------------------------------------------------------------
 
-class _InfoCard extends StatefulWidget {
-  final EventModel event;
-  final bool isOwner;
-  final Future<void> Function(Map<String, dynamic>) onSave;
-  final VoidCallback onError;
+class _LeagueFab extends StatefulWidget {
+  final TabController tabController;
+  final VoidCallback onAddTeam;
+  final VoidCallback onCreateMatch;
+  final VoidCallback onAutoSchedule;
 
-  const _InfoCard({
-    required this.event,
-    required this.isOwner,
-    required this.onSave,
-    required this.onError,
+  const _LeagueFab({
+    required this.tabController,
+    required this.onAddTeam,
+    required this.onCreateMatch,
+    required this.onAutoSchedule,
   });
 
   @override
-  State<_InfoCard> createState() => _InfoCardState();
+  State<_LeagueFab> createState() => _LeagueFabState();
 }
 
-class _InfoCardState extends State<_InfoCard> {
-  bool _editing = false;
-  bool _saving = false;
-  final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _nameCtrl;
-  late final TextEditingController _startDateCtrl;
-  late final TextEditingController _endDateCtrl;
-  DateTime? _startDate;
-  DateTime? _endDate;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameCtrl = TextEditingController(text: widget.event.name);
-    _startDate = widget.event.startDate;
-    _endDate = widget.event.endDate;
-    _startDateCtrl =
-        TextEditingController(text: DateFormatters.date(widget.event.startDate));
-    _endDateCtrl =
-        TextEditingController(text: DateFormatters.date(widget.event.endDate));
-  }
-
-  @override
-  void dispose() {
-    _nameCtrl.dispose();
-    _startDateCtrl.dispose();
-    _endDateCtrl.dispose();
-    super.dispose();
-  }
-
-  void _startEditing() => setState(() => _editing = true);
-
-  void _cancelEditing() {
-    setState(() {
-      _editing = false;
-      _nameCtrl.text = widget.event.name;
-      _startDate = widget.event.startDate;
-      _endDate = widget.event.endDate;
-      _startDateCtrl.text = DateFormatters.date(widget.event.startDate);
-      _endDateCtrl.text = DateFormatters.date(widget.event.endDate);
-    });
-  }
-
-  Future<void> _pickDate({required bool isStart}) async {
-    final initial = isStart
-        ? (_startDate ?? DateTime.now())
-        : (_endDate ?? _startDate ?? DateTime.now());
-    final date = await showDatePicker(
-      context: context,
-      initialDate: initial,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2035),
-    );
-    if (date == null || !mounted) return;
-    setState(() {
-      if (isStart) {
-        _startDate = date;
-        _startDateCtrl.text = DateFormatters.date(date);
-      } else {
-        _endDate = date;
-        _endDateCtrl.text = DateFormatters.date(date);
-      }
-    });
-  }
-
-  Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _saving = true);
-    try {
-      await widget.onSave({
-        'name': _nameCtrl.text.trim(),
-        'startDate': DateFormatters.apiDate(_startDate!),
-        'endDate': DateFormatters.apiDate(_endDate!),
-      });
-      if (mounted) setState(() => _editing = false);
-    } catch (_) {
-      if (mounted) widget.onError();
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
-  }
+class _LeagueFabState extends State<_LeagueFab> {
+  bool _expanded = false;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: _editing ? AppColors.primaryLight : AppColors.inputBorder,
-        ),
-      ),
-      child: _editing ? _buildEditMode() : _buildViewMode(),
-    );
-  }
-
-  Widget _buildViewMode() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: widget.isOwner ? _startEditing : null,
-          behavior: HitTestBehavior.opaque,
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  widget.event.name,
-                  style: const TextStyle(
-                    color: AppColors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+    return AnimatedBuilder(
+      animation: widget.tabController,
+      builder: (_, _) {
+        switch (widget.tabController.index) {
+          case 1:
+            return FloatingActionButton(
+              onPressed: widget.onAddTeam,
+              backgroundColor: AppColors.primaryLight,
+              foregroundColor: AppColors.white,
+              tooltip: 'leagues.add_team'.tr(),
+              child: const Icon(Icons.group_add),
+            );
+          case 2:
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (_expanded) ...[
+                  _MiniActionButton(
+                    label: 'leagues.auto_schedule_title'.tr(),
+                    icon: Icons.auto_awesome,
+                    onTap: () {
+                      setState(() => _expanded = false);
+                      widget.onAutoSchedule();
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  _MiniActionButton(
+                    label: 'leagues.new_match'.tr(),
+                    icon: Icons.edit_calendar_outlined,
+                    onTap: () {
+                      setState(() => _expanded = false);
+                      widget.onCreateMatch();
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                FloatingActionButton(
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                  backgroundColor: AppColors.primaryLight,
+                  foregroundColor: AppColors.white,
+                  tooltip: 'leagues.new_match'.tr(),
+                  child: AnimatedRotation(
+                    turns: _expanded ? 0.125 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: const Icon(Icons.add),
                   ),
                 ),
-              ),
-              if (widget.isOwner) ...[
-                const SizedBox(width: 8),
-                const Icon(Icons.edit_outlined,
-                    color: AppColors.whiteSubtle, size: 16),
               ],
-            ],
-          ),
-        ),
-        if (widget.event.description != null &&
-            widget.event.description!.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          Text(
-            widget.event.description!,
-            style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
-          ),
-        ],
-        const SizedBox(height: 16),
-        GestureDetector(
-          onTap: widget.isOwner ? _startEditing : null,
-          behavior: HitTestBehavior.opaque,
-          child: _InfoRow(
-            icon: Icons.calendar_today,
-            label:
-                '${DateFormatters.date(widget.event.startDate)} - ${DateFormatters.date(widget.event.endDate)}',
-          ),
-        ),
-        if (widget.event.format.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          _InfoRow(icon: Icons.format_list_bulleted, label: widget.event.format),
-        ],
-        if (widget.event.eventTypeName != null &&
-            widget.event.eventTypeName!.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          _InfoRow(icon: Icons.military_tech, label: widget.event.eventTypeName!),
-        ],
-        const SizedBox(height: 8),
-        _InfoRow(
-          icon: Icons.access_time,
-          label: DateFormatters.date(widget.event.createdAt),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEditMode() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextFormField(
-            controller: _nameCtrl,
-            autofocus: true,
-            style: const TextStyle(color: AppColors.white),
-            decoration: AppInputDecoration.standard('leagues.name'.tr()),
-            validator: (v) => (v == null || v.trim().isEmpty)
-                ? 'leagues.name_required'.tr()
-                : null,
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _startDateCtrl,
-                  readOnly: true,
-                  onTap: () => _pickDate(isStart: true),
-                  style: const TextStyle(color: AppColors.white),
-                  decoration:
-                      AppInputDecoration.standard('leagues.start_date'.tr())
-                          .copyWith(
-                    suffixIcon: const Icon(Icons.calendar_today,
-                        color: AppColors.whiteSubtle, size: 18),
-                  ),
-                  validator: (_) => _startDate == null
-                      ? 'leagues.start_date_required'.tr()
-                      : null,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextFormField(
-                  controller: _endDateCtrl,
-                  readOnly: true,
-                  onTap: () => _pickDate(isStart: false),
-                  style: const TextStyle(color: AppColors.white),
-                  decoration:
-                      AppInputDecoration.standard('leagues.end_date'.tr())
-                          .copyWith(
-                    suffixIcon: const Icon(Icons.calendar_today,
-                        color: AppColors.whiteSubtle, size: 18),
-                  ),
-                  validator: (_) {
-                    if (_endDate == null) {
-                      return 'leagues.end_date_required'.tr();
-                    }
-                    if (_startDate != null && _endDate!.isBefore(_startDate!)) {
-                      return 'leagues.date_order_error'.tr();
-                    }
-                    return null;
-                  },
-                ),
-              ),
-            ],
-          ),
-          if (widget.event.format.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            _InfoRow(
-                icon: Icons.format_list_bulleted, label: widget.event.format),
-          ],
-          if (widget.event.eventTypeName != null &&
-              widget.event.eventTypeName!.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            _InfoRow(
-                icon: Icons.military_tech, label: widget.event.eventTypeName!),
-          ],
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _saving ? null : _cancelEditing,
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppColors.inputBorder),
-                    foregroundColor: AppColors.whiteSubtle,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                  ),
-                  child: Text('leagues.cancel'.tr()),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton(
-                  onPressed: _saving ? null : _save,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primaryLight,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                  ),
-                  child: _saving
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: AppColors.white),
-                        )
-                      : Text('leagues.save'.tr(),
-                          style: const TextStyle(color: AppColors.white)),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+            );
+          default:
+            return const SizedBox.shrink();
+        }
+      },
     );
   }
 }
@@ -777,24 +469,3 @@ class _MiniActionButton extends StatelessWidget {
   }
 }
 
-class _InfoRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _InfoRow({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, color: AppColors.whiteSubtle, size: 16),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
-          ),
-        ),
-      ],
-    );
-  }
-}

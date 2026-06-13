@@ -1,5 +1,7 @@
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
+import 'package:sport_platform/core/network/response_parser.dart';
+import 'package:sport_platform/core/utils/date_formatters.dart';
 import '../models/event_schedule_config_model.dart';
 import '../models/team_event_model.dart';
 import '../models/match_model.dart';
@@ -10,10 +12,7 @@ class LeagueDetailService {
   Future<List<TeamEventModel>> getTeamsByEvent(String eventId) async {
     final response =
         await _client.get(ApiEndpoints.teamsEventsByEvent(eventId));
-    final dynamic raw = response.data;
-    final List<dynamic> list =
-        raw is List ? raw : (raw['data'] as List<dynamic>);
-    return list
+    return ResponseParser.toList(response.data)
         .map((e) => TeamEventModel.fromJson(e as Map<String, dynamic>))
         .toList();
   }
@@ -23,7 +22,7 @@ class LeagueDetailService {
       ApiEndpoints.teamsEvents,
       data: {'teamId': teamId, 'eventId': eventId},
     );
-    return TeamEventModel.fromJson(_unwrap(response.data));
+    return TeamEventModel.fromJson(ResponseParser.toMap(response.data));
   }
 
   Future<void> removeTeam(String teamsEventsId) async {
@@ -33,22 +32,19 @@ class LeagueDetailService {
   Future<List<MatchModel>> getMatchesByEvent(String eventId) async {
     final response =
         await _client.get(ApiEndpoints.matchesByEvent(eventId));
-    final dynamic raw = response.data;
-    final List<dynamic> list =
-        raw is List ? raw : (raw['data'] as List<dynamic>);
-    return list
+    return ResponseParser.toList(response.data)
         .map((e) => MatchModel.fromJson(e as Map<String, dynamic>))
         .toList();
   }
 
   Future<MatchModel> createMatch(Map<String, dynamic> data) async {
     final response = await _client.post(ApiEndpoints.matches, data: data);
-    return MatchModel.fromJson(_unwrap(response.data));
+    return MatchModel.fromJson(ResponseParser.toMap(response.data));
   }
 
   Future<MatchModel> updateMatch(String id, Map<String, dynamic> data) async {
     final response = await _client.put(ApiEndpoints.matchById(id), data: data);
-    return MatchModel.fromJson(_unwrap(response.data));
+    return MatchModel.fromJson(ResponseParser.toMap(response.data));
   }
 
   Future<void> deleteMatch(String id) async {
@@ -59,7 +55,8 @@ class LeagueDetailService {
     try {
       final response =
           await _client.get(ApiEndpoints.scheduleConfig(eventId));
-      return EventScheduleConfigModel.fromJson(_unwrap(response.data));
+      return EventScheduleConfigModel.fromJson(
+          ResponseParser.toMap(response.data));
     } catch (_) {
       return null;
     }
@@ -71,16 +68,14 @@ class LeagueDetailService {
       ApiEndpoints.scheduleConfig(eventId),
       data: data,
     );
-    return EventScheduleConfigModel.fromJson(_unwrap(response.data));
+    return EventScheduleConfigModel.fromJson(
+        ResponseParser.toMap(response.data));
   }
 
   Future<List<MatchModel>> generateSchedule(String eventId) async {
     final response =
         await _client.post(ApiEndpoints.generateSchedule(eventId));
-    final dynamic raw = response.data;
-    final List<dynamic> list =
-        raw is List ? raw : (raw['data'] as List<dynamic>);
-    return list
+    return ResponseParser.toList(response.data)
         .map((e) => MatchModel.fromJson(e as Map<String, dynamic>))
         .toList();
   }
@@ -91,26 +86,12 @@ class LeagueDetailService {
     final response = await _client.patch(
       ApiEndpoints.rescheduleDateMatches(eventId),
       data: {
-        'fromDate': _isoDate(fromDate),
-        if (toDate != null) 'toDate': _isoDate(toDate),
+        'fromDate': DateFormatters.apiDate(fromDate),
+        if (toDate != null) 'toDate': DateFormatters.apiDate(toDate),
       },
     );
-    final dynamic raw = response.data;
-    final List<dynamic> list =
-        raw is List ? raw : (raw['data'] as List<dynamic>);
-    return list
+    return ResponseParser.toList(response.data)
         .map((e) => MatchModel.fromJson(e as Map<String, dynamic>))
         .toList();
-  }
-
-  static String _isoDate(DateTime d) =>
-      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-
-  static Map<String, dynamic> _unwrap(dynamic raw) {
-    final map = raw as Map<String, dynamic>;
-    if (map['data'] is Map<String, dynamic>) {
-      return map['data'] as Map<String, dynamic>;
-    }
-    return map;
   }
 }

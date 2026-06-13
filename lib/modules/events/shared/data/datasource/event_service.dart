@@ -1,5 +1,6 @@
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
+import 'package:sport_platform/core/network/response_parser.dart';
 import 'package:sport_platform/core/services/user_session.dart';
 import '../models/event_model.dart';
 
@@ -14,10 +15,7 @@ class EventService {
   Future<List<EventModel>> getAll() async {
     final response =
         await _client.get(ApiEndpoints.eventsByType(eventTypeId));
-    final dynamic raw = response.data;
-    final List<dynamic> list =
-        raw is List ? raw : (raw['data'] as List<dynamic>);
-    return list
+    return ResponseParser.toList(response.data)
         .map((e) => EventModel.fromJson(e as Map<String, dynamic>))
         .toList();
   }
@@ -32,10 +30,7 @@ class EventService {
     final response = await _client.get(
       ApiEndpoints.eventsByTypeAndUser(eventTypeId, userId),
     );
-    final dynamic raw = response.data;
-    final List<dynamic> list =
-        raw is List ? raw : (raw['data'] as List<dynamic>);
-    return list
+    return ResponseParser.toList(response.data)
         .map((e) => (e as Map<String, dynamic>)['id'] as String)
         .toSet();
   }
@@ -43,21 +38,12 @@ class EventService {
   Future<EventModel> create(Map<String, dynamic> data) async {
     final payload = {...data, 'idEventType': eventTypeId};
     final response = await _client.post(ApiEndpoints.events, data: payload);
-    return EventModel.fromJson(_unwrap(response.data));
+    return EventModel.fromJson(ResponseParser.toMap(response.data));
   }
 
   Future<EventModel> update(String id, Map<String, dynamic> data) async {
     final response = await _client.put(ApiEndpoints.eventById(id), data: data);
-    return EventModel.fromJson(_unwrap(response.data));
-  }
-
-  /// Extrae el objeto del evento ya sea directo o dentro de {"data": {...}}.
-  static Map<String, dynamic> _unwrap(dynamic raw) {
-    final map = raw as Map<String, dynamic>;
-    if (map['data'] is Map<String, dynamic>) {
-      return map['data'] as Map<String, dynamic>;
-    }
-    return map;
+    return EventModel.fromJson(ResponseParser.toMap(response.data));
   }
 
   Future<void> delete(String id) async {

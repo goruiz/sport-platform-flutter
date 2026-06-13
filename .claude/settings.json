@@ -26,7 +26,12 @@
       "Bash(Write-Output \"Done\")",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\backend\\\\src\\\\main\\\\java\\\\com\\\\platform\\\\backend\\\\modules\" -Directory)",
       "Bash(Select-Object -ExpandProperty Name)",
-      "Bash(mkdir -p \"C:/Users/WALDO/Documents/Proyectos/Plataforma deportiva/backend/src/main/java/com/platform/backend/modules/matches/presentation/requests/RescheduleDateRequest\")"
+      "Bash(mkdir -p \"C:/Users/WALDO/Documents/Proyectos/Plataforma deportiva/backend/src/main/java/com/platform/backend/modules/matches/presentation/requests/RescheduleDateRequest\")",
+      "Bash(find . -path ./.\\\\\\\\.dart_tool -prune -o -path ././build -prune -o -type f -name \"*.dart\")",
+      "Bash(Get-Content \"c:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\usuario-flutter\\\\lib\\\\modules\\\\events\\\\event_types\\\\leagues\\\\presentation\\\\pages\\\\league_detail_page.dart\")",
+      "Bash(Measure-Object -Line)",
+      "Bash(Select-Object -ExpandProperty Lines)",
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\usuario-flutter\\\\lib\\\\modules\\\\events\\\\event_types\\\\leagues\\\\presentation\\\\pages\\\\league_detail_page.dart\" | Measure-Object -Line\\).Lines)"
     ],
     "additionalDirectories": [
       "c:\\Users\\admseneca\\Documents\\Proyectos\\sports-platform\\Frontend\\sport_platform\\assets",

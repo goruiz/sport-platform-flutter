@@ -135,7 +135,7 @@ class StandingsTab extends StatelessWidget {
             child: Text(
               s.teamName,
               style: TextStyle(
-                color: isTop3 ? AppColors.white : AppColors.white,
+                color: isTop3 ? AppColors.white : AppColors.whiteSubtle,
                 fontSize: 13,
                 fontWeight:
                     isTop3 ? FontWeight.w600 : FontWeight.normal,
