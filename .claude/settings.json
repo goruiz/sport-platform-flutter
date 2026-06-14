@@ -31,7 +31,8 @@
       "Bash(Get-Content \"c:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\usuario-flutter\\\\lib\\\\modules\\\\events\\\\event_types\\\\leagues\\\\presentation\\\\pages\\\\league_detail_page.dart\")",
       "Bash(Measure-Object -Line)",
       "Bash(Select-Object -ExpandProperty Lines)",
-      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\usuario-flutter\\\\lib\\\\modules\\\\events\\\\event_types\\\\leagues\\\\presentation\\\\pages\\\\league_detail_page.dart\" | Measure-Object -Line\\).Lines)"
+      "PowerShell(\\(Get-Content \"c:\\\\Users\\\\WALDO\\\\Documents\\\\Proyectos\\\\Plataforma deportiva\\\\frontend\\\\usuario-flutter\\\\lib\\\\modules\\\\events\\\\event_types\\\\leagues\\\\presentation\\\\pages\\\\league_detail_page.dart\" | Measure-Object -Line\\).Lines)",
+      "Bash(xargs grep -l \"homeScore\\\\|awayScore\\\\|result\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\admseneca\\Documents\\Proyectos\\sports-platform\\Frontend\\sport_platform\\assets",

@@ -25,7 +25,8 @@ class ApiEndpoints {
   static const String playersInviteRegister = '/players/invite-register';
   static const String playersAuthRegister = '/players/auth/register';
   static String playersByTeam(String teamId) => '/players/by-team/$teamId';
-  static String playerRemoveFromTeam(String id) => '/players/$id/remove-from-team';
+  static String playerRemoveFromTeam(String id) =>
+      '/players/$id/remove-from-team';
 
   // Events
   static const String events = '/events';
@@ -74,4 +75,10 @@ class ApiEndpoints {
   // Leagues
   static const String leagues = '/ligas';
   static String leagueById(String id) => '/ligas/$id';
+
+  // Standings
+  static const String standings = '/events';
+  static String standingsByEvent(String eventId) =>
+      '/events/$eventId/standings';
+
 }
