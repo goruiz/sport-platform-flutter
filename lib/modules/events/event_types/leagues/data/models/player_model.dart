@@ -36,4 +36,39 @@ class PlayerModel {
       teamName: json['teamName']?.toString(),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'firstName': firstName,
+        'lastName': lastName,
+        'email': email,
+        if (phone != null) 'phone': phone,
+        if (profilePhotoUrl != null) 'profilePhotoUrl': profilePhotoUrl,
+        if (status != null) 'status': status,
+        if (teamId != null) 'teamId': teamId,
+        if (teamName != null) 'teamName': teamName,
+      };
+
+  PlayerModel copyWith({
+    String? id,
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? phone,
+    String? profilePhotoUrl,
+    String? status,
+    String? teamId,
+    String? teamName,
+  }) =>
+      PlayerModel(
+        id: id ?? this.id,
+        firstName: firstName ?? this.firstName,
+        lastName: lastName ?? this.lastName,
+        email: email ?? this.email,
+        phone: phone ?? this.phone,
+        profilePhotoUrl: profilePhotoUrl ?? this.profilePhotoUrl,
+        status: status ?? this.status,
+        teamId: teamId ?? this.teamId,
+        teamName: teamName ?? this.teamName,
+      );
 }

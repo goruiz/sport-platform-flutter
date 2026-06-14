@@ -24,4 +24,27 @@ class TeamEventModel {
           : DateTime.now(),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'teamId': teamId,
+        'teamName': teamName,
+        'eventId': eventId,
+        'createdAt': createdAt.toIso8601String(),
+      };
+
+  TeamEventModel copyWith({
+    String? id,
+    String? teamId,
+    String? teamName,
+    String? eventId,
+    DateTime? createdAt,
+  }) =>
+      TeamEventModel(
+        id: id ?? this.id,
+        teamId: teamId ?? this.teamId,
+        teamName: teamName ?? this.teamName,
+        eventId: eventId ?? this.eventId,
+        createdAt: createdAt ?? this.createdAt,
+      );
 }

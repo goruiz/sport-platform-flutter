@@ -1,97 +1,68 @@
-import 'package:sport_platform/core/network/api_endpoints.dart';
-import 'package:sport_platform/core/network/dio_client.dart';
-import 'package:sport_platform/core/network/response_parser.dart';
-import 'package:sport_platform/core/utils/date_formatters.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_matches_repository.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_schedule_repository.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_teams_repository.dart';
 import '../models/event_schedule_config_model.dart';
-import '../models/team_event_model.dart';
 import '../models/match_model.dart';
+import '../models/team_event_model.dart';
 
+/// Facade that aggregates the three league repositories into a single entry
+/// point for consumers that need cross-domain operations (e.g. AutoScheduleSheet).
 class LeagueDetailService {
-  final DioClient _client = DioClient();
+  final ILeagueTeamsRepository _teams;
+  final ILeagueMatchesRepository _matches;
+  final ILeagueScheduleRepository _schedule;
 
-  Future<List<TeamEventModel>> getTeamsByEvent(String eventId) async {
-    final response =
-        await _client.get(ApiEndpoints.teamsEventsByEvent(eventId));
-    return ResponseParser.toList(response.data)
-        .map((e) => TeamEventModel.fromJson(e as Map<String, dynamic>))
-        .toList();
-  }
+  LeagueDetailService({
+    required ILeagueTeamsRepository teams,
+    required ILeagueMatchesRepository matches,
+    required ILeagueScheduleRepository schedule,
+  })  : _teams = teams,
+        _matches = matches,
+        _schedule = schedule;
 
-  Future<TeamEventModel> addTeam(String teamId, String eventId) async {
-    final response = await _client.post(
-      ApiEndpoints.teamsEvents,
-      data: {'teamId': teamId, 'eventId': eventId},
-    );
-    return TeamEventModel.fromJson(ResponseParser.toMap(response.data));
-  }
+  // --- Teams ---
 
-  Future<void> removeTeam(String teamsEventsId) async {
-    await _client.delete(ApiEndpoints.teamsEventsHardDelete(teamsEventsId));
-  }
+  Future<List<TeamEventModel>> getTeamsByEvent(String eventId) =>
+      _teams.getByEvent(eventId);
 
-  Future<List<MatchModel>> getMatchesByEvent(String eventId) async {
-    final response =
-        await _client.get(ApiEndpoints.matchesByEvent(eventId));
-    return ResponseParser.toList(response.data)
-        .map((e) => MatchModel.fromJson(e as Map<String, dynamic>))
-        .toList();
-  }
+  Future<TeamEventModel> addTeam(String teamId, String eventId) =>
+      _teams.add(teamId, eventId);
 
-  Future<MatchModel> createMatch(Map<String, dynamic> data) async {
-    final response = await _client.post(ApiEndpoints.matches, data: data);
-    return MatchModel.fromJson(ResponseParser.toMap(response.data));
-  }
+  Future<void> removeTeam(String teamsEventsId) =>
+      _teams.remove(teamsEventsId);
 
-  Future<MatchModel> updateMatch(String id, Map<String, dynamic> data) async {
-    final response = await _client.put(ApiEndpoints.matchById(id), data: data);
-    return MatchModel.fromJson(ResponseParser.toMap(response.data));
-  }
+  // --- Matches ---
 
-  Future<void> deleteMatch(String id) async {
-    await _client.delete(ApiEndpoints.matchById(id));
-  }
+  Future<List<MatchModel>> getMatchesByEvent(String eventId) =>
+      _matches.getByEvent(eventId);
 
-  Future<EventScheduleConfigModel?> getScheduleConfig(String eventId) async {
-    try {
-      final response =
-          await _client.get(ApiEndpoints.scheduleConfig(eventId));
-      return EventScheduleConfigModel.fromJson(
-          ResponseParser.toMap(response.data));
-    } catch (_) {
-      return null;
-    }
-  }
+  Future<MatchModel> createMatch(Map<String, dynamic> data) =>
+      _matches.create(data);
 
-  Future<EventScheduleConfigModel> saveScheduleConfig(
-      String eventId, Map<String, dynamic> data) async {
-    final response = await _client.post(
-      ApiEndpoints.scheduleConfig(eventId),
-      data: data,
-    );
-    return EventScheduleConfigModel.fromJson(
-        ResponseParser.toMap(response.data));
-  }
+  Future<MatchModel> updateMatch(String id, Map<String, dynamic> data) =>
+      _matches.update(id, data);
 
-  Future<List<MatchModel>> generateSchedule(String eventId) async {
-    final response =
-        await _client.post(ApiEndpoints.generateSchedule(eventId));
-    return ResponseParser.toList(response.data)
-        .map((e) => MatchModel.fromJson(e as Map<String, dynamic>))
-        .toList();
-  }
+  Future<void> deleteMatch(String id) => _matches.delete(id);
 
   /// [toDate] null → aplaza (POSTPONED). Con fecha → reprograma a esa fecha.
   Future<List<MatchModel>> rescheduleDateMatches(
-      String eventId, DateTime fromDate, {DateTime? toDate}) async {
-    final response = await _client.patch(
-      ApiEndpoints.rescheduleDateMatches(eventId),
-      data: {
-        'fromDate': DateFormatters.apiDate(fromDate),
-        if (toDate != null) 'toDate': DateFormatters.apiDate(toDate),
-      },
-    );
-    return ResponseParser.toList(response.data)
-        .map((e) => MatchModel.fromJson(e as Map<String, dynamic>))
-        .toList();
-  }
+    String eventId,
+    DateTime fromDate, {
+    DateTime? toDate,
+  }) =>
+      _matches.rescheduleDate(eventId, fromDate, toDate: toDate);
+
+  // --- Schedule ---
+
+  Future<EventScheduleConfigModel?> getScheduleConfig(String eventId) =>
+      _schedule.getConfig(eventId);
+
+  Future<EventScheduleConfigModel> saveScheduleConfig(
+    String eventId,
+    Map<String, dynamic> data,
+  ) =>
+      _schedule.saveConfig(eventId, data);
+
+  Future<List<MatchModel>> generateSchedule(String eventId) =>
+      _schedule.generate(eventId);
 }

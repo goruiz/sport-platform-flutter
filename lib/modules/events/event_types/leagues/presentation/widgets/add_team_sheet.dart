@@ -11,11 +11,13 @@ import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 class AddTeamSheet extends StatefulWidget {
   final Set<String> enrolledTeamIds;
   final Future<void> Function(String teamId) onAdd;
+  final TeamsService teamsService;
 
   const AddTeamSheet({
     super.key,
     required this.enrolledTeamIds,
     required this.onAdd,
+    required this.teamsService,
   });
 
   static Future<void> show({
@@ -30,6 +32,7 @@ class AddTeamSheet extends StatefulWidget {
       builder: (_) => AddTeamSheet(
         enrolledTeamIds: enrolledTeamIds,
         onAdd: onAdd,
+        teamsService: getIt<TeamsService>(),
       ),
     );
   }
@@ -51,7 +54,7 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
   @override
   void initState() {
     super.initState();
-    _teamsService = getIt<TeamsService>();
+    _teamsService = widget.teamsService;
     _loadTeams();
   }
 

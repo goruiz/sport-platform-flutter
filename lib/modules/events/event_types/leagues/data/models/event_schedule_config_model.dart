@@ -45,4 +45,27 @@ class EventScheduleConfigModel {
         'breakBetweenMatchesMinutes': breakBetweenMatchesMinutes,
         if (courtId != null) 'courtId': courtId,
       };
+
+  EventScheduleConfigModel copyWith({
+    String? id,
+    String? eventId,
+    List<String>? playDays,
+    String? startTime,
+    int? matchDurationMinutes,
+    int? breakBetweenHalvesMinutes,
+    int? breakBetweenMatchesMinutes,
+    String? courtId,
+  }) =>
+      EventScheduleConfigModel(
+        id: id ?? this.id,
+        eventId: eventId ?? this.eventId,
+        playDays: playDays ?? this.playDays,
+        startTime: startTime ?? this.startTime,
+        matchDurationMinutes: matchDurationMinutes ?? this.matchDurationMinutes,
+        breakBetweenHalvesMinutes:
+            breakBetweenHalvesMinutes ?? this.breakBetweenHalvesMinutes,
+        breakBetweenMatchesMinutes:
+            breakBetweenMatchesMinutes ?? this.breakBetweenMatchesMinutes,
+        courtId: courtId ?? this.courtId,
+      );
 }

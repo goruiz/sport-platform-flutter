@@ -6,7 +6,7 @@ import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/courts_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/league_detail_service.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_schedule_repository.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/event_schedule_config_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
@@ -48,7 +48,7 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
   ];
 
   final _formKey = GlobalKey<FormState>();
-  late final LeagueDetailService _service;
+  late final ILeagueScheduleRepository _scheduleRepo;
   late final CourtsService _courtsService;
 
   final Set<String> _selectedDays = {};
@@ -67,7 +67,7 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
   @override
   void initState() {
     super.initState();
-    _service = getIt<LeagueDetailService>();
+    _scheduleRepo = getIt<ILeagueScheduleRepository>();
     _courtsService = getIt<CourtsService>();
     _loadData();
   }
@@ -96,7 +96,7 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
 
   Future<void> _loadConfig() async {
     try {
-      final config = await _service.getScheduleConfig(widget.eventId);
+      final config = await _scheduleRepo.getConfig(widget.eventId);
       if (config != null && mounted) _applyConfig(config);
     } catch (_) {
     } finally {
@@ -145,7 +145,7 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
     if (!_validate()) return;
     setState(() => _saving = true);
     try {
-      await _service.saveScheduleConfig(widget.eventId, _buildPayload());
+      await _scheduleRepo.saveConfig(widget.eventId, _buildPayload());
       if (mounted) _showSnack('leagues.schedule_config_saved'.tr());
     } catch (_) {
       if (mounted) _showSnack('leagues.schedule_error_save'.tr(), isError: true);
@@ -158,8 +158,8 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
     if (!_validate()) return;
     setState(() => _generating = true);
     try {
-      await _service.saveScheduleConfig(widget.eventId, _buildPayload());
-      final matches = await _service.generateSchedule(widget.eventId);
+      await _scheduleRepo.saveConfig(widget.eventId, _buildPayload());
+      final matches = await _scheduleRepo.generate(widget.eventId);
       await widget.onGenerated(matches);
       if (mounted) {
         _showSnack('leagues.schedule_generated'.tr(

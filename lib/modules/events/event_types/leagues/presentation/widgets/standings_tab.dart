@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/models/league_standing.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 
 class StandingsTab extends StatelessWidget {
@@ -15,51 +16,9 @@ class StandingsTab extends StatelessWidget {
     required this.matches,
   });
 
-  List<_Standing> _compute() {
-    final acc = <String, _Standing>{};
-    for (final t in teams) {
-      acc[t.teamId] = _Standing(teamId: t.teamId, teamName: t.teamName);
-    }
-    for (final m in matches) {
-      if (m.status != 'FINISHED') continue;
-      final hs = m.homeScore;
-      final as_ = m.awayScore;
-      if (hs == null || as_ == null) continue;
-      final home = acc[m.homeTeamId];
-      final away = acc[m.awayTeamId];
-      if (home == null || away == null) continue;
-      home.mp++;
-      away.mp++;
-      home.gf += hs;
-      home.ga += as_;
-      away.gf += as_;
-      away.ga += hs;
-      if (hs > as_) {
-        home.w++;
-        away.l++;
-      } else if (hs < as_) {
-        away.w++;
-        home.l++;
-      } else {
-        home.d++;
-        away.d++;
-      }
-    }
-    return acc.values.toList()
-      ..sort((a, b) {
-        final byPts = b.pts.compareTo(a.pts);
-        if (byPts != 0) return byPts;
-        final byGD = b.gd.compareTo(a.gd);
-        if (byGD != 0) return byGD;
-        final byGF = b.gf.compareTo(a.gf);
-        if (byGF != 0) return byGF;
-        return a.teamName.compareTo(b.teamName);
-      });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final standings = _compute();
+    final standings = LeagueStanding.compute(teams, matches);
     final hasData = standings.any((s) => s.mp > 0);
     if (!hasData) {
       return EmptyState(
@@ -117,7 +76,7 @@ class StandingsTab extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(int pos, _Standing s) {
+  Widget _buildRow(int pos, LeagueStanding s) {
     final isTop3 = pos <= 3;
     return Container(
       decoration: const BoxDecoration(
@@ -137,8 +96,7 @@ class StandingsTab extends StatelessWidget {
               style: TextStyle(
                 color: isTop3 ? AppColors.white : AppColors.whiteSubtle,
                 fontSize: 13,
-                fontWeight:
-                    isTop3 ? FontWeight.w600 : FontWeight.normal,
+                fontWeight: isTop3 ? FontWeight.w600 : FontWeight.normal,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -269,17 +227,4 @@ class _PosBadge extends StatelessWidget {
       ),
     );
   }
-}
-
-// ── Data accumulator (internal) ───────────────────────────────────────────────
-
-class _Standing {
-  final String teamId;
-  final String teamName;
-  int mp = 0, w = 0, d = 0, l = 0, gf = 0, ga = 0;
-
-  _Standing({required this.teamId, required this.teamName});
-
-  int get pts => w * 3 + d;
-  int get gd => gf - ga;
 }
