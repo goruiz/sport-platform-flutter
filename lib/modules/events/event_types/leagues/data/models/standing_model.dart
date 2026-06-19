@@ -1,6 +1,7 @@
 class StandingModel {
   final int position;
   final String teamId;
+  final String teamName;
   final int played;
   final int won;
   final int drawn;
@@ -13,6 +14,7 @@ class StandingModel {
   const StandingModel({
     required this.position,
     required this.teamId,
+    required this.teamName,
     required this.played,
     required this.won,
     required this.drawn,
@@ -27,6 +29,7 @@ class StandingModel {
     return StandingModel(
       position: json['position'] as int,
       teamId: json['teamId'].toString(),
+      teamName: json['teamName'].toString(),
       played: json['played'] as int,
       won: json['won'] as int,
       drawn: json['drawn'] as int,

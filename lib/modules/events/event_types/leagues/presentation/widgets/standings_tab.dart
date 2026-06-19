@@ -1,45 +1,48 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/domain/models/league_standing.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/standings_service.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/standing_model.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 
 class StandingsTab extends StatelessWidget {
-  final List<TeamEventModel> teams;
-  final List<MatchModel> matches;
+  final StandingsService _standingsService = getIt<StandingsService>();
+  final String eventId;
 
-  const StandingsTab({
-    super.key,
-    required this.teams,
-    required this.matches,
-  });
+  StandingsTab({super.key, required this.eventId});
 
   @override
   Widget build(BuildContext context) {
-    final standings = LeagueStanding.compute(teams, matches);
-    final hasData = standings.any((s) => s.mp > 0);
-    if (!hasData) {
-      return EmptyState(
-        icon: Icons.leaderboard_outlined,
-        title: 'leagues.standings_empty'.tr(),
-        subtitle: 'leagues.standings_empty_subtitle'.tr(),
-      );
-    }
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          children: [
-            _buildHeader(),
-            ...standings.asMap().entries.map(
-              (e) => _buildRow(e.key + 1, e.value),
+    return FutureBuilder<List<StandingModel>>(
+      future: _standingsService.getById(eventId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primaryLight),
+          );
+        }
+        if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+          return EmptyState(
+            icon: Icons.leaderboard_outlined,
+            title: 'leagues.standings_empty'.tr(),
+            subtitle: 'leagues.standings_empty_subtitle'.tr(),
+          );
+        }
+        final standings = snapshot.data!;
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Column(
+              children: [
+                _buildHeader(),
+                ...standings.map((s) => _buildRow(s.position, s)),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -76,7 +79,7 @@ class StandingsTab extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(int pos, LeagueStanding s) {
+  Widget _buildRow(int pos, StandingModel standing) {
     final isTop3 = pos <= 3;
     return Container(
       decoration: const BoxDecoration(
@@ -92,7 +95,7 @@ class StandingsTab extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              s.teamName,
+              standing.teamName,
               style: TextStyle(
                 color: isTop3 ? AppColors.white : AppColors.whiteSubtle,
                 fontSize: 13,
@@ -101,12 +104,12 @@ class StandingsTab extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          _DataCell('${s.mp}', width: 30, color: AppColors.whiteSubtle),
-          _DataCell('${s.w}', width: 28, color: AppColors.success),
-          _DataCell('${s.d}', width: 28, color: AppColors.whiteSubtle),
-          _DataCell('${s.l}', width: 28, color: AppColors.error),
+          _DataCell('${standing.played}', width: 30, color: AppColors.whiteSubtle),
+          _DataCell('${standing.won}', width: 28, color: AppColors.success),
+          _DataCell('${standing.drawn}', width: 28, color: AppColors.whiteSubtle),
+          _DataCell('${standing.lost}', width: 28, color: AppColors.error),
           _DataCell(
-            '${s.pts}',
+            '${standing.points}',
             width: 36,
             color: AppColors.primaryLight,
             bold: true,
@@ -201,8 +204,10 @@ class _PosBadge extends StatelessWidget {
           child: Container(
             width: 22,
             height: 22,
-            decoration:
-                BoxDecoration(color: badgeColor, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: badgeColor,
+              shape: BoxShape.circle,
+            ),
             child: Center(
               child: Text(
                 '$pos',

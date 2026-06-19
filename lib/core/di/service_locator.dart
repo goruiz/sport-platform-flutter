@@ -6,6 +6,7 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/datasourc
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/league_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/league_teams_event_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/standings_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/teams_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_matches_repository.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_schedule_repository.dart';
@@ -27,6 +28,7 @@ void setupServiceLocator() {
         schedule: getIt<ILeagueScheduleRepository>(),
       ));
 
+  getIt.registerLazySingleton<StandingsService>(() => StandingsService());
   getIt.registerLazySingleton<TeamsService>(() => TeamsService());
   getIt.registerLazySingleton<PlayersService>(() => PlayersService());
   getIt.registerLazySingleton<CourtsService>(() => CourtsService());

@@ -233,13 +233,13 @@ class _EventListView extends StatelessWidget {
         itemCount: events.length,
         itemBuilder: (_, i) {
           final event = events[i];
-          final isOwned = myEventIds.contains(event.id);
+          final isCurrentUserOwner = myEventIds.contains(event.id);
           return EventCard(
             event: event,
             typeIcon: typeIcon,
-            onTap: onEventTap != null ? () => onEventTap!(event, isOwned) : null,
-            onEdit: isOwned ? () => onEdit(event) : null,
-            onDelete: isOwned ? () => onDelete(event) : null,
+            onTap: onEventTap != null ? () => onEventTap!(event, isCurrentUserOwner) : null,
+            onEdit: isCurrentUserOwner ? () => onEdit(event) : null,
+            onDelete: isCurrentUserOwner ? () => onDelete(event) : null,
           );
         },
       ),

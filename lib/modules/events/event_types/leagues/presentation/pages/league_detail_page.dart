@@ -285,6 +285,6 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
         child: CircularProgressIndicator(color: AppColors.primaryLight),
       );
     }
-    return StandingsTab(teams: _notifier.teams, matches: _notifier.matches);
+    return StandingsTab(eventId: _event.id);
   }
 }
