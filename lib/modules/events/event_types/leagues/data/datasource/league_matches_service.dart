@@ -51,4 +51,25 @@ class LeagueMatchesService implements ILeagueMatchesRepository {
         .map((e) => MatchModel.fromJson(e as Map<String, dynamic>))
         .toList();
   }
+
+  @override
+  Future<MatchModel> postpone(String id) async {
+    final response = await _client.patch(ApiEndpoints.matchPostpone(id));
+    return MatchModel.fromJson(ResponseParser.toMap(response.data));
+  }
+
+  @override
+  Future<MatchModel> suspend(String id) async {
+    final response = await _client.patch(ApiEndpoints.matchSuspend(id));
+    return MatchModel.fromJson(ResponseParser.toMap(response.data));
+  }
+
+  @override
+  Future<MatchModel> reschedule(String id, DateTime newDate) async {
+    final response = await _client.patch(
+      ApiEndpoints.matchReschedule(id),
+      data: {'newDate': MatchModel.apiDateTime(newDate)},
+    );
+    return MatchModel.fromJson(ResponseParser.toMap(response.data));
+  }
 }

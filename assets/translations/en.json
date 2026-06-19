@@ -252,7 +252,22 @@
     "match_day_postpone_confirm": "Postpone",
     "match_day_rescheduled": "Round rescheduled successfully",
     "match_day_postponed": "Round postponed",
-    "match_day_error": "Error updating the round"
+    "match_day_error": "Error updating the round",
+    "match_status_suspended": "Suspended",
+    "match_status_rescheduled": "Rescheduled",
+    "match_postpone": "Postpone match",
+    "match_suspend": "Suspend match",
+    "match_reschedule": "Reschedule match",
+    "match_confirm_postpone": "Postpone this match? It will be pending a new date.",
+    "match_confirm_suspend": "Suspend this match indefinitely?",
+    "match_pick_reschedule_date": "Select the new match date",
+    "match_postponed": "Match postponed successfully",
+    "match_suspended": "Match suspended",
+    "match_rescheduled": "Match rescheduled successfully",
+    "match_action_error": "Error updating the match",
+    "schedule_blocked_dates": "Blocked dates",
+    "schedule_add_blocked_date": "Add blocked date",
+    "schedule_pick_blocked_date": "Select a date to block"
   },
   "menu": {
     "home": "Home",

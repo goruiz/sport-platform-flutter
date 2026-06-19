@@ -252,7 +252,22 @@
     "match_day_postpone_confirm": "Aplazar",
     "match_day_rescheduled": "Jornada reprogramada exitosamente",
     "match_day_postponed": "Jornada aplazada",
-    "match_day_error": "Error al actualizar la jornada"
+    "match_day_error": "Error al actualizar la jornada",
+    "match_status_suspended": "Suspendido",
+    "match_status_rescheduled": "Reagendado",
+    "match_postpone": "Aplazar partido",
+    "match_suspend": "Suspender partido",
+    "match_reschedule": "Reagendar partido",
+    "match_confirm_postpone": "¿Aplazar este partido? Quedará pendiente de nueva fecha.",
+    "match_confirm_suspend": "¿Suspender este partido indefinidamente?",
+    "match_pick_reschedule_date": "Selecciona la nueva fecha del partido",
+    "match_postponed": "Partido aplazado exitosamente",
+    "match_suspended": "Partido suspendido",
+    "match_rescheduled": "Partido reagendado exitosamente",
+    "match_action_error": "Error al actualizar el partido",
+    "schedule_blocked_dates": "Fechas bloqueadas",
+    "schedule_add_blocked_date": "Agregar fecha bloqueada",
+    "schedule_pick_blocked_date": "Selecciona una fecha a bloquear"
   },
   "menu": {
     "home": "Inicio",

@@ -207,7 +207,22 @@
     "success_team_created": "Team erstellt und zur Liga hinzugefügt",
     "error_create_team": "Fehler beim Erstellen des Teams",
     "tap_to_manage_players": "Tippen, um Spieler zu verwalten",
-    "manage_players": "Spieler verwalten"
+    "manage_players": "Spieler verwalten",
+    "match_status_suspended": "Suspendiert",
+    "match_status_rescheduled": "Neu angesetzt",
+    "match_postpone": "Spiel verschieben",
+    "match_suspend": "Spiel aussetzen",
+    "match_reschedule": "Spiel neu ansetzen",
+    "match_confirm_postpone": "Dieses Spiel verschieben? Es wird auf einen neuen Termin warten.",
+    "match_confirm_suspend": "Dieses Spiel auf unbestimmte Zeit aussetzen?",
+    "match_pick_reschedule_date": "Neues Spieldatum auswählen",
+    "match_postponed": "Spiel erfolgreich verschoben",
+    "match_suspended": "Spiel ausgesetzt",
+    "match_rescheduled": "Spiel erfolgreich neu angesetzt",
+    "match_action_error": "Fehler beim Aktualisieren des Spiels",
+    "schedule_blocked_dates": "Gesperrte Daten",
+    "schedule_add_blocked_date": "Gesperrtes Datum hinzufügen",
+    "schedule_pick_blocked_date": "Datum zum Sperren auswählen"
   },
   "menu": {
     "home": "Startseite",

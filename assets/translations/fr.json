@@ -207,7 +207,22 @@
     "success_team_created": "Équipe créée et ajoutée à la ligue",
     "error_create_team": "Erreur lors de la création de l'équipe",
     "tap_to_manage_players": "Appuyer pour gérer les joueurs",
-    "manage_players": "Gérer les joueurs"
+    "manage_players": "Gérer les joueurs",
+    "match_status_suspended": "Suspendu",
+    "match_status_rescheduled": "Reprogrammé",
+    "match_postpone": "Reporter le match",
+    "match_suspend": "Suspendre le match",
+    "match_reschedule": "Reprogrammer le match",
+    "match_confirm_postpone": "Reporter ce match ? Il sera en attente d'une nouvelle date.",
+    "match_confirm_suspend": "Suspendre ce match indéfiniment ?",
+    "match_pick_reschedule_date": "Sélectionner la nouvelle date du match",
+    "match_postponed": "Match reporté avec succès",
+    "match_suspended": "Match suspendu",
+    "match_rescheduled": "Match reprogrammé avec succès",
+    "match_action_error": "Erreur lors de la mise à jour du match",
+    "schedule_blocked_dates": "Dates bloquées",
+    "schedule_add_blocked_date": "Ajouter une date bloquée",
+    "schedule_pick_blocked_date": "Sélectionner une date à bloquer"
   },
   "menu": {
     "home": "Accueil",

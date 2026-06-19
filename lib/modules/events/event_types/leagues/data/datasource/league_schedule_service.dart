@@ -29,10 +29,13 @@ class LeagueScheduleService implements ILeagueScheduleRepository {
   }
 
   @override
-  Future<List<MatchModel>> generate(String eventId) async {
+  Future<(List<MatchModel>, String?)> generate(String eventId) async {
     final response = await _client.post(ApiEndpoints.generateSchedule(eventId));
-    return ResponseParser.toList(response.data)
+    final data = ResponseParser.toMap(response.data);
+    final matches = (data['matches'] as List<dynamic>)
         .map((e) => MatchModel.fromJson(e as Map<String, dynamic>))
         .toList();
+    final warning = data['warning'] as String?;
+    return (matches, warning);
   }
 }

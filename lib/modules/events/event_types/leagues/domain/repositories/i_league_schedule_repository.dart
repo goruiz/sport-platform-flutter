@@ -4,5 +4,6 @@ import '../../data/models/match_model.dart';
 abstract interface class ILeagueScheduleRepository {
   Future<EventScheduleConfigModel?> getConfig(String eventId);
   Future<EventScheduleConfigModel> saveConfig(String eventId, Map<String, dynamic> data);
-  Future<List<MatchModel>> generate(String eventId);
+  /// Returns the generated matches and an optional warning message.
+  Future<(List<MatchModel>, String?)> generate(String eventId);
 }

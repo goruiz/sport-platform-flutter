@@ -63,6 +63,6 @@ class LeagueDetailService {
   ) =>
       _schedule.saveConfig(eventId, data);
 
-  Future<List<MatchModel>> generateSchedule(String eventId) =>
+  Future<(List<MatchModel>, String?)> generateSchedule(String eventId) =>
       _schedule.generate(eventId);
 }

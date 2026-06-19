@@ -72,6 +72,11 @@ class ApiEndpoints {
   static String rescheduleDateMatches(String eventId) =>
       '/matches/by-event/$eventId/reschedule-date';
 
+  // Match status transitions
+  static String matchPostpone(String id) => '/matches/$id/postpone';
+  static String matchSuspend(String id) => '/matches/$id/suspend';
+  static String matchReschedule(String id) => '/matches/$id/reschedule';
+
   // Leagues
   static const String leagues = '/ligas';
   static String leagueById(String id) => '/ligas/$id';

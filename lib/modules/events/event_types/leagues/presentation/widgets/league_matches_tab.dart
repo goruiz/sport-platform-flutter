@@ -16,6 +16,9 @@ class LeagueMatchesTab extends StatelessWidget {
   final void Function(MatchModel) onEdit;
   final void Function(MatchModel) onDelete;
   final Future<void> Function(DateTime, DateTime?) onRescheduleDay;
+  final Future<void> Function(MatchModel)? onMatchPostpone;
+  final Future<void> Function(MatchModel)? onMatchSuspend;
+  final Future<void> Function(MatchModel, DateTime)? onMatchReschedule;
 
   const LeagueMatchesTab({
     super.key,
@@ -28,6 +31,9 @@ class LeagueMatchesTab extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onRescheduleDay,
+    this.onMatchPostpone,
+    this.onMatchSuspend,
+    this.onMatchReschedule,
   });
 
   @override
@@ -63,6 +69,9 @@ class LeagueMatchesTab extends StatelessWidget {
             onEdit: onEdit,
             onDelete: onDelete,
             onRescheduleDay: onRescheduleDay,
+            onMatchPostpone: onMatchPostpone,
+            onMatchSuspend: onMatchSuspend,
+            onMatchReschedule: onMatchReschedule,
           );
         },
       ),

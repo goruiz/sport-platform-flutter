@@ -48,7 +48,7 @@ class MatchModel {
   Map<String, dynamic> toJson() => {
         'homeTeamId': homeTeamId,
         'awayTeamId': awayTeamId,
-        'matchDate': _apiDateTime(matchDate),
+        'matchDate': apiDateTime(matchDate),
         'status': status,
         'eventId': eventId,
         if (location != null) 'location': location,
@@ -84,7 +84,7 @@ class MatchModel {
         createdAt: createdAt ?? this.createdAt,
       );
 
-  static String _apiDateTime(DateTime d) =>
+  static String apiDateTime(DateTime d) =>
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}'
       'T${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}:00';
 }

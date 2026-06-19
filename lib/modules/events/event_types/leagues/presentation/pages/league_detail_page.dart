@@ -144,6 +144,33 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     }
   }
 
+  Future<void> _handleMatchPostpone(MatchModel match) async {
+    try {
+      await _notifier.postponeMatch(match.id);
+      if (mounted) _showSnack('leagues.match_postponed'.tr());
+    } catch (_) {
+      if (mounted) _showSnack('leagues.match_action_error'.tr(), isError: true);
+    }
+  }
+
+  Future<void> _handleMatchSuspend(MatchModel match) async {
+    try {
+      await _notifier.suspendMatch(match.id);
+      if (mounted) _showSnack('leagues.match_suspended'.tr());
+    } catch (_) {
+      if (mounted) _showSnack('leagues.match_action_error'.tr(), isError: true);
+    }
+  }
+
+  Future<void> _handleMatchReschedule(MatchModel match, DateTime newDate) async {
+    try {
+      await _notifier.rescheduleMatch(match.id, newDate);
+      if (mounted) _showSnack('leagues.match_rescheduled'.tr());
+    } catch (_) {
+      if (mounted) _showSnack('leagues.match_action_error'.tr(), isError: true);
+    }
+  }
+
   // --------------- Helpers ---------------
 
   Future<void> _confirmAndExecute({
@@ -276,6 +303,9 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       onEdit: _openEditMatch,
       onDelete: _confirmDeleteMatch,
       onRescheduleDay: _onRescheduleDay,
+      onMatchPostpone: widget.isOwner ? _handleMatchPostpone : null,
+      onMatchSuspend: widget.isOwner ? _handleMatchSuspend : null,
+      onMatchReschedule: widget.isOwner ? _handleMatchReschedule : null,
     );
   }
 

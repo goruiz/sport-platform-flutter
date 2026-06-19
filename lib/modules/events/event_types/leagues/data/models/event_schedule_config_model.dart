@@ -7,6 +7,7 @@ class EventScheduleConfigModel {
   final int breakBetweenHalvesMinutes;
   final int breakBetweenMatchesMinutes;
   final String? courtId;
+  final List<String> blockedDates;
 
   const EventScheduleConfigModel({
     this.id,
@@ -17,6 +18,7 @@ class EventScheduleConfigModel {
     required this.breakBetweenHalvesMinutes,
     required this.breakBetweenMatchesMinutes,
     this.courtId,
+    this.blockedDates = const [],
   });
 
   factory EventScheduleConfigModel.fromJson(Map<String, dynamic> json) {
@@ -34,6 +36,10 @@ class EventScheduleConfigModel {
       breakBetweenMatchesMinutes:
           (json['breakBetweenMatchesMinutes'] as num?)?.toInt() ?? 30,
       courtId: json['courtId']?.toString(),
+      blockedDates: (json['blockedDates'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
     );
   }
 
@@ -44,6 +50,7 @@ class EventScheduleConfigModel {
         'breakBetweenHalvesMinutes': breakBetweenHalvesMinutes,
         'breakBetweenMatchesMinutes': breakBetweenMatchesMinutes,
         if (courtId != null) 'courtId': courtId,
+        'blockedDates': blockedDates,
       };
 
   EventScheduleConfigModel copyWith({
@@ -55,6 +62,7 @@ class EventScheduleConfigModel {
     int? breakBetweenHalvesMinutes,
     int? breakBetweenMatchesMinutes,
     String? courtId,
+    List<String>? blockedDates,
   }) =>
       EventScheduleConfigModel(
         id: id ?? this.id,
@@ -67,5 +75,6 @@ class EventScheduleConfigModel {
         breakBetweenMatchesMinutes:
             breakBetweenMatchesMinutes ?? this.breakBetweenMatchesMinutes,
         courtId: courtId ?? this.courtId,
+        blockedDates: blockedDates ?? this.blockedDates,
       );
 }

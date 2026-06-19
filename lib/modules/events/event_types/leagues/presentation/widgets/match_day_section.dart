@@ -15,6 +15,9 @@ class MatchDaySection extends StatelessWidget {
   final void Function(MatchModel) onEdit;
   final void Function(MatchModel) onDelete;
   final Future<void> Function(DateTime fromDate, DateTime? toDate) onRescheduleDay;
+  final Future<void> Function(MatchModel)? onMatchPostpone;
+  final Future<void> Function(MatchModel)? onMatchSuspend;
+  final Future<void> Function(MatchModel, DateTime)? onMatchReschedule;
 
   const MatchDaySection({
     super.key,
@@ -26,6 +29,9 @@ class MatchDaySection extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onRescheduleDay,
+    this.onMatchPostpone,
+    this.onMatchSuspend,
+    this.onMatchReschedule,
   });
 
   Future<void> _handlePostpone(BuildContext context) async {
@@ -65,6 +71,42 @@ class MatchDaySection extends StatelessWidget {
     await onRescheduleDay(date, newDate);
   }
 
+  Future<void> _handleMatchPostpone(MatchModel m, BuildContext ctx) async {
+    final confirmed = await showConfirmationDialog(
+      ctx,
+      title: 'leagues.match_postpone'.tr(),
+      content: 'leagues.match_confirm_postpone'.tr(),
+      confirmLabel: 'leagues.match_postpone'.tr(),
+      cancelLabel: 'leagues.cancel'.tr(),
+    );
+    if (!confirmed || !ctx.mounted) return;
+    await onMatchPostpone?.call(m);
+  }
+
+  Future<void> _handleMatchSuspend(MatchModel m, BuildContext ctx) async {
+    final confirmed = await showConfirmationDialog(
+      ctx,
+      title: 'leagues.match_suspend'.tr(),
+      content: 'leagues.match_confirm_suspend'.tr(),
+      confirmLabel: 'leagues.match_suspend'.tr(),
+      cancelLabel: 'leagues.cancel'.tr(),
+    );
+    if (!confirmed || !ctx.mounted) return;
+    await onMatchSuspend?.call(m);
+  }
+
+  Future<void> _handleMatchReschedule(MatchModel m, BuildContext ctx) async {
+    final newDate = await showDatePicker(
+      context: ctx,
+      initialDate: m.matchDate.add(const Duration(days: 7)),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2035),
+      helpText: 'leagues.match_pick_reschedule_date'.tr(),
+    );
+    if (newDate == null || !ctx.mounted) return;
+    await onMatchReschedule?.call(m, newDate);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -83,6 +125,15 @@ class MatchDaySection extends StatelessWidget {
               awayTeamName: teamMap[m.awayTeamId] ?? m.awayTeamId,
               onEdit: isOwner ? () => onEdit(m) : null,
               onDelete: isOwner ? () => onDelete(m) : null,
+              onMatchPostpone: isOwner && onMatchPostpone != null
+                  ? () => _handleMatchPostpone(m, context)
+                  : null,
+              onMatchSuspend: isOwner && onMatchSuspend != null
+                  ? () => _handleMatchSuspend(m, context)
+                  : null,
+              onMatchReschedule: isOwner && onMatchReschedule != null
+                  ? () => _handleMatchReschedule(m, context)
+                  : null,
             )),
         const SizedBox(height: 8),
       ],

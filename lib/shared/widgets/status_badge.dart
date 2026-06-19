@@ -104,6 +104,9 @@ class StatusBadge extends StatelessWidget {
       'FINISHED': 'leagues.match_status_finished',
       'CANCELLED': 'leagues.match_status_cancelled',
       'POSTPONED': 'leagues.match_status_postponed',
+      'SUSPENDED': 'leagues.match_status_suspended',
+      'RESCHEDULED': 'leagues.match_status_rescheduled',
+      'COMPLETED': 'leagues.match_status_finished',
     };
     final key = map[status.toUpperCase()];
     return key != null ? key.tr() : status;
@@ -116,11 +119,16 @@ class StatusBadge extends StatelessWidget {
       case 'IN_PROGRESS':
         return AppColors.warning;
       case 'FINISHED':
+      case 'COMPLETED':
         return AppColors.whiteSubtle;
       case 'CANCELLED':
         return AppColors.error;
       case 'POSTPONED':
         return const Color(0xFFFFB347);
+      case 'SUSPENDED':
+        return AppColors.error;
+      case 'RESCHEDULED':
+        return const Color(0xFF64B5F6);
       default:
         return AppColors.whiteSubtle;
     }

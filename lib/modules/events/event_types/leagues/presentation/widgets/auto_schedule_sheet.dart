@@ -57,6 +57,7 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
   final _halvesBreakCtrl = TextEditingController(text: '15');
   final _matchBreakCtrl = TextEditingController(text: '30');
   String? _courtId;
+  final List<DateTime> _blockedDates = [];
 
   List<CourtModel> _courts = [];
   bool _loadingCourts = true;
@@ -118,6 +119,9 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
       _halvesBreakCtrl.text = config.breakBetweenHalvesMinutes.toString();
       _matchBreakCtrl.text = config.breakBetweenMatchesMinutes.toString();
       _courtId = config.courtId;
+      _blockedDates
+        ..clear()
+        ..addAll(config.blockedDates.map(DateTime.parse));
     });
   }
 
@@ -129,8 +133,37 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
     if (picked != null && mounted) setState(() => _startTime = picked);
   }
 
+  Future<void> _addBlockedDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2035),
+      helpText: 'leagues.schedule_pick_blocked_date'.tr(),
+    );
+    if (picked == null || !mounted) return;
+    final alreadyAdded = _blockedDates.any(
+      (d) => d.year == picked.year && d.month == picked.month && d.day == picked.day,
+    );
+    if (!alreadyAdded) {
+      setState(() {
+        _blockedDates.add(picked);
+        _blockedDates.sort();
+      });
+    }
+  }
+
+  void _removeBlockedDate(DateTime date) {
+    setState(() => _blockedDates.removeWhere(
+          (d) => d.year == date.year && d.month == date.month && d.day == date.day,
+        ));
+  }
+
   String get _startTimeLabel =>
       '${_startTime.hour.toString().padLeft(2, '0')}:${_startTime.minute.toString().padLeft(2, '0')}';
+
+  static String _isoDate(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
   Map<String, dynamic> _buildPayload() => {
         'playDays': _selectedDays.toList(),
@@ -139,6 +172,7 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
         'breakBetweenHalvesMinutes': int.tryParse(_halvesBreakCtrl.text) ?? 15,
         'breakBetweenMatchesMinutes': int.tryParse(_matchBreakCtrl.text) ?? 30,
         if (_courtId != null) 'courtId': _courtId,
+        'blockedDates': _blockedDates.map(_isoDate).toList(),
       };
 
   Future<void> _saveConfig() async {
@@ -159,9 +193,12 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
     setState(() => _generating = true);
     try {
       await _scheduleRepo.saveConfig(widget.eventId, _buildPayload());
-      final matches = await _scheduleRepo.generate(widget.eventId);
+      final (matches, warning) = await _scheduleRepo.generate(widget.eventId);
       await widget.onGenerated(matches);
       if (mounted) {
+        if (warning != null) {
+          _showSnack(warning, isWarning: true);
+        }
         _showSnack('leagues.schedule_generated'.tr(
           namedArgs: {'count': matches.length.toString()},
         ));
@@ -196,12 +233,18 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
     return true;
   }
 
-  void _showSnack(String message, {bool isError = false}) {
+  void _showSnack(String message, {bool isError = false, bool isWarning = false}) {
+    Color bg = AppColors.success;
+    if (isError) bg = AppColors.error;
+    if (isWarning) bg = const Color(0xFFFFB347);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.success,
+        backgroundColor: bg,
         behavior: SnackBarBehavior.floating,
+        duration: isWarning
+            ? const Duration(seconds: 6)
+            : const Duration(seconds: 3),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
@@ -274,6 +317,10 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
                 _sectionLabel('leagues.court'.tr()),
                 const SizedBox(height: 8),
                 _buildCourtDropdown(),
+                const SizedBox(height: 16),
+                _sectionLabel('leagues.schedule_blocked_dates'.tr()),
+                const SizedBox(height: 8),
+                _buildBlockedDates(),
                 const SizedBox(height: 28),
                 _buildActions(),
               ],
@@ -412,6 +459,50 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
       dropdownColor: AppColors.sheetBackground,
       style: const TextStyle(color: AppColors.white),
       decoration: AppInputDecoration.standard('leagues.court'.tr()),
+    );
+  }
+
+  Widget _buildBlockedDates() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_blockedDates.isNotEmpty) ...[
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: _blockedDates.map((d) {
+              final label = _isoDate(d);
+              return Chip(
+                label: Text(label,
+                    style: const TextStyle(
+                        color: AppColors.white, fontSize: 12)),
+                deleteIcon: const Icon(Icons.close,
+                    size: 14, color: AppColors.whiteSubtle),
+                onDeleted: () => _removeBlockedDate(d),
+                backgroundColor: AppColors.inputFill,
+                side: const BorderSide(color: AppColors.inputBorder),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 8),
+        ],
+        OutlinedButton.icon(
+          onPressed: _addBlockedDate,
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: AppColors.inputBorder),
+            foregroundColor: AppColors.whiteSubtle,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10)),
+          ),
+          icon: const Icon(Icons.block, size: 16),
+          label: Text('leagues.schedule_add_blocked_date'.tr(),
+              style: const TextStyle(fontSize: 13)),
+        ),
+      ],
     );
   }
 

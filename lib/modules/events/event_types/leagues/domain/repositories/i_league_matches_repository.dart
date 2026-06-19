@@ -10,4 +10,7 @@ abstract interface class ILeagueMatchesRepository {
     DateTime fromDate, {
     DateTime? toDate,
   });
+  Future<MatchModel> postpone(String id);
+  Future<MatchModel> suspend(String id);
+  Future<MatchModel> reschedule(String id, DateTime newDate);
 }

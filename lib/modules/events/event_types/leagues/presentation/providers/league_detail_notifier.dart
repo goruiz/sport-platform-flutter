@@ -86,11 +86,7 @@ class LeagueDetailNotifier extends ChangeNotifier {
 
   Future<MatchModel> updateMatch(String id, Map<String, dynamic> data) async {
     final updated = await _matchesRepo.update(id, data);
-    final copy = [..._matches];
-    final idx = copy.indexWhere((m) => m.id == id);
-    if (idx != -1) copy[idx] = updated;
-    _matches = copy;
-    _groupedMatches = _groupByDate(_matches);
+    _replaceMatch(updated);
     notifyListeners();
     return updated;
   }
@@ -106,6 +102,35 @@ class LeagueDetailNotifier extends ChangeNotifier {
     _matches = [..._matches, ...generated];
     _groupedMatches = _groupByDate(_matches);
     notifyListeners();
+  }
+
+  Future<MatchModel> postponeMatch(String id) async {
+    final updated = await _matchesRepo.postpone(id);
+    _replaceMatch(updated);
+    notifyListeners();
+    return updated;
+  }
+
+  Future<MatchModel> suspendMatch(String id) async {
+    final updated = await _matchesRepo.suspend(id);
+    _replaceMatch(updated);
+    notifyListeners();
+    return updated;
+  }
+
+  Future<MatchModel> rescheduleMatch(String id, DateTime newDate) async {
+    final updated = await _matchesRepo.reschedule(id, newDate);
+    _replaceMatch(updated);
+    notifyListeners();
+    return updated;
+  }
+
+  void _replaceMatch(MatchModel updated) {
+    final copy = [..._matches];
+    final idx = copy.indexWhere((m) => m.id == updated.id);
+    if (idx != -1) copy[idx] = updated;
+    _matches = copy;
+    _groupedMatches = _groupByDate(_matches);
   }
 
   Future<List<MatchModel>> rescheduleDateMatches(
