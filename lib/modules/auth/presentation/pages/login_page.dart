@@ -45,6 +45,7 @@ class _LoginPageState extends State<LoginPage> {
         data: {
           'email': _emailController.text.trim(),
           'password': _passwordController.text,
+          'clientType': 'MOBILE_APP',
         },
       );
       final token = response.data['data']['token'] as String;

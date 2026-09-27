@@ -9,6 +9,12 @@
   - **Excepción:** el nombre del **archivo** debe ser claro pero **no demasiado largo** — nombres de archivo muy largos rompen la subida de cambios (límite de longitud de ruta en Windows). Si un nombre de archivo se vuelve muy largo, acortarlo sin perder claridad (abreviar palabras obvias, quitar redundancia con la carpeta contenedora, etc.).
 - **Siempre respetar el orden, flujo, arquitectura y estructura de carpetas ya implementados en el proyecto.** No introducir un patrón, convención o forma de organizar código distinta a la existente sin que se pida explícitamente. Antes de crear archivos nuevos, revisar cómo está hecho en un módulo ya maduro (ej. `events/event_types/leagues`) y seguir ese mismo patrón.
 
+## Proyectos relacionados (monorepo lógico "Plataforma deportiva")
+
+- Frontend usuario (este proyecto, Flutter): `C:\Users\WALDO\Documents\Proyectos\Plataforma deportiva\frontend\usuario-flutter`
+- Frontend admin (Angular): `C:\Users\WALDO\Documents\Proyectos\Plataforma deportiva\frontend\administration-angular`
+- Backend (Spring Boot): `C:\Users\WALDO\Documents\Proyectos\Plataforma deportiva\backend`
+
 ## Stack del proyecto
 
 - **Flutter/Dart** (`sdk: ^3.11.5`). App: `sport_platform`.
