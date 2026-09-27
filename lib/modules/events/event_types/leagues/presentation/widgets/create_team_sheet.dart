@@ -9,6 +9,7 @@ import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/teams_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_players_sheet.dart';
+import 'package:sport_platform/shared/mixins/snack_mixin.dart';
 import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
 class CreateTeamSheet extends StatefulWidget {
@@ -44,7 +45,7 @@ class CreateTeamSheet extends StatefulWidget {
   State<CreateTeamSheet> createState() => _CreateTeamSheetState();
 }
 
-class _CreateTeamSheetState extends State<CreateTeamSheet> {
+class _CreateTeamSheetState extends State<CreateTeamSheet> with SnackMixin {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameCtrl;
   final _picker = ImagePicker();
@@ -63,17 +64,6 @@ class _CreateTeamSheetState extends State<CreateTeamSheet> {
   void dispose() {
     _nameCtrl.dispose();
     super.dispose();
-  }
-
-  void _showSnack(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -161,7 +151,7 @@ class _CreateTeamSheetState extends State<CreateTeamSheet> {
     } catch (_) {
       if (mounted) {
         setState(() => _saving = false);
-        _showSnack('leagues.error_create_team'.tr(), isError: true);
+        showSnack('leagues.error_create_team'.tr(), isError: true);
       }
     }
   }

@@ -1,5 +1,6 @@
-﻿import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
@@ -8,6 +9,8 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/datasourc
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/shared/mixins/snack_mixin.dart';
 import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
 class MatchFormSheet extends StatefulWidget {
@@ -48,7 +51,7 @@ class MatchFormSheet extends StatefulWidget {
   State<MatchFormSheet> createState() => _MatchFormSheetState();
 }
 
-class _MatchFormSheetState extends State<MatchFormSheet> {
+class _MatchFormSheetState extends State<MatchFormSheet> with SnackMixin {
   final _formKey = GlobalKey<FormState>();
   late final CourtsService _courtsService;
 
@@ -57,7 +60,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
   DateTime? _matchDate;
   final _matchDateCtrl = TextEditingController();
   String? _courtId;
-  String _status = 'SCHEDULED';
+  MatchStatus _status = MatchStatus.scheduled;
   final _homeScoreCtrl = TextEditingController();
   final _awayScoreCtrl = TextEditingController();
 
@@ -67,18 +70,13 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
 
   bool get _isEditing => widget.match != null;
 
-  static const _statuses = ['SCHEDULED', 'IN_PROGRESS', 'FINISHED', 'CANCELLED', 'POSTPONED'];
-
-  void _showSnack(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
+  static const _statuses = [
+    MatchStatus.scheduled,
+    MatchStatus.inProgress,
+    MatchStatus.finished,
+    MatchStatus.cancelled,
+    MatchStatus.postponed,
+  ];
 
   @override
   void initState() {
@@ -111,7 +109,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
       final courts = await _courtsService.getAll();
       if (mounted) setState(() => _courts = courts);
     } catch (_) {
-      if (mounted) _showSnack('leagues.error_load_courts'.tr(), isError: true);
+      showSnack('leagues.error_load_courts'.tr(), isError: true);
     } finally {
       if (mounted) setState(() => _loadingCourts = false);
     }
@@ -121,8 +119,8 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
     final date = await showDatePicker(
       context: context,
       initialDate: _matchDate ?? DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2035),
+      firstDate: AppConstants.minPickerDate,
+      lastDate: AppConstants.maxPickerDate,
     );
     if (date == null || !mounted) return;
     final time = await showTimePicker(
@@ -147,7 +145,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
         'homeTeamId': _homeTeamId,
         'awayTeamId': _awayTeamId,
         'matchDate': DateFormatters.apiDateTime(_matchDate!),
-        'status': _status,
+        'status': _status.toJson(),
         'eventId': widget.eventId,
         if (_courtId != null) 'courtId': _courtId,
         if (_isEditing && _homeScoreCtrl.text.isNotEmpty)
@@ -158,7 +156,7 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
       await widget.onSave(data);
       if (mounted) Navigator.of(context).pop();
     } catch (_) {
-      if (mounted) _showSnack('leagues.error_match_action'.tr(), isError: true);
+      showSnack('leagues.error_match_action'.tr(), isError: true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -324,17 +322,17 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
   }
 
   Widget _buildStatusDropdown() {
-    return DropdownButtonFormField<String>(
+    return DropdownButtonFormField<MatchStatus>(
       // ignore: deprecated_member_use
       value: _status,
       items: _statuses
           .map((s) => DropdownMenuItem(
                 value: s,
-                child: Text(_statusLabel(s),
+                child: Text(s.label.tr(),
                     style: const TextStyle(color: AppColors.white)),
               ))
           .toList(),
-      onChanged: (v) => setState(() => _status = v ?? 'SCHEDULED'),
+      onChanged: (v) => setState(() => _status = v ?? MatchStatus.scheduled),
       dropdownColor: AppColors.sheetBackground,
       style: const TextStyle(color: AppColors.white),
       decoration: AppInputDecoration.standard('leagues.match_status_scheduled'.tr()),
@@ -380,16 +378,5 @@ class _MatchFormSheetState extends State<MatchFormSheet> {
         ),
       ],
     );
-  }
-
-  static String _statusLabel(String status) {
-    const map = {
-      'SCHEDULED': 'leagues.match_status_scheduled',
-      'IN_PROGRESS': 'leagues.match_status_in_progress',
-      'FINISHED': 'leagues.match_status_finished',
-      'CANCELLED': 'leagues.match_status_cancelled',
-      'POSTPONED': 'leagues.match_status_postponed',
-    };
-    return (map[status] ?? status).tr();
   }
 }

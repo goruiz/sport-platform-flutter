@@ -1,10 +1,12 @@
+import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+
 class MatchModel {
   final String id;
   final String homeTeamId;
   final String awayTeamId;
   final DateTime matchDate;
   final String? location;
-  final String status;
+  final MatchStatus status;
   final int? homeScore;
   final int? awayScore;
   final String? courtId;
@@ -34,7 +36,7 @@ class MatchModel {
           ? DateTime.parse(json['matchDate'].toString())
           : DateTime.now(),
       location: json['location']?.toString(),
-      status: json['status']?.toString() ?? 'SCHEDULED',
+      status: MatchStatus.fromString(json['status']?.toString() ?? 'SCHEDULED'),
       homeScore: json['homeScore'] as int?,
       awayScore: json['awayScore'] as int?,
       courtId: json['courtId']?.toString(),
@@ -49,7 +51,7 @@ class MatchModel {
         'homeTeamId': homeTeamId,
         'awayTeamId': awayTeamId,
         'matchDate': apiDateTime(matchDate),
-        'status': status,
+        'status': status.toJson(),
         'eventId': eventId,
         if (location != null) 'location': location,
         if (courtId != null) 'courtId': courtId,
@@ -63,7 +65,7 @@ class MatchModel {
     String? awayTeamId,
     DateTime? matchDate,
     String? location,
-    String? status,
+    MatchStatus? status,
     int? homeScore,
     int? awayScore,
     String? courtId,

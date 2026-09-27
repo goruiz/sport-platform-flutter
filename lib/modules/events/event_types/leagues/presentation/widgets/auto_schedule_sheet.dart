@@ -1,15 +1,17 @@
-import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/courts_service.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/exceptions/schedule_capacity_exception.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_schedule_repository.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/event_schedule_config_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/shared/mixins/snack_mixin.dart';
 import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
 class AutoScheduleSheet extends StatefulWidget {
@@ -42,7 +44,7 @@ class AutoScheduleSheet extends StatefulWidget {
   State<AutoScheduleSheet> createState() => _AutoScheduleSheetState();
 }
 
-class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
+class _AutoScheduleSheetState extends State<AutoScheduleSheet> with SnackMixin {
   static const _allDays = [
     'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'
   ];
@@ -137,8 +139,8 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2035),
+      firstDate: AppConstants.minPickerDate,
+      lastDate: AppConstants.maxPickerDate,
       helpText: 'leagues.schedule_pick_blocked_date'.tr(),
     );
     if (picked == null || !mounted) return;
@@ -180,9 +182,9 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
     setState(() => _saving = true);
     try {
       await _scheduleRepo.saveConfig(widget.eventId, _buildPayload());
-      if (mounted) _showSnack('leagues.schedule_config_saved'.tr());
+      showSnack('leagues.schedule_config_saved'.tr());
     } catch (_) {
-      if (mounted) _showSnack('leagues.schedule_error_save'.tr(), isError: true);
+      showSnack('leagues.schedule_error_save'.tr(), isError: true);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -196,29 +198,19 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
       final (matches, warning) = await _scheduleRepo.generate(widget.eventId);
       await widget.onGenerated(matches);
       if (mounted) {
-        if (warning != null) {
-          _showSnack(warning, isWarning: true);
-        }
-        _showSnack('leagues.schedule_generated'.tr(
+        if (warning != null) showSnack(warning, isWarning: true);
+        showSnack('leagues.schedule_generated'.tr(
           namedArgs: {'count': matches.length.toString()},
         ));
         Navigator.of(context).pop();
       }
     } catch (e) {
-      if (mounted) {
-        bool isCapacityError = false;
-        if (e is DioException) {
-          final data = e.response?.data;
-          final msg = data is Map ? (data['message'] as String? ?? '') : '';
-          isCapacityError = msg.contains('date range') || msg.contains('play days');
-        }
-        _showSnack(
-          isCapacityError
-              ? 'leagues.schedule_no_space'.tr()
-              : 'leagues.schedule_error_generate'.tr(),
-          isError: true,
-        );
-      }
+      showSnack(
+        e is ScheduleCapacityException
+            ? 'leagues.schedule_no_space'.tr()
+            : 'leagues.schedule_error_generate'.tr(),
+        isError: true,
+      );
     } finally {
       if (mounted) setState(() => _generating = false);
     }
@@ -226,28 +218,11 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> {
 
   bool _validate() {
     if (_selectedDays.isEmpty) {
-      _showSnack('leagues.schedule_days_required'.tr(), isError: true);
+      showSnack('leagues.schedule_days_required'.tr(), isError: true);
       return false;
     }
     if (!(_formKey.currentState?.validate() ?? false)) return false;
     return true;
-  }
-
-  void _showSnack(String message, {bool isError = false, bool isWarning = false}) {
-    Color bg = AppColors.success;
-    if (isError) bg = AppColors.error;
-    if (isWarning) bg = const Color(0xFFFFB347);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: bg,
-        behavior: SnackBarBehavior.floating,
-        duration: isWarning
-            ? const Duration(seconds: 6)
-            : const Duration(seconds: 3),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
   }
 
   @override

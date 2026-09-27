@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
 import 'package:sport_platform/shared/widgets/status_badge.dart';
 
 class MatchCard extends StatelessWidget {
@@ -27,15 +28,13 @@ class MatchCard extends StatelessWidget {
     this.onMatchReschedule,
   });
 
-  bool get _canPostponeOrSuspend {
-    final s = match.status.toUpperCase();
-    return s == 'SCHEDULED' || s == 'RESCHEDULED';
-  }
+  bool get _canPostponeOrSuspend =>
+      match.status == MatchStatus.scheduled ||
+      match.status == MatchStatus.rescheduled;
 
-  bool get _canReschedule {
-    final s = match.status.toUpperCase();
-    return s == 'POSTPONED' || s == 'SUSPENDED';
-  }
+  bool get _canReschedule =>
+      match.status == MatchStatus.postponed ||
+      match.status == MatchStatus.suspended;
 
   bool get _hasStatusActions =>
       (_canPostponeOrSuspend || _canReschedule) &&
@@ -153,7 +152,7 @@ class MatchCard extends StatelessWidget {
                               value: _MatchStatusAction.postpone,
                               child: Row(children: [
                                 const Icon(Icons.pause_circle_outline,
-                                    color: Color(0xFFFFB347), size: 18),
+                                    color: AppColors.warningLight, size: 18),
                                 const SizedBox(width: 10),
                                 Text('leagues.match_postpone'.tr(),
                                     style: const TextStyle(

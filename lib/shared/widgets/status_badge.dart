@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
 
 /// Badge de estado reutilizable para eventos y partidos.
 /// Usa [StatusBadge.forEvent] o [StatusBadge.forMatch] como constructores de fábrica.
@@ -34,11 +35,11 @@ class StatusBadge extends StatelessWidget {
     );
   }
 
-  factory StatusBadge.forMatch(String status, {Key? key}) {
+  factory StatusBadge.forMatch(MatchStatus status, {Key? key}) {
     return StatusBadge(
       key: key,
-      label: _matchLabel(status),
-      color: _matchColor(status),
+      label: status.label.tr(),
+      color: status.color,
       showDot: true,
     );
   }
@@ -92,43 +93,6 @@ class StatusBadge extends StatelessWidget {
         return AppColors.whiteSubtle;
       case 'CANCELLED':
         return AppColors.error;
-      default:
-        return AppColors.whiteSubtle;
-    }
-  }
-
-  static String _matchLabel(String status) {
-    const map = {
-      'SCHEDULED': 'leagues.match_status_scheduled',
-      'IN_PROGRESS': 'leagues.match_status_in_progress',
-      'FINISHED': 'leagues.match_status_finished',
-      'CANCELLED': 'leagues.match_status_cancelled',
-      'POSTPONED': 'leagues.match_status_postponed',
-      'SUSPENDED': 'leagues.match_status_suspended',
-      'RESCHEDULED': 'leagues.match_status_rescheduled',
-      'COMPLETED': 'leagues.match_status_finished',
-    };
-    final key = map[status.toUpperCase()];
-    return key != null ? key.tr() : status;
-  }
-
-  static Color _matchColor(String status) {
-    switch (status.toUpperCase()) {
-      case 'SCHEDULED':
-        return AppColors.primaryLight;
-      case 'IN_PROGRESS':
-        return AppColors.warning;
-      case 'FINISHED':
-      case 'COMPLETED':
-        return AppColors.whiteSubtle;
-      case 'CANCELLED':
-        return AppColors.error;
-      case 'POSTPONED':
-        return const Color(0xFFFFB347);
-      case 'SUSPENDED':
-        return AppColors.error;
-      case 'RESCHEDULED':
-        return const Color(0xFF64B5F6);
       default:
         return AppColors.whiteSubtle;
     }

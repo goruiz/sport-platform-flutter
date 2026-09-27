@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/network/response_parser.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/exceptions/schedule_capacity_exception.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_schedule_repository.dart';
 import '../models/event_schedule_config_model.dart';
 import '../models/match_model.dart';
@@ -30,12 +32,21 @@ class LeagueScheduleService implements ILeagueScheduleRepository {
 
   @override
   Future<(List<MatchModel>, String?)> generate(String eventId) async {
-    final response = await _client.post(ApiEndpoints.generateSchedule(eventId));
-    final data = ResponseParser.toMap(response.data);
-    final matches = (data['matches'] as List<dynamic>)
-        .map((e) => MatchModel.fromJson(e as Map<String, dynamic>))
-        .toList();
-    final warning = data['warning'] as String?;
-    return (matches, warning);
+    try {
+      final response = await _client.post(ApiEndpoints.generateSchedule(eventId));
+      final data = ResponseParser.toMap(response.data);
+      final matches = (data['matches'] as List<dynamic>)
+          .map((e) => MatchModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+      final warning = data['warning'] as String?;
+      return (matches, warning);
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final msg = data is Map ? (data['message'] as String? ?? '') : '';
+      if (msg.contains('date range') || msg.contains('play days')) {
+        throw const ScheduleCapacityException();
+      }
+      rethrow;
+    }
   }
 }

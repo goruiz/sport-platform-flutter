@@ -8,6 +8,8 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/models/pl
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/providers/add_players_notifier.dart';
+import 'package:sport_platform/shared/mixins/snack_mixin.dart';
+import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
 import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
 class AddPlayersSheet extends StatefulWidget {
@@ -45,7 +47,7 @@ class AddPlayersSheet extends StatefulWidget {
   State<AddPlayersSheet> createState() => _AddPlayersSheetState();
 }
 
-class _AddPlayersSheetState extends State<AddPlayersSheet> {
+class _AddPlayersSheetState extends State<AddPlayersSheet> with SnackMixin {
   final _searchFormKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   late final AddPlayersNotifier _notifier;
@@ -79,7 +81,7 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
     final email = _emailCtrl.text.trim();
     final success = await _notifier.inviteExistingUser(email);
     if (success && mounted) {
-      _showSnack('players.invitation_sent'.tr(args: [email]));
+      showSnack('players.invitation_sent'.tr(args: [email]));
       _clearSearch();
     }
   }
@@ -88,41 +90,22 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
     final email = _emailCtrl.text.trim();
     final success = await _notifier.sendRegistrationLink(email);
     if (success && mounted) {
-      _showSnack('players.registration_link_sent'.tr(args: [email]));
+      showSnack('players.registration_link_sent'.tr(args: [email]));
       _clearSearch();
     }
   }
 
   Future<void> _removePlayerFromTeam(PlayerModel player) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.sheetBackground,
-        title: Text(
-          'players.confirm_remove_title'.tr(),
-          style: const TextStyle(color: AppColors.white),
-        ),
-        content: Text(
-          'players.confirm_remove_body'.tr(args: [player.fullName]),
-          style: const TextStyle(color: AppColors.whiteSubtle),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text('leagues.cancel'.tr(),
-                style: const TextStyle(color: AppColors.whiteSubtle)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('leagues.delete'.tr(),
-                style: const TextStyle(color: AppColors.error)),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmationDialog(
+      context,
+      title: 'players.confirm_remove_title'.tr(),
+      content: 'players.confirm_remove_body'.tr(args: [player.fullName]),
+      confirmLabel: 'leagues.delete'.tr(),
+      cancelLabel: 'leagues.cancel'.tr(),
     );
-    if (confirmed != true || !mounted) return;
+    if (!confirmed || !mounted) return;
     final success = await _notifier.removePlayer(player.id);
-    if (!success && mounted) _showSnack('players.error_remove'.tr());
+    if (!success) showSnack('players.error_remove'.tr(), isError: true);
   }
 
   // ── UI helpers ────────────────────────────────────────────────────────────────
@@ -133,28 +116,13 @@ class _AddPlayersSheetState extends State<AddPlayersSheet> {
     _notifier.clearSearch();
   }
 
-  void _showSnack(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
   void _finish() {
     if (!widget.isEditMode &&
         _notifier.addedPlayers.length < AddPlayersNotifier.minPlayers) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('players.min_required'
-              .tr(args: [AddPlayersNotifier.minPlayers.toString()])),
-          backgroundColor: AppColors.warning,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
+      showSnack(
+        'players.min_required'
+            .tr(args: [AddPlayersNotifier.minPlayers.toString()]),
+        isWarning: true,
       );
       return;
     }

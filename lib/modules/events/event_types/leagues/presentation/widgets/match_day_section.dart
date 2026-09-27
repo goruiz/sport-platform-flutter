@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
@@ -51,8 +52,8 @@ class MatchDaySection extends StatelessWidget {
     final newDate = await showDatePicker(
       context: context,
       initialDate: date.add(const Duration(days: 7)),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2035),
+      firstDate: AppConstants.minPickerDate,
+      lastDate: AppConstants.maxPickerDate,
       helpText: 'leagues.match_day_pick_date'.tr(),
     );
     if (newDate == null || !context.mounted) return;
@@ -99,8 +100,8 @@ class MatchDaySection extends StatelessWidget {
     final newDate = await showDatePicker(
       context: ctx,
       initialDate: m.matchDate.add(const Duration(days: 7)),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2035),
+      firstDate: AppConstants.minPickerDate,
+      lastDate: AppConstants.maxPickerDate,
       helpText: 'leagues.match_pick_reschedule_date'.tr(),
     );
     if (newDate == null || !ctx.mounted) return;
@@ -156,22 +157,13 @@ class _DayHeader extends StatelessWidget {
     required this.onReschedule,
   });
 
-  String get _dayLabel {
-    const days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-    final dow = days[date.weekday - 1];
-    return '$dow ${date.day} ${_monthAbbr(date.month)} ${date.year}';
-  }
-
-  static String _monthAbbr(int m) {
-    const months = [
-      'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
-      'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
-    ];
-    return months[m - 1];
-  }
-
   @override
   Widget build(BuildContext context) {
+    final dayLabel = DateFormat(
+      'EEE d MMM yyyy',
+      context.locale.toString(),
+    ).format(date);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 8, 4),
       child: Row(
@@ -197,7 +189,7 @@ class _DayHeader extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              _dayLabel,
+              dayLabel,
               style: const TextStyle(
                 color: AppColors.whiteSubtle,
                 fontSize: 12,
@@ -237,7 +229,7 @@ class _DayHeader extends StatelessWidget {
                   child: Row(
                     children: [
                       const Icon(Icons.pause_circle_outline,
-                          color: Color(0xFFFFB347), size: 18),
+                          color: AppColors.warningLight, size: 18),
                       const SizedBox(width: 10),
                       Text(
                         'leagues.match_day_postpone'.tr(),

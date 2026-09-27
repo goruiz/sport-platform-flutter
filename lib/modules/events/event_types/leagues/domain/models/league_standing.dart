@@ -1,5 +1,6 @@
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
 
 class LeagueStanding {
   final String teamId;
@@ -34,7 +35,7 @@ class LeagueStanding {
       acc[t.teamId] = LeagueStanding(teamId: t.teamId, teamName: t.teamName);
     }
     for (final m in matches) {
-      if (m.status != 'FINISHED') continue;
+      if (m.status != MatchStatus.finished && m.status != MatchStatus.completed) continue;
       final hs = m.homeScore;
       final as_ = m.awayScore;
       if (hs == null || as_ == null) continue;

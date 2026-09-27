@@ -184,16 +184,12 @@ class _PosBadge extends StatelessWidget {
   final int pos;
   const _PosBadge({required this.pos});
 
-  static const _gold = Color(0xFFFFD700);
-  static const _silver = Color(0xFFB0B8C1);
-  static const _bronze = Color(0xFFCD7F32);
-
   @override
   Widget build(BuildContext context) {
     final Color? badgeColor = switch (pos) {
-      1 => _gold,
-      2 => _silver,
-      3 => _bronze,
+      1 => AppColors.podiumGold,
+      2 => AppColors.podiumSilver,
+      3 => AppColors.podiumBronze,
       _ => null,
     };
 

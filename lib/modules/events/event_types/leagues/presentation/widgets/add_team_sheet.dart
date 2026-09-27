@@ -6,6 +6,7 @@ import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/teams_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/create_team_sheet.dart';
+import 'package:sport_platform/shared/mixins/snack_mixin.dart';
 import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
 class AddTeamSheet extends StatefulWidget {
@@ -41,7 +42,7 @@ class AddTeamSheet extends StatefulWidget {
   State<AddTeamSheet> createState() => _AddTeamSheetState();
 }
 
-class _AddTeamSheetState extends State<AddTeamSheet> {
+class _AddTeamSheetState extends State<AddTeamSheet> with SnackMixin {
   late final TeamsService _teamsService;
   final _searchCtrl = TextEditingController();
 
@@ -87,17 +88,6 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
     return available.where((t) => t.name.toLowerCase().contains(q)).toList();
   }
 
-  void _showSnack(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
   Future<void> _add(TeamModel team) async {
     setState(() => _addingTeamId = team.id);
     try {
@@ -106,7 +96,7 @@ class _AddTeamSheetState extends State<AddTeamSheet> {
     } catch (_) {
       if (mounted) {
         setState(() => _addingTeamId = null);
-        _showSnack('leagues.error_team_action'.tr(), isError: true);
+        showSnack('leagues.error_team_action'.tr(), isError: true);
       }
     }
   }

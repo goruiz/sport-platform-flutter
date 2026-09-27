@@ -15,4 +15,9 @@ class AppColors {
   static const Color warning = Color(0xFFFF9800);
   static const Color info = Color(0xFF2196F3);
   static const Color sheetBackground = Color(0xFF0F2A0F);
+  static const Color warningLight = Color(0xFFFFB347);
+  static const Color rescheduled = Color(0xFF64B5F6);
+  static const Color podiumGold = Color(0xFFFFD700);
+  static const Color podiumSilver = Color(0xFFB0B8C1);
+  static const Color podiumBronze = Color(0xFFCD7F32);
 }
