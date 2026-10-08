@@ -2,12 +2,32 @@
 
 ## Cómo trabajar (siempre)
 
-- Pensar como un **desarrollador senior** y un **diseñador UX/UI senior** al mismo tiempo: no solo que el código funcione, también que la experiencia de usuario resultante tenga sentido.
-- El código debe ser **escalable** y **muy fácil de entender para cualquier persona**, no solo para quien lo escribió.
-- Los métodos/funciones deben ser **reutilizables**: evitar duplicar lógica, extraer a un método/widget común cuando aplique.
-- Nombres muy claros sobre lo que hacen, sin miedo a que sean largos: variables, funciones, clases, métodos, archivos.
+### Mentalidad
+
+- Pensar siempre como un **desarrollador senior** y un **diseñador UX/UI senior** al mismo tiempo: no basta con que el código funcione, la experiencia de usuario resultante también debe tener sentido.
+
+### Coherencia con lo existente
+
+- **Siempre seguir los patrones, la arquitectura y la estructura de carpetas ya implementados.** No introducir un patrón, una convención ni una forma de organizar el código distinta a la existente sin que se pida explícitamente.
+- Antes de crear archivos nuevos, revisar cómo está resuelto en un módulo ya maduro (ej. `events/event_types/leagues`) y seguir ese mismo patrón.
+
+### Legibilidad
+
+- El código debe ser **muy fácil de entender para cualquier persona**, no solo para quien lo escribió.
+- Los nombres de clases, variables, funciones, widgets, archivos, etc. deben dejar **muy claro qué hacen**, sin miedo a que sean largos.
   - **Excepción:** el nombre del **archivo** debe ser claro pero **no demasiado largo** — nombres de archivo muy largos rompen la subida de cambios (límite de longitud de ruta en Windows). Si un nombre de archivo se vuelve muy largo, acortarlo sin perder claridad (abreviar palabras obvias, quitar redundancia con la carpeta contenedora, etc.).
-- **Siempre respetar el orden, flujo, arquitectura y estructura de carpetas ya implementados en el proyecto.** No introducir un patrón, convención o forma de organizar código distinta a la existente sin que se pida explícitamente. Antes de crear archivos nuevos, revisar cómo está hecho en un módulo ya maduro (ej. `events/event_types/leagues`) y seguir ese mismo patrón.
+- Los comentarios deben ser **precisos, claros y concretos**, nunca exhaustivos: explican el *porqué* de lo que no es evidente, no repiten lo que el código ya dice.
+
+### Estructura y calidad
+
+- El código debe ser siempre **ordenado, eficiente y escalable**.
+- Los métodos/funciones **no deben ser demasiado largos**: cuando crezcan, dividirlos en submétodos con nombres descriptivos, cada uno con una única responsabilidad. En la UI, extraer sub-widgets en lugar de anidar `build` gigantes.
+- Los métodos/funciones/widgets deben ser **reutilizables**: evitar duplicar lógica y extraerla a un método o widget común cuando aplique.
+
+### Nada fijo en el código
+
+- **Nada debe estar fijo ("hardcodeado"): todo debe ser dinámico** (textos, rutas, URLs, ids, límites, colores, etc. vienen de configuración, datos, traducciones o del tema).
+- Si algo **necesariamente** debe ser fijo (estados, tipos, roles, etc.), modelarlo con un **`enum`** en lugar de strings o números mágicos. Ubicarlo en el módulo al que pertenece, o en `lib/shared/enums/` si lo usan varios módulos.
 
 ## Proyectos relacionados (monorepo lógico "Plataforma deportiva")
 
