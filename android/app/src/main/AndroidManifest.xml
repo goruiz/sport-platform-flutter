@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Sin este permiso un build release no tiene red (en debug/profile lo declara Flutter). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="sport_platform"
         android:name="${applicationName}"

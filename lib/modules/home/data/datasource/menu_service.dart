@@ -18,7 +18,7 @@ class MenuService {
   final DioClient _client = DioClient();
 
   Future<MenuResult> getMenu() async {
-    final response = await _client.get(ApiEndpoints.menu);
+    final response = await _client.get(ApiEndpoints.menuForCurrentUser);
 
     // Dio may return the body as a String when the server omits Content-Type: application/json
     final raw = response.data is String

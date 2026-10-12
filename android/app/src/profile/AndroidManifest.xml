@@ -4,4 +4,7 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- El backend local se sirve por http y Android 9+ bloquea el tráfico sin cifrar por
+         defecto. Solo en debug/profile: el build release exige https. -->
+    <application android:usesCleartextTraffic="true"/>
 </manifest>

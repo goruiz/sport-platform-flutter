@@ -27,9 +27,14 @@ class UserSession {
     final entity = _decodeToken(token);
     if (entity == null) return;
 
-    _current = entity;
+    await update(entity);
+  }
+
+  /// Reemplaza el usuario en sesión (p. ej. tras editar su perfil) y lo guarda en disco.
+  static Future<void> update(UserEntity user) async {
+    _current = user;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_storageKey, jsonEncode(_toMap(entity)));
+    await prefs.setString(_storageKey, jsonEncode(_toMap(user)));
   }
 
   /// Recupera el usuario desde disco al arrancar la app (cold start).

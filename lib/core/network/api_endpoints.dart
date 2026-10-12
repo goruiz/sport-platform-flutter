@@ -8,6 +8,7 @@ class ApiEndpoints {
   static const String register = '/users/auth/register';
   static const String logout = '/users/auth/logout';
   static const String refreshToken = '/users/auth/refresh';
+  static const String updateProfile = '/users/auth/update-profile';
 
   // Users
   static const String users = '/users';
@@ -54,7 +55,7 @@ class ApiEndpoints {
   static const String sportComplexes = '/sport-complexes';
 
   // Menu
-  static const String menu = '/menu';
+  static const String menuForCurrentUser = '/menu/for-current-user';
 
   // Rankings
   static const String rankings = '/rankings';

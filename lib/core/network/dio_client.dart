@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:sport_platform/core/services/auth_storage.dart';
+import 'package:get_it/get_it.dart';
+import 'package:sport_platform/core/services/session_expired_listener.dart';
 import 'api_endpoints.dart';
+import 'auth_token_interceptor.dart';
 import 'key_format_interceptor.dart';
+import 'unauthorized_interceptor.dart';
 
 class DioClient {
   late final Dio _dio;
@@ -17,18 +20,17 @@ class DioClient {
     );
 
     _dio.interceptors.addAll([
-      InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final token = await AuthStorage.getToken();
-          if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
-          }
-          handler.next(options);
-        },
-      ),
+      AuthTokenInterceptor(),
+      UnauthorizedInterceptor(onSessionExpired: _notifySessionExpired),
       KeyFormatInterceptor(),
     ]);
   }
+
+  // Se resuelve al recibir el 401 (no al construir el cliente) para no depender del orden de
+  // arranque del DI. Usa GetIt.I y no el `getIt` de core/di para no crear un ciclo de imports
+  // con los servicios que se registran allí.
+  Future<void> _notifySessionExpired() =>
+      GetIt.I<SessionExpiredListener>().onSessionExpired();
 
   Future<Response> get(String path, {Map<String, dynamic>? queryParams}) =>
       _dio.get(path, queryParameters: queryParams);

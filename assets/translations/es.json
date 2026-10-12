@@ -90,6 +90,9 @@
     "switch_to_carousel": "Vista carrusel",
     "open_side_menu": "Abrir menú lateral para acciones rápidas"
   },
+  "session": {
+    "expired": "Tu sesión expiró. Inicia sesión de nuevo."
+  },
   "logout": {
     "title": "Cerrar sesión",
     "confirm": "¿Estás seguro de que deseas cerrar sesión?",
@@ -112,7 +115,10 @@
     "username_too_short": "Mínimo 3 caracteres",
     "username_no_spaces": "Sin espacios",
     "save_button": "Guardar perfil",
-    "skip_button": "Completar después"
+    "skip_button": "Completar después",
+    "skip_info": "Puedes completar tu perfil más tarde desde ajustes.",
+    "save_success": "Perfil completado exitosamente",
+    "save_error": "Error al guardar el perfil. Intenta de nuevo."
   },
   "settings": {
     "select_language": "Seleccionar idioma",

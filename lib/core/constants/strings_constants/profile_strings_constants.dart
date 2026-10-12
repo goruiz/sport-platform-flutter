@@ -14,4 +14,7 @@ class ProfileStringsConstants {
   static const String usernameNoSpaces = 'profile.username_no_spaces';
   static const String saveButton = 'profile.save_button';
   static const String skipButton = 'profile.skip_button';
+  static const String skipInfo = 'profile.skip_info';
+  static const String saveSuccess = 'profile.save_success';
+  static const String saveError = 'profile.save_error';
 }

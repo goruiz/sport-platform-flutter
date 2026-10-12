@@ -90,6 +90,9 @@
     "switch_to_carousel": "Carousel view",
     "open_side_menu": "Open side menu for quick actions"
   },
+  "session": {
+    "expired": "Your session has expired. Please sign in again."
+  },
   "logout": {
     "title": "Log out",
     "confirm": "Are you sure you want to log out?",
@@ -112,7 +115,10 @@
     "username_too_short": "Minimum 3 characters",
     "username_no_spaces": "No spaces allowed",
     "save_button": "Save profile",
-    "skip_button": "Complete later"
+    "skip_button": "Complete later",
+    "skip_info": "You can complete your profile later from settings.",
+    "save_success": "Profile completed successfully",
+    "save_error": "Could not save your profile. Please try again."
   },
   "settings": {
     "select_language": "Select language",

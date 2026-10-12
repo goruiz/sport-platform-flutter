@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/modules/modules_setup.dart';
+import 'package:sport_platform/core/routes/app_navigator.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
 import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
@@ -14,8 +15,6 @@ import 'package:sport_platform/core/theme/app_theme.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
 import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/modules/players/presentation/pages/invite_register_page.dart';
-
-final _navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +45,7 @@ class SportsPlatform extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      navigatorKey: _navigatorKey,
+      navigatorKey: AppNavigator.key,
       theme: AppTheme.sportsPlatform,
       onGenerateTitle: (ctx) => AppStringsConstants.appName.tr(),
       localizationsDelegates: context.localizationDelegates,
@@ -128,7 +127,7 @@ class _AppRouterState extends State<_AppRouter> {
   }
 
   void _navigateToInviteRegister(String token) {
-    _navigatorKey.currentState?.push(
+    AppNavigator.key.currentState?.push(
       MaterialPageRoute(
         builder: (_) => InviteRegisterPage(inviteToken: token),
       ),

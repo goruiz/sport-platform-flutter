@@ -1,5 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/strings_constants/profile_strings_constants.dart';
+import 'package:sport_platform/core/di/service_locator.dart';
+import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
+import 'package:sport_platform/modules/users/domain/entities/user_profile_update.dart';
+import 'package:sport_platform/modules/users/domain/repositories/i_user_profile_repository.dart';
 import 'package:sport_platform/modules/users/presentation/widgets/complete_profile_body.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
@@ -12,6 +18,8 @@ class CompleteProfilePage extends StatefulWidget {
 }
 
 class _CompleteProfilePageState extends State<CompleteProfilePage> {
+  final IUserProfileRepository _profileRepository =
+      getIt<IUserProfileRepository>();
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _middleNameController = TextEditingController();
@@ -30,26 +38,40 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     super.dispose();
   }
 
-  void _onSubmit() async {
+  Future<void> _onSubmit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
     try {
-      // TODO: llamar al endpoint de actualización de perfil
-      await Future.delayed(const Duration(seconds: 1));
+      final updatedUser =
+          await _profileRepository.updateProfile(_buildProfileUpdate());
+      await UserSession.update(updatedUser);
       if (!mounted) return;
-      AppSnackbar.success(context, 'Perfil completado exitosamente');
+      AppSnackbar.success(context, ProfileStringsConstants.saveSuccess.tr());
       _navigateToHome();
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
-      AppSnackbar.error(context, 'Error al guardar el perfil. Intenta de nuevo.');
+      AppSnackbar.error(context, ProfileStringsConstants.saveError.tr());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  UserProfileUpdate _buildProfileUpdate() => UserProfileUpdate(
+        firstName: _firstNameController.text.trim(),
+        middleName: _optionalText(_middleNameController),
+        lastName: _lastNameController.text.trim(),
+        secondLastName: _optionalText(_secondLastNameController),
+        username: _usernameController.text.trim(),
+      );
+
+  String? _optionalText(TextEditingController controller) {
+    final text = controller.text.trim();
+    return text.isEmpty ? null : text;
+  }
+
   void _onSkip() {
-    AppSnackbar.info(context, 'Puedes completar tu perfil más tarde desde ajustes.');
+    AppSnackbar.info(context, ProfileStringsConstants.skipInfo.tr());
     _navigateToHome();
   }
 

@@ -2,9 +2,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/logout_strings_constants.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
+import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
-import 'package:sport_platform/core/services/auth_storage.dart';
-import 'package:sport_platform/core/services/user_session.dart';
+import 'package:sport_platform/core/services/session_service.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
 
@@ -65,8 +65,7 @@ class _LogoutButtonState extends State<LogoutButton> {
     } catch (_) {
       // si falla el endpoint igual limpiamos la sesión local
     } finally {
-      await AuthStorage.clearToken();
-      await UserSession.clear();
+      await getIt<SessionService>().clear();
     }
 
     if (!mounted) return;
