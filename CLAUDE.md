@@ -37,45 +37,51 @@
 
 ## Stack del proyecto
 
-- **Flutter/Dart** (`sdk: ^3.11.5`). App: `sport_platform`.
-- **Estado**: `provider` (`ChangeNotifier`) es lo que realmente se usa (ej. `events_notifier.dart`, `league_detail_notifier.dart`), combinado con `StatefulWidget`/`setState` en pantallas simples. Las carpetas `application/bloc` y `application/cubit` existen en varios módulos pero están **vacías** (scaffolding sin implementar) — no asumir Bloc/Cubit real, y no llenarlas "porque están ahí" salvo que se pida migrar a Bloc explícitamente.
+- **Flutter/Dart** (`sdk: ^3.11.5`). App: `sport_platform`, versión `1.0.0+1`, `publish_to: none`. Hay carpetas de plataforma para android, ios, web, windows, linux y macos; en la práctica se usan Android, web y Windows.
+- **Estado**: `provider` (`ChangeNotifier`) es lo que realmente se usa (ej. `events_notifier.dart`, `league_detail_notifier.dart`, `add_players_notifier.dart`), combinado con `StatefulWidget`/`setState` en pantallas simples. Las carpetas `application/bloc`, `application/cubit` y `application/state` existen en varios módulos pero están **vacías** (scaffolding sin implementar) — no asumir Bloc/Cubit real, y no llenarlas "porque están ahí" salvo que se pida migrar a Bloc explícitamente.
 - **DI**: `get_it` como service locator (`lib/core/di/service_locator.dart`), registrando servicios/repositorios/notifiers como lazy singletons.
 - **Navegación**: `Navigator` clásico (`MaterialPageRoute`), sin go_router/auto_route. Rutas de módulo se arman vía `AppRouteFactory` + `ModuleRegistry`. Deep links con `app_links` (ej. invitaciones de registro).
-- **HTTP**: `dio` envuelto en `DioClient` (`lib/core/network/dio_client.dart`) con interceptor de auth (`Authorization: Bearer <token>`) y `KeyFormatInterceptor`. Endpoints centralizados en `ApiEndpoints`.
-- **Persistencia**: solo `shared_preferences`. Token de sesión vía `AuthStorage` (cache en memoria + `SharedPreferences`, key `auth_token`). No hay Hive/sqflite/secure storage.
-- **i18n**: `easy_localization`, locales `es/en/fr/de`, fallback `es`, JSON en `assets/translations/`. Los textos visibles al usuario deben ir a estos archivos de traducción, no hardcodeados en el widget.
+- **HTTP**: `dio` envuelto en `DioClient` (`lib/core/network/dio_client.dart`) con tres interceptores: `AuthTokenInterceptor` (`Authorization: Bearer <token>`), `UnauthorizedInterceptor` (cierra la sesión ante un 401) y `KeyFormatInterceptor`. Endpoints centralizados en `ApiEndpoints`.
+- **Persistencia**: solo `shared_preferences`. Token de sesión vía `AuthStorage` (cache en memoria + `SharedPreferences`, key `auth_token`) y usuario en `UserSession` (key `user_session`). No hay Hive/sqflite/secure storage.
+- **i18n**: `easy_localization`, locales `es/en/fr/de`, fallback `es`, JSON en `assets/translations/` (la única carpeta de assets: no hay imágenes ni fuentes propias). Los textos visibles al usuario deben ir a estos archivos de traducción, no hardcodeados en el widget.
+- **Otras dependencias**: `image_picker` (foto del logo de equipo), `cupertino_icons`, `flutter_localizations`. No hay Freezed ni `json_serializable`: los modelos se escriben a mano (`fromJson`/`toJson`/`copyWith`).
 - **Lint**: `analysis_options.yaml` usa `flutter_lints` sin overrides — respetar esas reglas por defecto, no relajarlas.
 
 ## Arquitectura y estructura de carpetas
 
 Patrón clean-architecture por módulo bajo `lib/modules/<feature>/`:
 
-- `application/{bloc,cubit,state}` — scaffolding, en la práctica mayormente vacío (ver nota de estado arriba).
+- `application/{bloc,cubit,state}` — scaffolding, en la práctica vacío en todos los módulos (ver nota de estado arriba).
 - `data/{datasource,mapper,models,repositories}` — llamadas HTTP/fuentes de datos, mapeo a modelos, implementación de repositorios.
 - `domain/{entities,repositories,usecases}` — entidades de negocio e interfaces de repositorio (contrato), independientes de Flutter/dio.
-- `presentation/{pages,widgets}` — UI del módulo.
+- `presentation/{pages,widgets}` — UI del módulo. Los módulos maduros agregan `providers/` con los notifiers de sus pantallas (ver `leagues`).
 
-Módulos existentes: `auth, events, home, matches, players, rankings, reports, teams, users`. Muchos tienen solo `.gitkeep` en varias capas (scaffolding pendiente) — antes de implementar algo nuevo en un módulo poco maduro, mirar `events/event_types/leagues` como referencia de cómo se ve el patrón completo y maduro.
+Módulos existentes: `auth, events, home, matches, players, rankings, reports, teams, users`. Solo `events` (con `event_types/leagues`), `home`, `auth` y, en parte, `users` y `players` tienen código real; `matches`, `rankings`, `reports` y `teams` son una página placeholder y el resto de sus capas son `.gitkeep`. Antes de implementar algo nuevo en un módulo poco maduro, mirar `events/event_types/leagues` como referencia de cómo se ve el patrón completo y maduro.
 
-- `lib/core/` — transversal técnico: `config, constants, di, errors, modules, network, routes, services, theme, utils`.
-- `lib/shared/` — transversal de dominio/UI reutilizable: `enums, extensions, mixins, models, services, widgets`.
+- `lib/core/` — transversal técnico: `config, constants, di, errors, modules, network, routes, services, theme, utils` (`errors` está vacío).
+- `lib/shared/` — transversal de dominio/UI reutilizable: `enums, extensions, mixins, models, services, widgets`. Hoy solo `mixins`, `services` y `widgets` tienen código; `enums`, `extensions` y `models` están vacíos (ahí van los `enum`s compartidos que pide la regla de "Nada fijo").
+- La intención es que `core/` y `shared/` no importen de `modules/`, pero hoy lo hacen (`service_locator`, `user_session`, `module_registry`, `logout_button`, `status_badge`). No agregues más; la forma correcta es la de `SessionExpiredListener`: la interfaz vive en `core/services` y su implementación en `shared/services`.
 
 Un módulo nuevo debe replicar esta misma carpeta interna (`data/domain/presentation`), no inventar una organización distinta.
 
-## Testing
+## Testing y linting
 
-- Prácticamente no hay cobertura real: solo `test/widget_test.dart` con un smoke test del login. No asumas que existen tests de un flujo antes de verificarlo.
-- Si agregas lógica nueva, favorece que sea testeable (separar lógica de UI en notifiers/usecases), aunque no se exija escribir el test en el mismo cambio salvo que se pida explícitamente.
+- `flutter analyze` queda **sin issues** (verificado el 2026-10-17): debe seguir así antes de commitear.
+- Hay 6 archivos de test con 14 pruebas que **pasan** con `flutter test` (2026-10-17): `widget_test.dart` (login sin sesión guardada), `AppConfig`, `UnauthorizedInterceptor`, `SessionService`, `SessionExpiredHandler` y `UserProfileService`. Cubren sesión, red y perfil: login, registro, home, menú y todo `leagues` (notifiers, servicios, modelos) no tienen tests. No asumas que existen tests de un flujo antes de verificarlo.
+- Patrón de los tests existentes: sin red, con un `DioClient` falso que hereda del real (`UserProfileService({DioClient? client})` lo recibe por constructor) o con un `HttpClientAdapter` que responde un código fijo; `SharedPreferences.setMockInitialValues` antes de `EasyLocalization.ensureInitialized()`.
+- Si agregas lógica nueva, favorece que sea testeable (separar lógica de UI en notifiers/usecases y recibir las dependencias por constructor, como `UserProfileService` y `SessionService`), aunque no se exija escribir el test en el mismo cambio salvo que se pida explícitamente.
 
 ## Cosas a tener en cuenta / no replicar
 
 - El `login_page.dart` tiene credenciales de prueba precargadas con comentario `// DEV:` — es deuda de desarrollo, no un patrón a copiar en otras pantallas.
+- El resto de la deuda conocida (código muerto, strings sueltos donde debería haber `enum`, errores tragados, archivos demasiado largos) está en "Tests y deuda técnica", más abajo.
+- Idioma de los comentarios: el código reciente (sesión, red, perfil) los escribe en español y el más antiguo mezcla inglés. En código nuevo sigue el español; no hace falta traducir lo existente.
 
 ---
 
 # Contexto de la plataforma
 
-> Sección añadida el 2026-10-12 tras analizar los 3 proyectos y la carpeta `Documentación/` del monorepo. Está verificada contra el **código**, no contra los documentos de diseño. **Si algo de aquí contradice una sección anterior de este archivo, prevalece esto**: varias secciones previas quedaron desactualizadas (se señalan en "Estado real" de cada proyecto). El bloque "Visión de la plataforma" es idéntico en los 3 CLAUDE.md: si lo cambias, cámbialo en los 3.
+> Sección añadida el 2026-10-12 tras analizar los 3 proyectos y la carpeta `Documentación/` del monorepo; las secciones de este proyecto se volvieron a verificar contra el código el 2026-10-17. Está verificada contra el **código**, no contra los documentos de diseño. El bloque "Visión de la plataforma" es idéntico en los 3 CLAUDE.md: si lo cambias, cámbialo en los 3.
 
 ## Visión de la plataforma (bloque común a los 3 proyectos)
 
@@ -104,10 +110,10 @@ Los 3 son repos git independientes. La carpeta `Documentación/` (en la raíz de
 
 | Dominio | Backend | Admin (Angular) | App usuario (Flutter) |
 |---|---|---|---|
-| Auth, usuarios y roles | ✅ | ✅ lista, alta con contraseña temporal por email, edición, borrado y asignación de roles | Login, registro y completar perfil |
+| Auth, usuarios y roles | ✅ | ✅ lista, alta con contraseña temporal por email, edición, borrado y asignación de roles; el administrador ve su perfil y cambia su contraseña | Login, registro y completar perfil |
 | Menú dinámico por rol | ✅ | ✅ sidebar | ✅ Home (barra inferior y acciones rápidas) |
 | Eventos y ligas | ✅ | ✅ CRUD de eventos (lista con búsqueda y filtros, alta, edición y borrado lógico); sin equipos, partidos ni calendario | ✅ **único módulo maduro** (`leagues`) |
-| Equipos, jugadores e invitaciones | ✅ | ✅ CRUD de equipos (lista con búsqueda y filtros, alta, edición, estado y borrado lógico) y lista de jugadores de cada equipo (solo lectura); sin alta de jugadores ni invitaciones | ✅ dentro de ligas |
+| Equipos, jugadores e invitaciones | ✅ | ✅ CRUD de equipos (lista con búsqueda y filtros, alta, edición, estado y borrado lógico) y jugadores de cada equipo: lista, alta por email (lo agrega o lo traslada al equipo) e invitación de registro por correo si el email no existe; sin edición ni baja de jugadores | ✅ dentro de ligas |
 | Partidos, calendario automático y posiciones | ✅ | ❌ | ✅ dentro de ligas |
 | Canchas y complejos | ✅ CRUD | ❌ | solo lectura (selector al programar) |
 | Categorías | ✅ CRUD | ✅ CRUD (lista con búsqueda, alta, edición y borrado lógico; solo si ningún equipo ni evento la usa) | ❌ |
@@ -129,81 +135,92 @@ Los 3 son repos git independientes. La carpeta `Documentación/` (en la raíz de
 
 ### Qué hace hoy
 
-- App del usuario final. El login envía siempre `clientType=MOBILE_APP` (el backend rechaza a los administradores). Flujos reales: login; registro abierto (email + password) que lleva a `CompleteProfilePage`, que guarda el perfil con `PUT /users/auth/update-profile` (se puede omitir); registro por invitación mediante deep link; Home dinámico; **Ligas**; cambio de idioma y logout.
+- App del usuario final. El login envía siempre `clientType=MOBILE_APP` (el backend rechaza a los administradores). Flujos reales: login; registro abierto (email + password) que **inicia sesión solo** (guarda el token si el backend lo devuelve) y lleva a `CompleteProfilePage`, que guarda el perfil con `PUT /users/auth/update-profile` (se puede omitir); registro por invitación mediante deep link; Home dinámico; **Ligas**; cambio de idioma y logout.
 - **Ligas (`/ligas`) es el único módulo de negocio funcional**:
-  - Listado con pestañas "Mis ligas / Todas". Crear, editar y borrar liga solo si eres el creador (`isOwner` sale de `GET /events/by-event-type/{typeId}/by-user/{userId}`).
-  - Detalle con 4 pestañas: Info (edición en línea), Equipos, Partidos y Posiciones (las calcula el backend).
-  - Equipos: agregar uno existente, crear uno nuevo y gestionar jugadores (buscar por email, invitar a un usuario existente, enviar enlace de registro a uno no registrado, quitar).
-  - Partidos: CRUD, aplazar, suspender, reprogramar (uno o un día completo) y auto-programación.
+  - Listado con pestañas "Mis ligas / Todas". Crear, editar y borrar liga solo si eres el creador (`isOwner` sale de `GET /events/by-event-type/{typeId}/by-user/{userId}`). El formulario de liga solo pide nombre y fechas.
+  - Detalle (`LeagueDetailPage`) con 4 pestañas: Info (edición en línea), Equipos, Partidos y Posiciones (las calcula el backend). Solo el creador ve el botón flotante y las acciones de edición.
+  - Equipos: agregar uno existente, crear uno nuevo (nombre y logo) y gestionar jugadores (buscar por email, invitar a un usuario existente, enviar enlace de registro a uno no registrado, quitar).
+  - Partidos: crear, editar, borrar, aplazar, suspender, reprogramar (uno o un día completo) y auto-programación. **El resultado se registra editando el partido**: al editar aparecen el estado y el marcador (local/visitante). El selector de estado ofrece solo `scheduled`, `inProgress`, `finished`, `cancelled` y `postponed`; suspender y reprogramar van por sus propias acciones.
 
 ### Estado por módulo (`lib/modules/<m>/`)
 
 | Módulo | Estado real | Dónde mirar |
 |---|---|---|
-| `events/event_types/leagues` | **Maduro**, referencia de patrón (clean-arch completa salvo `domain/entities`) | `data/datasource/*_service.dart`, `data/models/`, `domain/{enums,repositories}`, `presentation/{pages,providers,widgets}`, guía `LEAGUES.md` |
-| `events/shared` | Implementado: base reutilizable para cualquier tipo de evento | `event_service.dart`, `events_notifier.dart`, `event_type_page.dart`, `event_form_sheet.dart` |
+| `events/event_types/leagues` | **Maduro**, referencia de patrón (clean-arch completa salvo `domain/entities`) | `data/{datasource,models}`, `domain/{enums,exceptions,models,repositories}`, `presentation/{pages,providers,widgets}`, guía `LEAGUES.md` |
+| `events/shared` | Implementado: base reutilizable para cualquier tipo de evento | `data/{datasource,local,models,providers}` y `presentation/{pages,widgets}`: `event_service.dart`, `events_notifier.dart`, `event_type_page.dart`, `event_form_sheet.dart` |
 | `events` (raíz), `teams`, `matches`, `rankings`, `reports` | **Placeholder**: una página con `PlaceholderTab` ("Próximamente") y capas `.gitkeep` | `presentation/pages/<m>_page.dart` |
 | `home` | A medias: menú y acciones rápidas salen de `GET /menu/for-current-user`; `home_tab.dart` es **estático** (invitaciones, próximo evento, equipos y actividad son tarjetas vacías) | `home_page.dart`, `menu_service.dart`, `menu_item_model.dart` |
 | `auth` | Solo UI. No hay datasource ni repositorio: las páginas llaman a `DioClient` directamente | `login_page.dart`, `register_page.dart` |
 | `players` | Parcial y sin el layout estándar: solo el registro por invitación. Su lógica principal (`PlayersService`, `PlayerModel`) vive dentro de `leagues` | `players_auth_service.dart`, `invite_register_page.dart` |
 | `users` | Parcial: `CompleteProfilePage` real (`IUserProfileRepository` → `UserProfileService`, `UserModel`, `UserProfileUpdate`) y `profile_page.dart` (placeholder) | `data/datasource/user_profile_service.dart` |
 
-Hay 122 archivos `.dart` y 104 `.gitkeep`. Las carpetas `application/{bloc,cubit,state}` están vacías en todos los módulos.
+Hay 133 archivos `.dart` en `lib/` y 104 `.gitkeep`. Las carpetas `application/{bloc,cubit,state}` están vacías en todos los módulos.
 
 ### Backend: URL base y endpoints
 
-- `AppConfig.baseUrl` (`core/config/app_config.dart`) se elige con `--dart-define=APP_ENV=dev|staging|prod` (por defecto `dev`), y `--dart-define=API_BASE_URL=...` la reemplaza por completo. Las URLs están fijas en el código: dev `http://localhost:8080/api`; staging y prod `https://…sports-platform.com/v1`. Las de staging/prod terminan en `/v1`, no en el `/api` que sirve el backend ni coinciden con las de Angular: parecen placeholders sin validar.
-- **Android**: en `dev`, `AppConfig` usa `10.0.2.2` (el alias de la PC en el emulador); en web y escritorio, `localhost`. Para un dispositivo físico: `--dart-define=API_BASE_URL=http://<ip-de-la-PC>:8080/api` (o `adb reverse tcp:8080 tcp:8080` con `API_BASE_URL=http://localhost:8080/api`). El manifest principal declara `INTERNET` y el tráfico `http` (`usesCleartextTraffic`) solo se permite en los manifests de debug/profile. **No se verificó con un build real de Android** (la máquina donde se hizo no tiene el SDK).
-- `DioClient` (`core/network/dio_client.dart`): timeout de 20 s, `Authorization: Bearer` y `KeyFormatInterceptor` (solo convierte si se cambia `AppConfig.apiKeyFormat`). Cada servicio crea su propio `DioClient()`. `ResponseParser` acepta el valor directo o envuelto en `{"data": …}`.
+- `AppConfig.baseUrl` (`core/config/app_config.dart`) se elige con `--dart-define=APP_ENV=dev|staging|prod` (por defecto `dev`), y `--dart-define=API_BASE_URL=...` la reemplaza por completo. Dev se arma con constantes (host, puerto `8080`, context-path `/api`); staging y prod son literales `https://…sports-platform.com/v1`. Las de staging/prod terminan en `/v1`, no en el `/api` que sirve el backend ni coinciden con las de Angular: parecen placeholders sin validar. `AppConfig.apiKeyFormat` (`camelCase` hoy) decide si `KeyFormatInterceptor` convierte las keys de la respuesta.
+- **Android**: en `dev`, `AppConfig` usa `10.0.2.2` (el alias de la PC en el emulador); en web y escritorio, `localhost`. Para un dispositivo físico: `--dart-define=API_BASE_URL=http://<ip-de-la-PC>:8080/api` (o `adb reverse tcp:8080 tcp:8080` con `API_BASE_URL=http://localhost:8080/api`). El manifest principal declara `INTERNET` y el tráfico `http` (`usesCleartextTraffic`) solo se permite en los manifests de debug/profile. **No se verificó con un build real de Android.**
+- `DioClient` (`core/network/dio_client.dart`): timeout de 20 s e interceptores en este orden: `AuthTokenInterceptor`, `UnauthorizedInterceptor`, `KeyFormatInterceptor`. Cada servicio crea su propio `DioClient()` (un `Dio` nuevo por servicio). `ResponseParser` acepta el valor directo o envuelto en `{"data": …}`.
 - Endpoints consumidos (rutas en `ApiEndpoints`, `core/network/api_endpoints.dart`):
-  - Auth: `POST /users/auth/login`, `/register`, `/logout`; `PUT /users/auth/update-profile` (completar perfil); `POST /players/auth/register` (invitación).
+  - Auth: `POST /users/auth/login`, `/register` (envía `email`, `password` y `confirm_password`, en snake_case), `/logout`; `PUT /users/auth/update-profile` (completar perfil); `POST /players/auth/register` (invitación).
   - Menú: `GET /menu/for-current-user`.
-  - Eventos: `GET /events/by-event-type/{typeId}` y `.../by-user/{userId}`, `POST /events`, `PUT|DELETE /events/{id}`, `GET /events/{id}/standings`, `GET|POST /events/{id}/schedule-config`, `POST /events/{id}/schedule-config/generate`.
-  - Equipos: `GET|POST /teams`, `GET /teams-events/by-event/{eventId}`, `POST /teams-events`, `DELETE /teams-events/{id}/hard`.
+  - Eventos: `GET /events/by-event-type/{typeId}` y `.../by-user/{userId}`, `POST /events` (agrega `idEventType` al cuerpo), `PUT|DELETE /events/{id}`, `GET /events/{id}/standings`, `GET|POST /events/{id}/schedule-config`, `POST /events/{id}/schedule-config/generate`.
+  - Equipos: `GET|POST /teams` (el alta envía `name` y `logoUrl` solo si hay), `GET /teams-events/by-event/{eventId}`, `POST /teams-events` (`teamId`, `eventId`), `DELETE /teams-events/{id}/hard`.
   - Partidos: `GET /matches/by-event/{eventId}`, `POST /matches`, `PUT|DELETE /matches/{id}`, `PATCH /matches/{id}/postpone|suspend|reschedule`, `PATCH /matches/by-event/{eventId}/reschedule-date`.
   - Jugadores: `GET /players/by-team/{teamId}`, `GET /players/search?email=` (un 404 significa "no existe"), `POST /players/invite`, `POST /players/invite-register`, `PATCH /players/{id}/remove-from-team`.
   - Canchas: `GET /courts`.
-- Definidos en `ApiEndpoints` pero sin uso: `refreshToken`, `users`, `sportComplexes`, `rankings`, `reports` y otros.
+- Definidos en `ApiEndpoints` pero sin uso: `refreshToken`, `users`, `userById`, `teamById`, `teamsEventsById`, `sportComplexes`, `rankings`, `reports`, `leagues` y `leagueById` (estos dos son la ruta de pantalla `/ligas`, no un endpoint).
+- Fechas hacia el backend: `DateFormatters` (`core/utils`) arma `yyyy-MM-dd` (`apiDate`) y `yyyy-MM-ddTHH:mm:00` (`apiDateTime`, hora local sin zona); para mostrar usa `date` y `dateTime` (`dd/MM/yyyy`). No formatees fechas a mano.
 
 ### Navegación y módulos dinámicos
 
-- `Navigator` clásico (`MaterialPageRoute`). `main.dart` decide entre `HomePage` y `LoginPage` según `AuthStorage.hasToken()`.
-- Cada pantalla de módulo se conecta así: la `url` del ítem de menú (columna `menu.url` del backend) se busca en `ModuleRegistry` (`core/modules/modules_setup.dart`, una línea `register` por módulo, con las URLs en `module_urls.dart`). `AppRouteFactory` abre la página o la pestaña. Una `url` no registrada cae en un placeholder genérico.
+- `Navigator` clásico (`MaterialPageRoute`). `main.dart` decide entre `HomePage` y `LoginPage` según `AuthStorage.hasToken()` (y carga `UserSession` desde disco si hay token).
+- Cada pantalla de módulo se conecta así: la `url` del ítem de menú (columna `menu.url` del backend) se busca en `ModuleRegistry` (`core/modules/modules_setup.dart`, una línea `register` por módulo, con las URLs en `module_urls.dart`; la URL se normaliza a minúsculas y con `/` inicial). `AppRouteFactory` abre la página (`buildPage`, con `Scaffold` propio) o la pestaña de la barra inferior (`buildTab`, sin `Scaffold`). Una `url` no registrada cae en un placeholder genérico.
 - La URL real de ligas es **`/ligas`** (no `/leagues`).
-- El menú se pide a `GET /menu/for-current-user`, filtrado por rol igual que en Angular. **Un usuario sin rol o sin filas visibles en `roles_menu` ve el menú vacío** (sin barra inferior ni acciones rápidas): el registro no asigna ningún rol, así que hay que dárselo y concederle los ítems en `roles_menu`.
-- `HomePage`: la barra inferior (se oculta con menos de 2 ítems) y las acciones rápidas salen del menú; el índice 0 de la barra es **siempre** `HomeTab`, aunque `navItems[0].url` apunte a otra cosa. Los ítems con hijos abren un `ChildrenSheet`.
+- El menú se pide a `GET /menu/for-current-user`, filtrado por rol igual que en Angular. `MenuService` reparte los ítems en dos listas: `navOrder > 0` van a la barra inferior (ordenados por `navOrder`) y el resto a las acciones rápidas (ordenados por `order`). **Un usuario sin rol o sin filas visibles en `roles_menu` recibe el menú vacío**: el registro no asigna ningún rol, así que hay que dárselo y concederle los ítems en `roles_menu`.
+- `HomePage`: la barra inferior (se oculta con menos de 2 ítems) y las acciones rápidas salen del menú; el índice 0 de la barra es **siempre** `HomeTab`, aunque `navItems[0].url` apunte a otra cosa. Las acciones rápidas se muestran como carrusel o como drawer (`HomeMenuStyle`, se alterna con un botón de la barra superior; arranca en carrusel). Los ítems con hijos abren un `ChildrenSheet`. El botón de notificaciones está deshabilitado. Con `navItems` vacío (cargando, con error o sin permisos) el cuerpo queda **en blanco**: ni se construye `HomeTab`, así que el spinner y el botón de reintentar del carrusel nunca se ven (solo el drawer los muestra).
+- Iconos: `MenuItemModel` traduce el nombre del icono del backend a un `IconData` de Material con `_filledIcons`/`_outlinedIcons`; un nombre desconocido se muestra como `Icons.sports`. Los colores de las tarjetas de acción salen de `kMenuColors`, que se recorre por posición.
 
 ### Auth, sesión y deep links
 
-- Token en `AuthStorage` (memoria + `SharedPreferences`, clave `auth_token`). La sesión (`UserSession`) decodifica el JWT a mano y se guarda en `user_session`. `AuthStorage` y `UserSession` son clases estáticas con estado global: difíciles de testear.
-- **Sesión vencida**: `UnauthorizedInterceptor` (red) detecta un 401 en una petición que llevaba token (excepto login y logout) y avisa a `SessionExpiredListener` (interfaz en `core/services`), que implementa `SessionExpiredHandler` (`shared/services`): limpia la sesión, lleva al login con `AppNavigator.key` y muestra el aviso `session.expired`; varios 401 simultáneos cierran la sesión una sola vez. No hay refresh de token. El login muestra "credenciales inválidas" ante cualquier excepción.
-- Logout (`shared/widgets/logout_button.dart`): confirma, llama a `POST /users/auth/logout` (ignora el fallo) y limpia con `SessionService.clear()`, igual que la sesión vencida: borra token y usuario y descarta el estado en memoria del usuario (`_resetSessionScopedServices` en `service_locator.dart`; **si agregas un notifier con datos del usuario, resetéalo ahí**). Luego vuelve al login.
-- Deep link de invitación (`app_links`): `…/register?inviteToken=<token>`, el único soportado. Android declara `http://localhost:5021/register`, `https://yourdomain.com/register` (**placeholder sin reemplazar**) y el esquema `sportplatform://`; iOS solo el esquema `sportplatform://` (sin Universal Links). Tras registrarse, la invitación lleva al login: no inicia sesión sola.
+- Token en `AuthStorage` (memoria + `SharedPreferences`, clave `auth_token`). La sesión (`UserSession`) decodifica a mano el payload del JWT (`id`/`sub`, `idRole`/`role`, nombres, `username`, `email`) y se guarda en `user_session`; `UserSession.update` la reemplaza tras editar el perfil. `AuthStorage` y `UserSession` son clases estáticas con estado global: difíciles de testear.
+- **Sesión vencida**: `UnauthorizedInterceptor` (red) detecta un 401 en una petición que llevaba token (excepto login y logout) y avisa a `SessionExpiredListener` (interfaz en `core/services`), que implementa `SessionExpiredHandler` (`shared/services`): limpia la sesión, lleva al login con `AppNavigator.key` y muestra el aviso `session.expired`; varios 401 simultáneos cierran la sesión una sola vez. No hay refresh de token. El login muestra "credenciales inválidas" ante cualquier excepción (también si no hay red).
+- Logout (`shared/widgets/logout_button.dart`): confirma, llama a `POST /users/auth/logout` (ignora el fallo) y limpia con `SessionService.clear()`, igual que la sesión vencida: borra token y usuario y descarta el estado en memoria del usuario (`_resetSessionScopedServices` en `service_locator.dart`; hoy solo reinicia el `EventsNotifier` de ligas: **si agregas un notifier con datos del usuario, resetéalo ahí**). Luego vuelve al login.
+- Deep link de invitación (`app_links`): `…/register?inviteToken=<token>`, el único soportado. En web se lee `Uri.base` (la librería no intercepta la URL del navegador). Android declara `http://localhost:5021/register`, `https://yourdomain.com/register` (**placeholder sin reemplazar**) y el esquema `sportplatform://`; iOS solo el esquema `sportplatform://` (sin Universal Links). Tras registrarse, la invitación lleva al login: no inicia sesión sola.
+- **`_extractToken` solo reconoce `uri.path == '/register'`**: `sportplatform://register?inviteToken=…` se parsea con `host=register` y `path` vacío, así que **no se reconoce**; el esquema propio solo funciona como `sportplatform:///register?…`. El correo que manda el backend usa `http(s)`, por lo que hoy el esquema `sportplatform://` solo sirve para pruebas manuales.
 
 ### Tema y convenciones de UI
 
-- `core/theme/app_theme.dart`: un único tema **oscuro** (sin tema claro ni `themeMode`). Paleta verde en `AppColors` (`primary 2E7D32`, fondos degradados, translúcidos para inputs, colores semánticos y de podio). Casi todos los widgets fijan colores a mano con `AppColors.*` en vez de `Theme.of(context)`.
-- Widgets compartidos en `lib/shared/widgets/`: `GradientBackground`, `SportTextField`, `AppSnackbar`, `showConfirmationDialog`, `EmptyState`, `ErrorRetry`, `StatusBadge`, `SheetHandle`, `LanguageSelector`, `LogoutButton`; mixin `SnackMixin`.
+- `core/theme/app_theme.dart`: un único tema **oscuro** (sin tema claro ni `themeMode`; `fontFamily: 'sans-serif'`, sin fuentes en assets). Paleta verde en `AppColors` (`primary 2E7D32`, fondos degradados, translúcidos para inputs, colores semánticos y de podio). Casi todos los widgets fijan colores a mano con `AppColors.*` en vez de `Theme.of(context)`. `AppInputDecoration.standard(label)` es el estilo común de los campos (esquinas de 10).
+- Widgets compartidos en `lib/shared/widgets/`: `GradientBackground`, `SportTextField`, `SocialButton`, `AppSnackbar` (`success`/`error`/`warning`/`info`), `showConfirmationDialog`, `EmptyState`, `ErrorRetry`, `StatusBadge`, `SheetHandle`, `LanguageSelector`, `LogoutButton`; mixin `SnackMixin`.
 - Convenciones observables: cada página de módulo recibe `MenuItemModel item` y usa `Scaffold(backgroundColor: backgroundEnd)` + `AppBar(backgroundColor: primaryDark)`; formularios y acciones en bottom sheets con `static show(...)`, fondo `sheetBackground`, esquinas de 20 y `SheetHandle`; listas con `RefreshIndicator`, padding inferior de 100 por el FAB y estados de carga, error y vacío; la UI se parte en métodos `_buildX()`; imports absolutos `package:sport_platform/...`; los widgets con texto traducido leen `context.locale;` en `build` para reaccionar al cambio de idioma.
+- Los pickers de fecha toman el rango de `AppConstants.minPickerDate`/`maxPickerDate`.
+
+### Patrón de estado en `leagues` (referencia)
+
+- El **único notifier registrado en GetIt** es `EventsNotifier` (uno por tipo de evento, `instanceName: 'leagues'`): lista y "mis eventos", con caché de 3 minutos (`load()` la respeta, `load(force: true)` la ignora) y `silentReload()` tras crear. La página de entrada lo entrega con `ChangeNotifierProvider.value`.
+- Los notifiers de pantalla (`LeagueDetailNotifier`, `AddPlayersNotifier`) **se crean en el `State`** del widget que los usa, reciben los repositorios resueltos con `getIt<I…Repository>()` y se liberan en `dispose`. Todos los notifiers exponen listas inmutables (`List.unmodifiable`); los de pantalla guardan los errores como **clave de traducción** (`'leagues.error_load_teams'`), no como texto.
+- Los sheets de formulario (`MatchFormSheet`, `AddTeamSheet`, `CreateTeamSheet`, `AutoScheduleSheet`, `AddPlayersSheet`) resuelven sus servicios con `getIt` y avisan con `SnackMixin` o `AppSnackbar`.
 
 ### i18n (estado)
 
-- `easy_localization`: `es` (por defecto, siempre arranca en español), `en`, `fr`, `de`, en `assets/translations/{es,en,fr,de}.json`. El idioma elegido **no se persiste**.
-- **`fr` y `de` tienen 45 claves menos que `es` y `en`**: faltan las de `leagues.*` (auto-programación, días, estados) y esas pantallas caen al español. Al agregar claves, agrégalas en los 4 archivos.
-- Conviven dos estilos: clases de constantes en `core/constants/strings_constants/` (auth, home, perfil, logout) y literales `'leagues.xxx'.tr()` (ligas e invitación). Para código nuevo sigue el estilo del módulo donde trabajas.
-- `EventTypePage` es genérico y recibe un `translationPrefix`: **un tipo de evento nuevo necesita su bloque completo de claves bajo su propio prefijo**.
+- `easy_localization`: `es` (por defecto), `en`, `fr`, `de`, en `assets/translations/{es,en,fr,de}.json`. `startLocale: es` en `main.dart` fuerza el español en cada arranque: **el idioma elegido no se conserva**.
+- `es` y `en` tienen 349 claves; **`fr` y `de` tienen 304: les faltan las 45 de `leagues.*`** (auto-programación, días, estados) y esas pantallas caen al español. Al agregar claves, agrégalas en los 4 archivos. Prefijos en uso: `app`, `common`, `events`, `home`, `invite_register`, `leagues`, `login`, `logout`, `menu`, `players`, `profile`, `register`, `session`, `settings`.
+- Conviven dos estilos: clases de constantes en `core/constants/strings_constants/` (auth, home, perfil, logout, sesión) y literales `'leagues.xxx'.tr()` (ligas e invitación; son la mayoría). Para código nuevo sigue el estilo del módulo donde trabajas.
+- `EventTypePage` y `EventFormSheet` son genéricos y reciben un `translationPrefix`: **un tipo de evento nuevo necesita su bloque completo de claves bajo su propio prefijo**. Las que usan hoy son `tab_mine`, `tab_all`, `new_item`, `edit_item`, `name`, `start_date`, `end_date`, `save`, `cancel`, `delete`, `delete_item`, `confirm_delete`, `retry`, `error_load`, `error_delete`, `success_created`, `success_updated`, `success_deleted`, `no_items`, `no_items_subtitle`, `no_items_mine`, `no_items_mine_subtitle`, `name_required`, `start_date_required`, `end_date_required` y `date_order_error` (copiar el bloque de `leagues` es lo más seguro).
+- `StatusBadge.forEvent` traduce solo `ACTIVE`, `UPCOMING`, `FINISHED` y `CANCELLED` (con `events.status_*`, los mismos cuatro que el panel Angular); cualquier otro estado se muestra tal cual y en gris.
 
 ### Cómo agregar un tipo de evento nuevo (replica `leagues`)
 
 1. UUID del tipo en `core/constants/event_type_ids.dart` (es el id del tipo en la BD).
 2. Carpeta `lib/modules/events/event_types/<tipo>/` con `data/{datasource,models}`, `domain/{enums,repositories}` y `presentation/{pages,providers,widgets}`. (`ARCHITECTURE_GUIDE.txt` propone `events/tournaments/`, que no coincide con la estructura real.)
 3. `<Tipo>Service extends EventService` con `super(eventTypeId: EventTypeIds.<tipo>)` (ver `league_service.dart`).
-4. Registrar en `core/di/service_locator.dart` un `EventsNotifier` con `instanceName: '<tipo>'` y los repositorios de detalle que necesite (`abstract interface class I<…>Repository`).
+4. Registrar en `core/di/service_locator.dart` un `EventsNotifier` con `instanceName: '<tipo>'` y los repositorios de detalle que necesite (`abstract interface class I<…>Repository`). **Agregarlo también a `_resetSessionScopedServices`**, o el siguiente usuario que inicie sesión verá las listas del anterior.
 5. Página de entrada: `ChangeNotifierProvider.value(getIt<EventsNotifier>(instanceName: '<tipo>'))` + `EventTypePage(...)`.
 6. `core/modules/module_urls.dart` y una línea en `core/modules/modules_setup.dart`.
 7. Endpoints nuevos en `ApiEndpoints` y bloque de traducciones en los 4 JSON.
 8. Insertar el ítem en la tabla `menu` del backend con la misma `url` (si el icono es nuevo, agregarlo a `_filledIcons`/`_outlinedIcons` en `menu_item_model.dart`).
-9. Correr `flutter analyze`.
+9. Correr `flutter analyze` y `flutter test`.
 
 ### Comandos
 
@@ -211,17 +228,20 @@ Desde `frontend/usuario-flutter/`: `flutter pub get`, `flutter run` (entorno `de
 
 ### Tests y deuda técnica (no replicar)
 
-- Hay tests de: el login (`test/widget_test.dart`, con `EasyLocalization` y `SharedPreferences` simulados; el `setUpAll` simula primero las preferencias porque `EasyLocalization.ensureInitialized()` las lee), `AppConfig`, `UnauthorizedInterceptor`, `SessionService`, `SessionExpiredHandler` y `UserProfileService`. **Sin tests**: notifiers, servicios y modelos de ligas.
-- Código de prueba o sin terminar: `login_page.dart` con credenciales precargadas (`// DEV:`); subida del logo de equipo sin implementar (`logoUrl` siempre se envía `null`); firma release de Android con la de debug y `applicationId` `com.example.sport_platform`; `README.md` es la plantilla de Flutter; `.claude/settings.json` commiteado con rutas de otra máquina.
-- Falta de permisos de plataforma: iOS sin `NSPhotoLibraryUsageDescription`/`NSCameraUsageDescription` (que `image_picker` necesita) y macOS sin `network.client`.
-- Tres implementaciones de snackbar conviven (`AppSnackbar`, `SnackMixin` y `_showSnack` duplicado). Usa `AppSnackbar`.
-- Strings sueltos donde debería haber `enum`: `EventModel.format/status`, `TeamModel.status`, `PlayerModel.status`, `playDays`. Valores fijos que deberían salir de constantes: `DateTime(2020)`/`DateTime(2035)` en `EventFormSheet` y los defaults `'90'`, `'15'`, `'30'` en `AutoScheduleSheet`. `PlaceholderTab` tiene "Próximamente" fijo y los placeholders muestran `item.name` en vez de `item.displayName.tr()`.
+- Tests: ver "Testing y linting". **Sin tests**: notifiers, servicios y modelos de ligas, login, registro y menú.
+- Código de prueba o sin terminar: `login_page.dart` con credenciales precargadas (`// DEV:`); subida del logo de equipo sin implementar (el usuario puede elegir la imagen con `image_picker`, pero `TeamLogoStorageService` es un esqueleto comentado y `logoUrl` siempre se envía `null`); firma release de Android con la de debug y `applicationId`/`namespace` `com.example.sport_platform`; `README.md`, `pubspec.yaml` y los metadatos web (`web/index.html`, `manifest.json`: "A new Flutter project.", color `#0175C2`) son los de la plantilla; `.claude/settings.json` y `.vscode/settings.json` están commiteados (el primero con rutas de otra máquina).
+- Falta de permisos de plataforma: iOS sin `NSPhotoLibraryUsageDescription`/`NSCameraUsageDescription` (que `image_picker` necesita) y macOS sin `network.client` (solo `network.server` en debug/profile).
+- Tres implementaciones de snackbar conviven: `AppSnackbar` (la correcta), `SnackMixin` (cinco sheets de ligas) y un `_showSnack` duplicado en `LeagueDetailPage` y `EventTypePage`. Usa `AppSnackbar`.
+- Strings sueltos donde debería haber `enum`: `EventModel.format/status`, `TeamModel.status`, `PlayerModel.status`, `playDays`, y la lista fija `_statuses` de `MatchFormSheet`. Valores fijos que deberían salir de constantes: `DateTime(2020)`/`DateTime(2035)` en `EventFormSheet` (el resto de pickers ya usa `AppConstants`), los defaults `'90'`, `'15'`, `'30'` en `AutoScheduleSheet` y el rango 1–30 jugadores de `AddPlayersNotifier`. `PlaceholderTab` tiene "Próximamente" fijo y las seis páginas placeholder (`events`, `teams`, `matches`, `rankings`, `reports`, `profile`) muestran `item.name` en vez de `item.displayName.tr()`.
+- Archivos que ya exceden lo razonable: `add_players_sheet.dart` (789 líneas) y `auto_schedule_sheet.dart` (532). Al tocarlos, extrae sub-widgets y métodos en vez de seguir creciendo.
+- Errores que no llegan al usuario: `EventFormSheet._submit` traga la excepción y `EventTypePage` no captura la de crear/editar, así que **crear o editar una liga que falla no muestra ningún mensaje** (el sheet solo se queda abierto). Hay además `catch (_) {}` vacíos en `main.dart` (deep links), `UserSession.loadFromStorage` y `EventsNotifier.silentReload`, y `LeagueScheduleService.getConfig` traga cualquier excepción y devuelve `null`.
+- Detección de errores por el texto en inglés del mensaje del backend (frágil): invitaciones (`already been used`, `expired`, `invalid invitation token` en `InviteRegisterPage`) y programación automática (`date range`, `play days` en `LeagueScheduleService.generate`).
+- `_AppRouter` (en `main.dart`) crea el `Future` de la sesión dentro de `build`: cualquier `setState` (p. ej. al llegar un deep link en frío) lo repite y vuelve a mostrar el spinner.
 - `shared/widgets/status_badge.dart` importa `MatchStatus` desde el módulo de ligas (dependencia de `shared` hacia un módulo).
-- Hay `catch (_) {}` vacíos y `LeagueScheduleService.getConfig` traga cualquier excepción y devuelve `null`. La detección de errores de invitación compara texto en inglés del mensaje del backend (frágil).
-- Código muerto: `LeagueStanding`, `LeagueDetailService`, `MyEventsStore`, `StandingsService.getAll`, `PlayersService.create/updatePlayer`.
+- Código muerto: `LeagueStanding` (y su `compute`), `LeagueDetailService`, `MyEventsStore`, `StandingsService.getAll`, `PlayersService.create/updatePlayer`, `TeamLogoStorageService`; constantes `EventsStringsConstants`, `SocialStringsConstants`, `AppConstants.appName/appVersion` y `LoginStringsConstants.appName/appTagline`.
 
 ### Documentación interna desactualizada (el código manda)
 
-- `lib/modules/events/event_types/leagues/LEAGUES.md`: dice que la tabla de posiciones se calcula en local con `LeagueStanding.compute`, pero hoy la pide al backend; además lista endpoints y `playDays` distintos a los reales.
-- `lib/modules/ARCHITECTURE_GUIDE.txt`: usa `AuthStorage.deleteToken()` (real: `clearToken()`) y propone `events/tournaments/`.
-- `lib/core/modules/MENU_GUIDE.txt`: usa `/leagues` en los ejemplos (real: `/ligas`).
+- `lib/modules/events/event_types/leagues/LEAGUES.md`: dice que la tabla de posiciones se calcula en local con `LeagueStanding.compute`, pero hoy la pide al backend; lista endpoints y `playDays` distintos a los reales y su árbol de carpetas omite `standings_service`, `team_logo_storage_service`, `standing_model`, `domain/enums` y `domain/exceptions`.
+- `lib/modules/ARCHITECTURE_GUIDE.txt`: usa `AuthStorage.deleteToken()` (real: `clearToken()`), propone `events/tournaments/`, dice que `core/` no importa módulos y describe `DioClient` con un `InterceptorsWrapper` en línea, sin `AuthTokenInterceptor` ni `UnauthorizedInterceptor`.
+- `lib/core/modules/MENU_GUIDE.txt`: usa `/leagues` en los ejemplos (real: `/ligas`) y `GET /menu` (real: `GET /menu/for-current-user`).
