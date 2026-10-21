@@ -29,6 +29,11 @@
 - **Nada debe estar fijo ("hardcodeado"): todo debe ser dinámico** (textos, rutas, URLs, ids, límites, colores, etc. vienen de configuración, datos, traducciones o del tema).
 - Si algo **necesariamente** debe ser fijo (estados, tipos, roles, etc.), modelarlo con un **`enum`** en lugar de strings o números mágicos. Ubicarlo en el módulo al que pertenece, o en `lib/shared/enums/` si lo usan varios módulos.
 
+### Base de datos: solo migraciones (nunca scripts)
+
+- **No se escriben scripts** (SQL suelto, de datos o de generación de esquema) ni se siembra nada a mano: la base de datos se maneja **solo con migraciones Flyway del Backend**, tanto para crear o cambiar tablas como para los datos iniciales (seeders: menú, roles, catálogos...). Viven en el proyecto Backend, en `src/main/resources/db/migration/` (`V{n}__descripcion.sql`, nunca editando una ya aplicada).
+- Si un cambio de esta app necesita tablas o datos nuevos (por ejemplo, el ítem de menú de una pantalla nueva), se hace como una migración nueva en el Backend; aquí solo se refleja el contrato.
+
 ## Proyectos relacionados (monorepo lógico "Plataforma deportiva")
 
 - Frontend usuario (este proyecto, Flutter): `C:\Users\WALDO\Documents\Proyectos\Plataforma deportiva\frontend\usuario-flutter`
@@ -128,7 +133,7 @@ Los 3 son repos git independientes. La carpeta `Documentación/` (en la raíz de
 - **Login**: `POST /users/auth/login` con `email`, `password` y `clientType`. `ADMIN_PANEL` solo admite administradores y `MOBILE_APP` rechaza administradores; si no corresponde, el backend responde 403. Es el único control de "quién entra a qué app".
 - **La API no autoriza por rol**: solo exige un JWT válido. Que un endpoint sea "de admin" es hoy una convención de qué app lo llama, no una protección. No asumas que el backend bloquea a un usuario de la app móvil.
 - **Admin** = el usuario tiene una fila activa en `users_roles` con el UUID de `app.security.admin-role-id` (backend). Angular repite ese UUID en `environment*.ts` (`adminRoleId`) y **los dos deben coincidir**. Los nombres de rol son editables: nunca comparar por nombre.
-- **Menú dinámico**: la navegación de ambos frontends sale de la tabla `menu` del backend. Cada ítem trae `url`, `icon` y `translationKey`. Ambos frontends llaman `GET /menu/for-current-user` (filtrado por los roles del usuario). **Un usuario sin rol, o con un rol sin filas visibles en `roles_menu`, recibe el menú vacío**: hoy el registro no asigna ningún rol, así que a los usuarios de la app hay que darles uno con sus ítems de menú. Para agregar una pantalla: (1) ruta/página en el frontend, (2) ítem en `menu` con esa misma `url`, (3) claves de traducción. Si el frontend no conoce la `url`, el ítem cae a un fallback (Angular redirige a `/dashboard`; Flutter muestra un placeholder).
+- **Menú dinámico**: la navegación de ambos frontends sale de la tabla `menu` del backend. Cada ítem trae `url`, `icon` y `translationKey`. Ambos frontends llaman `GET /menu/for-current-user` (filtrado por los roles del usuario). **Un usuario sin rol, o con un rol sin filas visibles en `roles_menu`, recibe el menú vacío**: hoy el registro no asigna ningún rol, así que a los usuarios de la app hay que darles uno con sus ítems de menú. Para agregar una pantalla: (1) ruta/página en el frontend, (2) ítem en `menu` con esa misma `url`, sembrado con una migración del Backend, (3) claves de traducción. Si el frontend no conoce la `url`, el ítem cae a un fallback (Angular redirige a `/dashboard`; Flutter muestra un placeholder).
 - **i18n**: claves `modulo.snake_case`, resueltas como `translationKey ?? name`. El `TranslationService` de Angular está calcado de `easy_localization` de Flutter.
 - **Invitaciones a equipos**: el backend envía un correo con `<app.frontend.url>/register?inviteToken=<token>`, que abre el registro por invitación de la app Flutter (deep link; en dev `app.frontend.url` apunta a Flutter web en el puerto 5021).
 
