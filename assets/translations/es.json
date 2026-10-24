@@ -90,6 +90,58 @@
     "switch_to_carousel": "Vista carrusel",
     "open_side_menu": "Abrir menú lateral para acciones rápidas"
   },
+  "mobile": {
+    "home": {
+      "invitations_note": "Las invitaciones se envían al correo registrado; la app aún no tiene una bandeja de invitaciones.",
+      "load_error": "No se pudo cargar el resumen.",
+      "retry_hint": "Desliza hacia abajo para volver a intentarlo.",
+      "next_match": "Próximo partido",
+      "no_next_match": "No hay partidos próximos"
+    },
+    "events": {
+      "all": "Todos",
+      "load_error": "No se pudieron cargar los eventos.",
+      "empty_title": "No hay eventos disponibles",
+      "empty_subtitle": "Las ligas y torneos aparecerán aquí.",
+      "filtered_empty_title": "No hay eventos de este tipo",
+      "filtered_empty_subtitle": "Prueba con otra categoría."
+    },
+    "teams": {
+      "load_error": "No se pudo cargar tu equipo.",
+      "empty_title": "Aún no tienes un equipo",
+      "no_membership": "Cuando te agreguen a un equipo, podrás consultar aquí a sus jugadores.",
+      "players": "Jugadores",
+      "players_empty": "Este equipo aún no tiene jugadores.",
+      "your_team": "Tu equipo"
+    },
+    "matches": {
+      "upcoming": "Próximos",
+      "results": "Resultados",
+      "all": "Todos",
+      "load_error": "No se pudieron cargar los partidos.",
+      "empty_title": "No hay partidos para mostrar",
+      "empty_subtitle": "El calendario y los resultados aparecerán aquí."
+    },
+    "courts": {
+      "load_error": "No se pudieron cargar las canchas.",
+      "empty_title": "No hay canchas disponibles",
+      "empty_subtitle": "Las canchas registradas aparecerán aquí.",
+      "search_hint": "Buscar cancha, complejo o ubicación",
+      "filtered_empty_title": "No hay coincidencias",
+      "filtered_empty_subtitle": "Prueba con otro término."
+    },
+    "profile": {
+      "load_error": "No se pudieron cargar los datos del perfil.",
+      "email": "Correo electrónico",
+      "username": "Nombre de usuario",
+      "first_name": "Primer nombre",
+      "middle_name": "Segundo nombre",
+      "last_name": "Primer apellido",
+      "second_last_name": "Segundo apellido",
+      "edit": "Editar perfil",
+      "incomplete": "Perfil sin completar"
+    }
+  },
   "session": {
     "expired": "Tu sesión expiró. Inicia sesión de nuevo."
   },
@@ -103,6 +155,8 @@
   "profile": {
     "title": "Completa tu perfil",
     "subtitle": "Agrega tus datos para que otros puedan encontrarte.",
+    "edit_title": "Editar perfil",
+    "edit_subtitle": "Mantén tus datos personales actualizados.",
     "step_account": "Cuenta",
     "step_profile": "Perfil",
     "step_done": "Listo",
@@ -115,6 +169,7 @@
     "username_too_short": "Mínimo 3 caracteres",
     "username_no_spaces": "Sin espacios",
     "save_button": "Guardar perfil",
+    "update_button": "Guardar cambios",
     "skip_button": "Completar después",
     "skip_info": "Puedes completar tu perfil más tarde desde ajustes.",
     "save_success": "Perfil completado exitosamente",
@@ -279,6 +334,12 @@
     "home": "Inicio",
     "rankings": "Rankings",
     "profile": "Perfil",
+    "reports": "Reportes",
+    "courts": "Canchas",
+    "admin": {
+      "events": "Eventos",
+      "teams": "Equipos"
+    },
     "leagues": {
       "title": "Ligas",
       "create_league": "Ver ligas disponibles",

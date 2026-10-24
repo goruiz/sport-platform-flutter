@@ -78,6 +78,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildTabBody() {
+    if (_navItems.isEmpty && _isLoadingMenu) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.primaryLight),
+      );
+    }
+    if (_navItems.isEmpty && _menuError) {
+      return Center(
+        child: TextButton.icon(
+          onPressed: _loadMenu,
+          icon: const Icon(Icons.refresh, color: AppColors.primaryLight),
+          label: Text(
+            'common.retry'.tr(),
+            style: const TextStyle(color: AppColors.primaryLight),
+          ),
+        ),
+      );
+    }
     if (_navItems.isEmpty) return const SizedBox.shrink();
     final safeIdx = _currentIndex.clamp(0, _navItems.length - 1);
     if (safeIdx == 0) {
@@ -87,9 +104,27 @@ class _HomePageState extends State<HomePage> {
         isLoadingMenu: _isLoadingMenu,
         menuError: _menuError,
         onRetryMenu: _loadMenu,
+        onNavigate: _navigateToUrl,
       );
     }
+
     return AppRouteFactory.tabForItem(_navItems[safeIdx]);
+  }
+
+  void _navigateToUrl(String url) {
+    final item = _findMenuItem([..._navItems, ..._menuItems], url);
+    if (item != null && mounted) {
+      AppRouteFactory.navigateTo(context, item);
+    }
+  }
+
+  MenuItemModel? _findMenuItem(List<MenuItemModel> items, String url) {
+    for (final item in items) {
+      if (item.url == url) return item;
+      final nested = _findMenuItem(item.children, url);
+      if (nested != null) return nested;
+    }
+    return null;
   }
 
   PreferredSizeWidget _buildAppBar() {

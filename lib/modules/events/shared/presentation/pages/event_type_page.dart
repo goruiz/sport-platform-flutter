@@ -17,6 +17,7 @@ class EventTypePage extends StatefulWidget {
   final MenuItemModel menuItem;
   final String translationPrefix;
   final IconData typeIcon;
+  final bool readOnly;
   final void Function(EventModel event, bool isOwner)? onEventTap;
 
   const EventTypePage({
@@ -24,6 +25,7 @@ class EventTypePage extends StatefulWidget {
     required this.menuItem,
     required this.translationPrefix,
     this.typeIcon = Icons.sports,
+    this.readOnly = false,
     this.onEventTap,
   });
 
@@ -100,6 +102,7 @@ class _EventTypePageState extends State<EventTypePage> {
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
+      initialIndex: widget.readOnly ? 1 : 0,
       child: Scaffold(
         backgroundColor: AppColors.backgroundEnd,
         appBar: AppBar(
@@ -114,7 +117,9 @@ class _EventTypePageState extends State<EventTypePage> {
             Consumer<EventsNotifier>(
               builder: (context, notifier, child) => IconButton(
                 icon: const Icon(Icons.refresh, color: AppColors.white),
-                onPressed: notifier.loading ? null : () => notifier.load(force: true),
+                onPressed: notifier.loading
+                    ? null
+                    : () => notifier.load(force: true),
                 tooltip: '$_prefix.retry'.tr(),
               ),
             ),
@@ -133,13 +138,15 @@ class _EventTypePageState extends State<EventTypePage> {
         body: Consumer<EventsNotifier>(
           builder: (context, notifier, child) => _buildBody(notifier),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _openCreate,
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.white,
-          tooltip: '$_prefix.new_item'.tr(),
-          child: const Icon(Icons.add),
-        ),
+        floatingActionButton: widget.readOnly
+            ? null
+            : FloatingActionButton(
+                onPressed: _openCreate,
+                backgroundColor: AppColors.primaryLight,
+                foregroundColor: AppColors.white,
+                tooltip: '$_prefix.new_item'.tr(),
+                child: const Icon(Icons.add),
+              ),
       ),
     );
   }
@@ -163,11 +170,11 @@ class _EventTypePageState extends State<EventTypePage> {
           myEventIds: notifier.myIds,
           typeIcon: widget.typeIcon,
           onRefresh: () => notifier.load(force: true),
-          onEdit: _openEdit,
-          onDelete: _confirmDelete,
+          onEdit: widget.readOnly ? null : _openEdit,
+          onDelete: widget.readOnly ? null : _confirmDelete,
           emptyTitle: '$_prefix.no_items_mine'.tr(),
           emptySubtitle: '$_prefix.no_items_mine_subtitle'.tr(),
-          onAdd: _openCreate,
+          onAdd: widget.readOnly ? null : _openCreate,
           onEventTap: widget.onEventTap,
         ),
         _EventListView(
@@ -175,11 +182,11 @@ class _EventTypePageState extends State<EventTypePage> {
           myEventIds: notifier.myIds,
           typeIcon: widget.typeIcon,
           onRefresh: () => notifier.load(force: true),
-          onEdit: _openEdit,
-          onDelete: _confirmDelete,
+          onEdit: widget.readOnly ? null : _openEdit,
+          onDelete: widget.readOnly ? null : _confirmDelete,
           emptyTitle: '$_prefix.no_items'.tr(),
           emptySubtitle: '$_prefix.no_items_subtitle'.tr(),
-          onAdd: _openCreate,
+          onAdd: widget.readOnly ? null : _openCreate,
           onEventTap: widget.onEventTap,
         ),
       ],
@@ -194,11 +201,11 @@ class _EventListView extends StatelessWidget {
   final Set<String> myEventIds;
   final IconData typeIcon;
   final Future<void> Function() onRefresh;
-  final void Function(EventModel) onEdit;
-  final void Function(EventModel) onDelete;
+  final void Function(EventModel)? onEdit;
+  final void Function(EventModel)? onDelete;
   final String emptyTitle;
   final String emptySubtitle;
-  final VoidCallback onAdd;
+  final VoidCallback? onAdd;
   final void Function(EventModel event, bool isOwner)? onEventTap;
 
   const _EventListView({
@@ -237,9 +244,15 @@ class _EventListView extends StatelessWidget {
           return EventCard(
             event: event,
             typeIcon: typeIcon,
-            onTap: onEventTap != null ? () => onEventTap!(event, isCurrentUserOwner) : null,
-            onEdit: isCurrentUserOwner ? () => onEdit(event) : null,
-            onDelete: isCurrentUserOwner ? () => onDelete(event) : null,
+            onTap: onEventTap != null
+                ? () => onEventTap!(event, isCurrentUserOwner)
+                : null,
+            onEdit: isCurrentUserOwner && onEdit != null
+                ? () => onEdit!(event)
+                : null,
+            onDelete: isCurrentUserOwner && onDelete != null
+                ? () => onDelete!(event)
+                : null,
           );
         },
       ),

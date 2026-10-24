@@ -35,16 +35,36 @@ class MenuService {
     // The API already returns a fully nested structure: submenus are embedded
     // inside each parent's "submenus" array. MenuItemModel.fromJson handles the
     // nesting recursively, so no manual tree-building is needed here.
-    final navItems = all
-        .where((i) => i.isNavItem)
+    final flattened = _flatten(all);
+    final navItems = flattened
+        .where((item) => item.isNavItem)
         .toList()
       ..sort((a, b) => a.navOrder!.compareTo(b.navOrder!));
 
     final menuItems = all
-        .where((i) => !i.isNavItem)
+        .map(_withoutNavigationItems)
+        .whereType<MenuItemModel>()
         .toList()
       ..sort((a, b) => a.order.compareTo(b.order));
 
     return MenuResult(navItems: navItems, menuItems: menuItems);
+  }
+
+  static List<MenuItemModel> _flatten(List<MenuItemModel> items) => [
+        for (final item in items) ...[
+          item,
+          ..._flatten(item.children),
+        ],
+      ];
+
+  static MenuItemModel? _withoutNavigationItems(MenuItemModel item) {
+    if (item.isNavItem) return null;
+    if (!item.hasChildren) return item;
+
+    final children = item.children
+        .map(_withoutNavigationItems)
+        .whereType<MenuItemModel>()
+        .toList();
+    return children.isEmpty ? null : item.copyWith(children: children);
   }
 }

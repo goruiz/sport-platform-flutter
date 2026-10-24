@@ -14,6 +14,7 @@ class CompleteProfileBody extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onSubmit;
   final VoidCallback? onSkip;
+  final bool editing;
 
   const CompleteProfileBody({
     super.key,
@@ -26,6 +27,7 @@ class CompleteProfileBody extends StatelessWidget {
     required this.isLoading,
     required this.onSubmit,
     this.onSkip,
+    this.editing = false,
   });
 
   @override
@@ -36,14 +38,19 @@ class CompleteProfileBody extends StatelessWidget {
       children: [
         const SizedBox(height: 48),
         _buildHeader(),
-        const SizedBox(height: 32),
-        _buildProgressIndicator(),
-        const SizedBox(height: 32),
+        if (!editing) ...[
+          const SizedBox(height: 32),
+          _buildProgressIndicator(),
+          const SizedBox(height: 32),
+        ] else
+          const SizedBox(height: 24),
         _buildForm(),
         const SizedBox(height: 28),
         _buildSubmitButton(),
-        const SizedBox(height: 16),
-        _buildSkipButton(),
+        if (onSkip != null) ...[
+          const SizedBox(height: 16),
+          _buildSkipButton(),
+        ],
         const SizedBox(height: 24),
       ],
     );
@@ -54,7 +61,10 @@ class CompleteProfileBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          ProfileStringsConstants.title.tr(),
+          (editing
+                  ? ProfileStringsConstants.editTitle
+                  : ProfileStringsConstants.title)
+              .tr(),
           style: const TextStyle(
             color: AppColors.white,
             fontSize: 28,
@@ -64,7 +74,10 @@ class CompleteProfileBody extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          ProfileStringsConstants.subtitle.tr(),
+          (editing
+                  ? ProfileStringsConstants.editSubtitle
+                  : ProfileStringsConstants.subtitle)
+              .tr(),
           style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
         ),
       ],
@@ -234,7 +247,10 @@ class CompleteProfileBody extends StatelessWidget {
                 ),
               )
             : Text(
-                ProfileStringsConstants.saveButton.tr(),
+                (editing
+                        ? ProfileStringsConstants.updateButton
+                        : ProfileStringsConstants.saveButton)
+                    .tr(),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,

@@ -1,6 +1,8 @@
 class ProfileStringsConstants {
   static const String title = 'profile.title';
   static const String subtitle = 'profile.subtitle';
+  static const String editTitle = 'profile.edit_title';
+  static const String editSubtitle = 'profile.edit_subtitle';
   static const String stepAccount = 'profile.step_account';
   static const String stepProfile = 'profile.step_profile';
   static const String stepDone = 'profile.step_done';
@@ -13,6 +15,7 @@ class ProfileStringsConstants {
   static const String usernameTooShort = 'profile.username_too_short';
   static const String usernameNoSpaces = 'profile.username_no_spaces';
   static const String saveButton = 'profile.save_button';
+  static const String updateButton = 'profile.update_button';
   static const String skipButton = 'profile.skip_button';
   static const String skipInfo = 'profile.skip_info';
   static const String saveSuccess = 'profile.save_success';

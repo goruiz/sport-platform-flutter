@@ -90,6 +90,58 @@
     "switch_to_carousel": "Karussellansicht",
     "open_side_menu": "Seitenmenü für Schnellaktionen öffnen"
   },
+  "mobile": {
+    "home": {
+      "invitations_note": "Teameinladungen werden an Ihre registrierte E-Mail gesendet; die App hat noch keinen Einladungs-Posteingang.",
+      "load_error": "Die Übersicht konnte nicht geladen werden.",
+      "retry_hint": "Zum erneuten Laden nach unten ziehen.",
+      "next_match": "Nächstes Spiel",
+      "no_next_match": "Keine kommenden Spiele"
+    },
+    "events": {
+      "all": "Alle",
+      "load_error": "Veranstaltungen konnten nicht geladen werden.",
+      "empty_title": "Keine Veranstaltungen verfügbar",
+      "empty_subtitle": "Ligen und Turniere werden hier angezeigt.",
+      "filtered_empty_title": "Keine Veranstaltungen dieses Typs",
+      "filtered_empty_subtitle": "Versuchen Sie eine andere Kategorie."
+    },
+    "teams": {
+      "load_error": "Ihr Team konnte nicht geladen werden.",
+      "empty_title": "Sie sind noch in keinem Team",
+      "no_membership": "Sobald Sie einem Team hinzugefügt wurden, sehen Sie hier die Spieler.",
+      "players": "Spieler",
+      "players_empty": "Dieses Team hat noch keine Spieler.",
+      "your_team": "Ihr Team"
+    },
+    "matches": {
+      "upcoming": "Bevorstehend",
+      "results": "Ergebnisse",
+      "all": "Alle",
+      "load_error": "Spiele konnten nicht geladen werden.",
+      "empty_title": "Keine Spiele vorhanden",
+      "empty_subtitle": "Spielplan und Ergebnisse werden hier angezeigt."
+    },
+    "courts": {
+      "load_error": "Plätze konnten nicht geladen werden.",
+      "empty_title": "Keine Plätze verfügbar",
+      "empty_subtitle": "Registrierte Plätze werden hier angezeigt.",
+      "search_hint": "Platz, Anlage oder Ort suchen",
+      "filtered_empty_title": "Keine Treffer",
+      "filtered_empty_subtitle": "Versuchen Sie einen anderen Suchbegriff."
+    },
+    "profile": {
+      "load_error": "Profil konnte nicht geladen werden.",
+      "email": "E-Mail",
+      "username": "Benutzername",
+      "first_name": "Vorname",
+      "middle_name": "Zweiter Vorname",
+      "last_name": "Nachname",
+      "second_last_name": "Zweiter Nachname",
+      "edit": "Profil bearbeiten",
+      "incomplete": "Profil unvollständig"
+    }
+  },
   "session": {
     "expired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
   },
@@ -103,6 +155,8 @@
   "profile": {
     "title": "Profil vervollständigen",
     "subtitle": "Fügen Sie Ihre Daten hinzu, damit andere Sie finden können.",
+    "edit_title": "Profil bearbeiten",
+    "edit_subtitle": "Halten Sie Ihre persönlichen Daten aktuell.",
     "step_account": "Konto",
     "step_profile": "Profil",
     "step_done": "Fertig",
@@ -115,6 +169,7 @@
     "username_too_short": "Mindestens 3 Zeichen",
     "username_no_spaces": "Keine Leerzeichen",
     "save_button": "Profil speichern",
+    "update_button": "Änderungen speichern",
     "skip_button": "Später vervollständigen",
     "skip_info": "Sie können Ihr Profil später in den Einstellungen vervollständigen.",
     "save_success": "Profil erfolgreich vervollständigt",
@@ -214,6 +269,16 @@
     "error_create_team": "Fehler beim Erstellen des Teams",
     "tap_to_manage_players": "Tippen, um Spieler zu verwalten",
     "manage_players": "Spieler verwalten",
+    "detail_tab_standings": "Tabelle",
+    "standings_empty": "Noch keine abgeschlossenen Spiele",
+    "standings_empty_subtitle": "Die Tabelle erscheint nach den ersten Ergebnissen",
+    "standings_col_team": "Team",
+    "standings_col_played": "Sp",
+    "standings_col_won": "S",
+    "standings_col_drawn": "U",
+    "standings_col_lost": "N",
+    "standings_col_pts": "Pkt",
+    "match_status_postponed": "Verschoben",
     "match_status_suspended": "Suspendiert",
     "match_status_rescheduled": "Neu angesetzt",
     "match_postpone": "Spiel verschieben",
@@ -234,6 +299,12 @@
     "home": "Startseite",
     "rankings": "Ranglisten",
     "profile": "Profil",
+    "reports": "Berichte",
+    "courts": "Sportplätze",
+    "admin": {
+      "events": "Veranstaltungen",
+      "teams": "Teams"
+    },
     "leagues": {
       "title": "Ligen",
       "create_league": "Liga erstellen",

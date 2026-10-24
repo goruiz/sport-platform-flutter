@@ -90,6 +90,58 @@
     "switch_to_carousel": "Carousel view",
     "open_side_menu": "Open side menu for quick actions"
   },
+  "mobile": {
+    "home": {
+      "invitations_note": "Team invitations are sent to your registered email; the app does not yet have an invitation inbox.",
+      "load_error": "The overview could not be loaded.",
+      "retry_hint": "Pull down to try again.",
+      "next_match": "Next match",
+      "no_next_match": "No upcoming matches"
+    },
+    "events": {
+      "all": "All",
+      "load_error": "Events could not be loaded.",
+      "empty_title": "No events available",
+      "empty_subtitle": "Leagues and tournaments will appear here.",
+      "filtered_empty_title": "No events of this type",
+      "filtered_empty_subtitle": "Try another category."
+    },
+    "teams": {
+      "load_error": "Your team could not be loaded.",
+      "empty_title": "You are not on a team yet",
+      "no_membership": "Once you are added to a team, you can see its players here.",
+      "players": "Players",
+      "players_empty": "This team does not have any players yet.",
+      "your_team": "Your team"
+    },
+    "matches": {
+      "upcoming": "Upcoming",
+      "results": "Results",
+      "all": "All",
+      "load_error": "Matches could not be loaded.",
+      "empty_title": "No matches to show",
+      "empty_subtitle": "The schedule and results will appear here."
+    },
+    "courts": {
+      "load_error": "Courts could not be loaded.",
+      "empty_title": "No courts available",
+      "empty_subtitle": "Registered courts will appear here.",
+      "search_hint": "Search court, complex or location",
+      "filtered_empty_title": "No matches found",
+      "filtered_empty_subtitle": "Try another search term."
+    },
+    "profile": {
+      "load_error": "Profile details could not be loaded.",
+      "email": "Email",
+      "username": "Username",
+      "first_name": "First name",
+      "middle_name": "Middle name",
+      "last_name": "Last name",
+      "second_last_name": "Second last name",
+      "edit": "Edit profile",
+      "incomplete": "Profile incomplete"
+    }
+  },
   "session": {
     "expired": "Your session has expired. Please sign in again."
   },
@@ -103,6 +155,8 @@
   "profile": {
     "title": "Complete your profile",
     "subtitle": "Add your details so others can find you.",
+    "edit_title": "Edit profile",
+    "edit_subtitle": "Keep your personal details up to date.",
     "step_account": "Account",
     "step_profile": "Profile",
     "step_done": "Done",
@@ -115,6 +169,7 @@
     "username_too_short": "Minimum 3 characters",
     "username_no_spaces": "No spaces allowed",
     "save_button": "Save profile",
+    "update_button": "Save changes",
     "skip_button": "Complete later",
     "skip_info": "You can complete your profile later from settings.",
     "save_success": "Profile completed successfully",
@@ -279,6 +334,12 @@
     "home": "Home",
     "rankings": "Rankings",
     "profile": "Profile",
+    "reports": "Reports",
+    "courts": "Courts",
+    "admin": {
+      "events": "Events",
+      "teams": "Teams"
+    },
     "leagues": {
       "title": "Leagues",
       "create_league": "View available leagues",

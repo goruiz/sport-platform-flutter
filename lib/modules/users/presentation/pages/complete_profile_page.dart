@@ -11,7 +11,9 @@ import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
 
 class CompleteProfilePage extends StatefulWidget {
-  const CompleteProfilePage({super.key});
+  final bool editing;
+
+  const CompleteProfilePage({super.key, this.editing = false});
 
   @override
   State<CompleteProfilePage> createState() => _CompleteProfilePageState();
@@ -27,6 +29,17 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   final _secondLastNameController = TextEditingController();
   final _usernameController = TextEditingController();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = UserSession.current;
+    _firstNameController.text = user?.firstName ?? '';
+    _middleNameController.text = user?.middleName ?? '';
+    _lastNameController.text = user?.lastName ?? '';
+    _secondLastNameController.text = user?.secondLastName ?? '';
+    _usernameController.text = user?.username ?? '';
+  }
 
   @override
   void dispose() {
@@ -47,6 +60,10 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           await _profileRepository.updateProfile(_buildProfileUpdate());
       await UserSession.update(updatedUser);
       if (!mounted) return;
+      if (widget.editing) {
+        Navigator.of(context).pop(updatedUser);
+        return;
+      }
       AppSnackbar.success(context, ProfileStringsConstants.saveSuccess.tr());
       _navigateToHome();
     } catch (_) {
@@ -85,6 +102,13 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: widget.editing
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              foregroundColor: Colors.white,
+              elevation: 0,
+            )
+          : null,
       body: GradientBackground(
         child: CompleteProfileBody(
           formKey: _formKey,
@@ -95,7 +119,8 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           usernameController: _usernameController,
           isLoading: _isLoading,
           onSubmit: _onSubmit,
-          onSkip: _onSkip,
+          onSkip: widget.editing ? null : _onSkip,
+          editing: widget.editing,
         ),
       ),
     );

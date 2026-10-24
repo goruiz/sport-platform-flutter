@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
+import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 class GreetingBanner extends StatelessWidget {
@@ -15,7 +16,10 @@ class GreetingBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = HomeStringsConstants.guestName.tr();
+    final user = UserSession.current;
+    final name = user == null || user.fullName.isEmpty
+        ? HomeStringsConstants.guestName.tr()
+        : user.fullName;
     final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
     return Row(
