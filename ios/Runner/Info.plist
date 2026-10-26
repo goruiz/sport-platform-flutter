@@ -4,8 +4,9 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<!-- Custom URL scheme for invite registration deep links.
-	     Usage: sportplatform://register?inviteToken=<token>
+	<!-- Custom URL scheme for invitation and password-reset links.
+	     Examples: sportplatform://register?inviteToken=<token>
+	               sportplatform://reset-password?token=<token>
 	     For production, configure Universal Links (HTTPS + Associated Domains). -->
 	<key>CFBundleURLTypes</key>
 	<array>

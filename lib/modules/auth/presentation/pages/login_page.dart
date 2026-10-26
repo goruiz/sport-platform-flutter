@@ -6,6 +6,7 @@ import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
 import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/register_page.dart';
+import 'package:sport_platform/modules/auth/presentation/pages/password_recovery_page.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/login_body.dart';
 import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
@@ -21,9 +22,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  // DEV: prefilled credentials — remove these two lines to return to normal
-  final _emailController = TextEditingController(text: 'usuario@algo.com');
-  final _passwordController = TextEditingController(text: 'Demo!8ABCB80F76B094');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
   final _client = DioClient();
@@ -86,6 +86,9 @@ class _LoginPageState extends State<LoginPage> {
           onSignUp: () => Navigator.of(
             context,
           ).push(MaterialPageRoute(builder: (_) => const RegisterPage())),
+          onForgotPassword: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const ForgotPasswordPage())),
         ),
       ),
     );

@@ -15,6 +15,7 @@ class LoginBody extends StatelessWidget {
   final VoidCallback onLogin;
   final VoidCallback onTogglePassword;
   final VoidCallback? onSignUp;
+  final VoidCallback? onForgotPassword;
 
   const LoginBody({
     super.key,
@@ -26,6 +27,7 @@ class LoginBody extends StatelessWidget {
     required this.onLogin,
     required this.onTogglePassword,
     this.onSignUp,
+    this.onForgotPassword,
   });
 
   @override
@@ -86,8 +88,12 @@ class LoginBody extends StatelessWidget {
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (v) {
-              if (v == null || v.isEmpty) return LoginStringsConstants.emailRequired.tr();
-              if (!v.contains('@')) return LoginStringsConstants.emailInvalid.tr();
+              if (v == null || v.isEmpty) {
+                return LoginStringsConstants.emailRequired.tr();
+              }
+              if (!v.contains('@')) {
+                return LoginStringsConstants.emailInvalid.tr();
+              }
               return null;
             },
           ),
@@ -108,8 +114,12 @@ class LoginBody extends StatelessWidget {
               onPressed: onTogglePassword,
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return LoginStringsConstants.passwordRequired.tr();
-              if (v.length < 8) return LoginStringsConstants.passwordTooShort.tr();
+              if (v == null || v.isEmpty) {
+                return LoginStringsConstants.passwordRequired.tr();
+              }
+              if (v.length < 8) {
+                return LoginStringsConstants.passwordTooShort.tr();
+              }
               return null;
             },
           ),
@@ -122,7 +132,7 @@ class LoginBody extends StatelessWidget {
     return Align(
       alignment: Alignment.centerRight,
       child: TextButton(
-        onPressed: () {},
+        onPressed: onForgotPassword,
         style: TextButton.styleFrom(padding: EdgeInsets.zero),
         child: Text(
           LoginStringsConstants.forgotPassword.tr(),
@@ -141,8 +151,12 @@ class LoginBody extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryLight,
           foregroundColor: AppColors.white,
-          disabledBackgroundColor: AppColors.primaryLight.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          disabledBackgroundColor: AppColors.primaryLight.withValues(
+            alpha: 0.5,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           elevation: 0,
         ),
         child: isLoading
@@ -169,7 +183,9 @@ class LoginBody extends StatelessWidget {
   Widget _buildDivider() {
     return Row(
       children: [
-        const Expanded(child: Divider(color: AppColors.inputBorder, thickness: 1)),
+        const Expanded(
+          child: Divider(color: AppColors.inputBorder, thickness: 1),
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
@@ -177,7 +193,9 @@ class LoginBody extends StatelessWidget {
             style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
           ),
         ),
-        const Expanded(child: Divider(color: AppColors.inputBorder, thickness: 1)),
+        const Expanded(
+          child: Divider(color: AppColors.inputBorder, thickness: 1),
+        ),
       ],
     );
   }
@@ -185,9 +203,19 @@ class LoginBody extends StatelessWidget {
   Widget _buildSocialButtons() {
     return Row(
       children: [
-        Expanded(child: SocialButton(label: LoginStringsConstants.google.tr(), icon: Icons.g_mobiledata)),
+        Expanded(
+          child: SocialButton(
+            label: LoginStringsConstants.google.tr(),
+            icon: Icons.g_mobiledata,
+          ),
+        ),
         const SizedBox(width: 12),
-        Expanded(child: SocialButton(label: LoginStringsConstants.apple.tr(), icon: Icons.apple)),
+        Expanded(
+          child: SocialButton(
+            label: LoginStringsConstants.apple.tr(),
+            icon: Icons.apple,
+          ),
+        ),
       ],
     );
   }

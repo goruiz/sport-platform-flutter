@@ -78,7 +78,7 @@ Un módulo nuevo debe replicar esta misma carpeta interna (`data/domain/presenta
 
 ## Cosas a tener en cuenta / no replicar
 
-- El `login_page.dart` tiene credenciales de prueba precargadas con comentario `// DEV:` — es deuda de desarrollo, no un patrón a copiar en otras pantallas.
+- `LoginPage` mantiene vacíos los campos de acceso. La recuperación usa `POST /users/auth/forgot-password` y `POST /users/auth/reset-password`; el enlace entrante puede ser web (`/reset-password?token=…`) o el esquema `sportplatform://reset-password?token=…`.
 - El resto de la deuda conocida (código muerto, strings sueltos donde debería haber `enum`, errores tragados, archivos demasiado largos) está en "Tests y deuda técnica", más abajo.
 - Idioma de los comentarios: el código reciente (sesión, red, perfil) los escribe en español y el más antiguo mezcla inglés. En código nuevo sigue el español; no hace falta traducir lo existente.
 
@@ -173,7 +173,7 @@ Hay 133 archivos `.dart` en `lib/` y 104 `.gitkeep`. Las carpetas `application/{
 - **Android**: en `dev`, `AppConfig` usa `10.0.2.2` (el alias de la PC en el emulador); en web y escritorio, `localhost`. Para un dispositivo físico: `--dart-define=API_BASE_URL=http://<ip-de-la-PC>:8080/api` (o `adb reverse tcp:8080 tcp:8080` con `API_BASE_URL=http://localhost:8080/api`). El manifest principal declara `INTERNET` y el tráfico `http` (`usesCleartextTraffic`) solo se permite en los manifests de debug/profile. **No se verificó con un build real de Android.**
 - `DioClient` (`core/network/dio_client.dart`): timeout de 20 s e interceptores en este orden: `AuthTokenInterceptor`, `UnauthorizedInterceptor`, `KeyFormatInterceptor`. Cada servicio crea su propio `DioClient()` (un `Dio` nuevo por servicio). `ResponseParser` acepta el valor directo o envuelto en `{"data": …}`.
 - Endpoints consumidos (rutas en `ApiEndpoints`, `core/network/api_endpoints.dart`):
-  - Auth: `POST /users/auth/login`, `/register` (envía `email`, `password` y `confirm_password`, en snake_case), `/logout`; `PUT /users/auth/update-profile` (completar perfil); `POST /players/auth/register` (invitación).
+  - Auth: `POST /users/auth/login`, `/register` (envía `email`, `password` y `confirm_password`, en snake_case), `/forgot-password` (`email`, respuesta genérica), `/reset-password` (`token`, `newPassword`) y `/logout`; `PUT /users/auth/update-profile` (completar perfil); `POST /players/auth/register` (invitación). El token de recuperación dura 30 minutos y solo se puede usar una vez.
   - Menú: `GET /menu/for-current-user`.
   - Eventos: `GET /events/by-event-type/{typeId}` y `.../by-user/{userId}`, `POST /events` (agrega `idEventType` al cuerpo), `PUT|DELETE /events/{id}`, `GET /events/{id}/standings`, `GET|POST /events/{id}/schedule-config`, `POST /events/{id}/schedule-config/generate`.
   - Equipos: `GET|POST /teams` (el alta envía `name` y `logoUrl` solo si hay), `GET /teams-events/by-event/{eventId}`, `POST /teams-events` (`teamId`, `eventId`), `DELETE /teams-events/{id}/hard`.

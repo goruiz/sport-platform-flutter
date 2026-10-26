@@ -6,6 +6,8 @@ class ApiEndpoints {
   // Auth
   static const String login = '/users/auth/login';
   static const String register = '/users/auth/register';
+  static const String forgotPassword = '/users/auth/forgot-password';
+  static const String resetPassword = '/users/auth/reset-password';
   static const String logout = '/users/auth/logout';
   static const String refreshToken = '/users/auth/refresh';
   static const String updateProfile = '/users/auth/update-profile';
@@ -86,5 +88,4 @@ class ApiEndpoints {
   static const String standings = '/events';
   static String standingsByEvent(String eventId) =>
       '/events/$eventId/standings';
-
 }

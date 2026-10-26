@@ -13,6 +13,7 @@ import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_theme.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
+import 'package:sport_platform/modules/auth/presentation/pages/password_recovery_page.dart';
 import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/modules/players/presentation/pages/invite_register_page.dart';
 
@@ -68,6 +69,7 @@ class _AppRouterState extends State<_AppRouter> {
 
   // Token from a cold-start deep link, pending navigation after first frame.
   String? _pendingInviteToken;
+  String? _pendingPasswordResetToken;
 
   @override
   void initState() {
@@ -77,7 +79,7 @@ class _AppRouterState extends State<_AppRouter> {
 
   Future<void> _initDeepLinks() async {
     // On web, app_links does not intercept the browser URL.
-    // Read Uri.base directly to extract any invite token from the address bar.
+    // Read Uri.base directly because app_links does not intercept browser URLs.
     if (kIsWeb) {
       final webUri = Uri.base;
       // Normalize path: collapse any leading double-slash (e.g. //register → /register)
@@ -89,7 +91,7 @@ class _AppRouterState extends State<_AppRouter> {
 
     final appLinks = AppLinks();
 
-    // Cold start: check if the app was launched from an invite link.
+    // Cold start: check if the app was launched from an invitation or reset link.
     try {
       final initial = await appLinks.getInitialLink();
       if (initial != null) _handleLink(initial, isInitial: true);
@@ -103,14 +105,25 @@ class _AppRouterState extends State<_AppRouter> {
   }
 
   void _handleLink(Uri uri, {bool isInitial = false}) {
-    final token = _extractToken(uri);
-    if (token == null) return;
+    final passwordResetToken = _extractPasswordResetToken(uri);
+    if (passwordResetToken != null) {
+      if (isInitial) {
+        if (mounted) {
+          setState(() => _pendingPasswordResetToken = passwordResetToken);
+        }
+      } else {
+        _navigateToPasswordReset(passwordResetToken);
+      }
+      return;
+    }
 
+    final inviteToken = _extractInviteToken(uri);
+    if (inviteToken == null) return;
     if (isInitial) {
       // Defer until after the first frame so Navigator is ready.
-      if (mounted) setState(() => _pendingInviteToken = token);
+      if (mounted) setState(() => _pendingInviteToken = inviteToken);
     } else {
-      _navigateToInviteRegister(token);
+      _navigateToInviteRegister(inviteToken);
     }
   }
 
@@ -119,17 +132,44 @@ class _AppRouterState extends State<_AppRouter> {
   ///   http://localhost:5021/register?inviteToken=...   (Android dev)
   ///   sportplatform://register?inviteToken=...         (iOS custom scheme)
   ///   https://yourdomain.com/register?inviteToken=...  (production)
-  String? _extractToken(Uri uri) {
-    if (uri.path == '/register') {
+  String? _extractInviteToken(Uri uri) {
+    if (uri.path == '/register' || uri.host == 'register') {
       return uri.queryParameters['inviteToken'];
+    }
+    return null;
+  }
+
+  String? _extractPasswordResetToken(Uri uri) {
+    if (uri.path == '/reset-password' || uri.host == 'reset-password') {
+      return uri.queryParameters['token'] ?? '';
     }
     return null;
   }
 
   void _navigateToInviteRegister(String token) {
     AppNavigator.key.currentState?.push(
+      MaterialPageRoute(builder: (_) => InviteRegisterPage(inviteToken: token)),
+    );
+  }
+
+  void _navigateToPasswordReset(String token) {
+    AppNavigator.key.currentState?.push(
       MaterialPageRoute(
-        builder: (_) => InviteRegisterPage(inviteToken: token),
+        builder: (_) => ResetPasswordPage(
+          token: token,
+          onBack: () {
+            AppNavigator.key.currentState?.pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const LoginPage()),
+              (route) => false,
+            );
+          },
+          onCompleted: () {
+            AppNavigator.key.currentState?.pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const LoginPage()),
+              (route) => false,
+            );
+          },
+        ),
       ),
     );
   }
@@ -148,8 +188,15 @@ class _AppRouterState extends State<_AppRouter> {
 
   @override
   Widget build(BuildContext context) {
-    // Navigate to InviteRegisterPage after the first frame if there's a
-    // pending cold-start token.
+    if (_pendingPasswordResetToken != null) {
+      final token = _pendingPasswordResetToken!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _pendingPasswordResetToken = null);
+        _navigateToPasswordReset(token);
+      });
+    }
+
+    // Handle incoming links after the first frame so Navigator is ready.
     if (_pendingInviteToken != null) {
       final token = _pendingInviteToken!;
       WidgetsBinding.instance.addPostFrameCallback((_) {
