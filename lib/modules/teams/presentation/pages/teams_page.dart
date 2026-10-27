@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
-import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/teams_service.dart';
@@ -30,11 +29,7 @@ class _TeamsPageState extends State<TeamsPage> {
   }
 
   Future<_TeamData?> _loadTeamData() async {
-    await UserSession.loadFromStorage();
-    final email = UserSession.current?.email;
-    if (email == null || email.isEmpty) return null;
-
-    final player = await getIt<PlayersService>().searchByEmail(email);
+    final player = await getIt<PlayersService>().getCurrent();
     final teamId = player?.teamId;
     if (player == null || teamId == null || teamId.isEmpty) return null;
 

@@ -18,6 +18,8 @@ import 'package:sport_platform/modules/events/event_types/leagues/presentation/w
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/standings_tab.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
+import 'package:sport_platform/modules/events/shared/presentation/widgets/championship_tab.dart';
+import 'package:sport_platform/modules/matches/presentation/pages/match_detail_page.dart';
 import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
 
 class LeagueDetailPage extends StatefulWidget {
@@ -104,6 +106,21 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
           if (mounted) _showSnack('leagues.success_match_created'.tr());
         },
       );
+
+  /// El detalle del partido: su cronología de goles y tarjetas (la registra el organizador en el panel).
+  void _openMatch(MatchModel match) {
+    final teamNames = {for (final team in _notifier.teams) team.teamId: team.teamName};
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MatchDetailPage(
+          match: match,
+          homeName: teamNames[match.homeTeamId] ?? '—',
+          awayName: teamNames[match.awayTeamId] ?? '—',
+          eventName: _event.name,
+        ),
+      ),
+    );
+  }
 
   Future<void> _openAutoSchedule() => AutoScheduleSheet.show(
         context: context,
@@ -232,7 +249,9 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
                 tabController: _tabController,
                 onAddTeam: _openAddTeam,
                 onCreateMatch: _openCreateMatch,
-                onAutoSchedule: _openAutoSchedule,
+                // Los partidos de un campeonato los genera el organizador fase a fase desde el
+                // panel: el calendario automático de una sola vuelta los desordenaría.
+                onAutoSchedule: _event.hasChampionship ? null : _openAutoSchedule,
               )
             : null,
       ),
@@ -255,7 +274,11 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
           Tab(text: 'leagues.detail_tab_info'.tr()),
           Tab(text: 'leagues.detail_tab_teams'.tr()),
           Tab(text: 'leagues.detail_tab_matches'.tr()),
-          Tab(text: 'leagues.detail_tab_standings'.tr()),
+          Tab(
+            text: _event.hasChampionship
+                ? 'championship.tab_title'.tr()
+                : 'leagues.detail_tab_standings'.tr(),
+          ),
         ],
       ),
     );
@@ -300,6 +323,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       error: _notifier.matchesError?.tr(),
       isOwner: widget.isOwner,
       onRetry: _notifier.loadMatches,
+      onOpen: _openMatch,
       onEdit: _openEditMatch,
       onDelete: _confirmDeleteMatch,
       onRescheduleDay: _onRescheduleDay,
@@ -309,11 +333,16 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     );
   }
 
+  /// Un evento con formato muestra su campeonato (etapas, tablas y llave); uno sin formato, la
+  /// tabla de posiciones de siempre.
   Widget _buildStandingsTab() {
     if (_notifier.loadingTeams || _notifier.loadingMatches) {
       return const Center(
         child: CircularProgressIndicator(color: AppColors.primaryLight),
       );
+    }
+    if (_event.hasChampionship) {
+      return ChampionshipTab(eventId: _event.id, isOwner: widget.isOwner);
     }
     return StandingsTab(eventId: _event.id);
   }

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/services/locale_storage.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 class LanguageSelector extends StatelessWidget {
@@ -22,7 +23,11 @@ class LanguageSelector extends StatelessWidget {
 
     return PopupMenuButton<String>(
       tooltip: 'settings.language_tooltip'.tr(),
-      onSelected: (code) => context.setLocale(Locale(code)),
+      onSelected: (code) {
+        final locale = Locale(code);
+        context.setLocale(locale);
+        LocaleStorage.save(locale);
+      },
       color: AppColors.primaryDark,
       elevation: 8,
       shape: RoundedRectangleBorder(

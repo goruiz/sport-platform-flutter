@@ -1,3 +1,6 @@
+import 'package:sport_platform/modules/events/shared/domain/enums/event_format_structure.dart';
+import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
+
 class EventModel {
   final String id;
   final String name;
@@ -10,6 +13,10 @@ class EventModel {
   final DateTime? updatedAt;
   final String? eventTypeName;
 
+  /// La estructura de juego de su formato; null si el evento no tiene formato o su formato no
+  /// tiene reglas (entonces es una liga como siempre y no hay campeonato que mostrar).
+  final EventFormatStructure? formatStructure;
+
   const EventModel({
     required this.id,
     required this.name,
@@ -21,10 +28,18 @@ class EventModel {
     required this.createdAt,
     this.updatedAt,
     this.eventTypeName,
+    this.formatStructure,
   });
+
+  /// Su estado como enum; null si el backend trae un texto distinto de los cuatro conocidos.
+  EventStatus? get statusType => EventStatus.fromApi(status);
+
+  /// El evento tiene un campeonato que seguir (fases, tablas o llave) según su formato.
+  bool get hasChampionship => formatStructure != null;
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
     final eventType = json['eventType'] as Map<String, dynamic>?;
+    final eventFormat = json['eventFormat'] as Map<String, dynamic>?;
     return EventModel(
       id: json['id']?.toString() ?? '',
       name: json['name']?.toString() ?? '',
@@ -44,6 +59,8 @@ class EventModel {
           ? DateTime.parse(json['updatedAt'].toString())
           : null,
       eventTypeName: eventType?['name']?.toString(),
+      formatStructure:
+          EventFormatStructure.fromApi(eventFormat?['structure']?.toString()),
     );
   }
 
@@ -66,6 +83,7 @@ class EventModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? eventTypeName,
+    EventFormatStructure? formatStructure,
   }) =>
       EventModel(
         id: id ?? this.id,
@@ -78,6 +96,7 @@ class EventModel {
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         eventTypeName: eventTypeName ?? this.eventTypeName,
+        formatStructure: formatStructure ?? this.formatStructure,
       );
 
   static String _apiDate(DateTime d) =>

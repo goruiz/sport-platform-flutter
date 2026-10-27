@@ -108,7 +108,6 @@
   },
   "mobile": {
     "home": {
-      "invitations_note": "Las invitaciones se envían al correo registrado; la app aún no tiene una bandeja de invitaciones.",
       "load_error": "No se pudo cargar el resumen.",
       "retry_hint": "Desliza hacia abajo para volver a intentarlo.",
       "next_match": "Próximo partido",
@@ -136,7 +135,10 @@
       "all": "Todos",
       "load_error": "No se pudieron cargar los partidos.",
       "empty_title": "No hay partidos para mostrar",
-      "empty_subtitle": "El calendario y los resultados aparecerán aquí."
+      "empty_subtitle": "El calendario y los resultados aparecerán aquí.",
+      "scope_mine": "Mi equipo",
+      "scope_all": "Todos",
+      "empty_mine_subtitle": "Los partidos de tu equipo aparecerán aquí."
     },
     "courts": {
       "load_error": "No se pudieron cargar las canchas.",
@@ -344,7 +346,8 @@
     "match_action_error": "Error al actualizar el partido",
     "schedule_blocked_dates": "Fechas bloqueadas",
     "schedule_add_blocked_date": "Agregar fecha bloqueada",
-    "schedule_pick_blocked_date": "Selecciona una fecha a bloquear"
+    "schedule_pick_blocked_date": "Selecciona una fecha a bloquear",
+    "standings_col_gd": "DG"
   },
   "menu": {
     "home": "Inicio",
@@ -354,7 +357,10 @@
     "courts": "Canchas",
     "admin": {
       "events": "Eventos",
-      "teams": "Equipos"
+      "teams": "Equipos",
+      "group_competition": "Competición",
+      "group_teams": "Equipos y categorías",
+      "group_facilities": "Instalaciones"
     },
     "leagues": {
       "title": "Ligas",
@@ -460,5 +466,136 @@
     "delete": "Eliminar",
     "retry": "Reintentar",
     "create": "Crear"
+  },
+  "championship": {
+    "tab_title": "Campeonato",
+    "load_error": "No se pudo cargar el campeonato.",
+    "none_title": "Este evento no tiene fases",
+    "none_subtitle": "Solo los eventos con un formato de campeonato muestran fases, tablas y llave.",
+    "nothing_generated": "Aún no se ha generado ningún partido del campeonato.",
+    "bracket": "ELIMINATORIA",
+    "champion": "Campeón: {}",
+    "tbd": "Por definir",
+    "bye": "Pase directo",
+    "needs_tiebreak": "Empatado: el organizador decide quién avanza",
+    "owner_hint": "Esta fase la gestionas desde el panel de administración.",
+    "round_final": "Final",
+    "round_semifinals": "Semifinales",
+    "round_quarterfinals": "Cuartos de final",
+    "round_round_of_16": "Octavos de final",
+    "round_number": "Ronda {}",
+    "table_group": "Grupo {}",
+    "tables": {
+      "LEAGUE": "Tabla de la liga",
+      "GROUPS": "Grupos",
+      "SWISS": "Clasificación suiza",
+      "KNOCKOUT": "Eliminatoria",
+      "DOUBLE_ELIMINATION": "Doble eliminación"
+    },
+    "structures": {
+      "ROUND_ROBIN": "Liga (todos contra todos)",
+      "SWISS": "Sistema suizo",
+      "KNOCKOUT": "Eliminación directa",
+      "DOUBLE_ELIMINATION": "Doble eliminación",
+      "GROUPS_KNOCKOUT": "Grupos + eliminatoria",
+      "LEAGUE_KNOCKOUT": "Liga + playoffs",
+      "SWISS_KNOCKOUT": "Suizo + playoffs"
+    },
+    "phases": {
+      "LEAGUE": "Liga",
+      "GROUPS": "Grupos",
+      "SWISS": "Suizo",
+      "KNOCKOUT": "Eliminatoria",
+      "DOUBLE_ELIMINATION": "Doble eliminación"
+    },
+    "next_step": {
+      "NO_FORMAT": "Este evento no tiene campeonato.",
+      "NOT_ENOUGH_TEAMS": "Faltan equipos: hay {registered} inscritos y se necesitan {required}.",
+      "GENERATE_CALENDAR": "El organizador debe generar el calendario.",
+      "GENERATE_ROUND": "El organizador debe generar la siguiente ronda.",
+      "WAITING_RESULTS": "Esperando {pending} resultados para continuar.",
+      "NEEDS_TIEBREAK": "Hay un cruce empatado: el organizador debe decidir quién avanza.",
+      "FINISHED": "El campeonato terminó."
+    },
+    "stages": {
+      "LEAGUE": "Liga",
+      "GROUP": "Grupo",
+      "SWISS": "Suizo",
+      "KNOCKOUT": "Eliminatoria",
+      "THIRD_PLACE": "Tercer puesto",
+      "WINNERS": "Llave de ganadores",
+      "LOSERS": "Llave de perdedores",
+      "GRAND_FINAL": "Gran final"
+    }
+  },
+  "match_events": {
+    "types": {
+      "GOAL": "Gol",
+      "ASSIST": "Asistencia",
+      "YELLOW_CARD": "Tarjeta amarilla",
+      "RED_CARD": "Tarjeta roja",
+      "FOUL": "Falta"
+    }
+  },
+  "match_detail": {
+    "title": "Detalle del partido",
+    "timeline": "CRONOLOGÍA",
+    "error_load": "No se pudo cargar la cronología del partido.",
+    "empty_title": "Sin eventos registrados",
+    "empty_subtitle": "Los goles, las tarjetas y las faltas del partido aparecerán aquí.",
+    "unknown_player": "Jugador desconocido"
+  },
+  "invitations": {
+    "title": "Invitaciones",
+    "empty_title": "Sin invitaciones pendientes",
+    "empty_subtitle": "Cuando un equipo te invite a unirte, lo verás aquí.",
+    "unknown_team": "Equipo",
+    "invited_you": "Te invitó a unirte a su equipo.",
+    "expires": "Vence el {}",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "accepted": "Ahora eres parte de {}.",
+    "declined": "Invitación rechazada.",
+    "pending_count": "Tienes {count} invitaciones pendientes",
+    "error_generic": "No se pudo completar la acción. Inténtalo de nuevo.",
+    "errors": {
+      "NOT_PENDING": "Esta invitación ya fue respondida.",
+      "EXPIRED": "Esta invitación venció.",
+      "TEAM_NOT_FOUND": "El equipo que te invitó ya no existe.",
+      "PLAYER_NOT_FOUND": "Necesitas registrarte como jugador para aceptar esta invitación."
+    }
+  },
+  "rankings": {
+    "standings": "Posiciones",
+    "scorers": "Goleadores",
+    "assists": "Asistencias",
+    "cards": "Tarjetas",
+    "event": "Evento",
+    "empty_title": "Aún no hay datos",
+    "empty_subtitle": "Los líderes aparecerán cuando se registren goles y tarjetas.",
+    "load_error": "No se pudieron cargar los rankings.",
+    "no_events_title": "No hay eventos",
+    "no_events_subtitle": "Los rankings aparecerán cuando haya eventos."
+  },
+  "reports": {
+    "load_error": "No se pudo cargar el reporte.",
+    "no_team_title": "Aún no tienes un equipo",
+    "no_team_subtitle": "Cuando te agreguen a un equipo, verás aquí su reporte.",
+    "no_results_title": "Sin resultados todavía",
+    "no_results_subtitle": "El reporte se arma con los partidos que ya tienen resultado.",
+    "played": "Jugados",
+    "won": "Ganados",
+    "drawn": "Empatados",
+    "lost": "Perdidos",
+    "win_rate": "{}% de partidos ganados",
+    "goals_for": "Goles a favor",
+    "goals_against": "Goles en contra",
+    "goal_difference": "Diferencia",
+    "recent_form": "Racha reciente",
+    "form_win": "G",
+    "form_draw": "E",
+    "form_loss": "P",
+    "by_event": "Por evento",
+    "event_summary": "{won}G {drawn}E {lost}P"
   }
 }

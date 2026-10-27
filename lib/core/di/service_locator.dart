@@ -14,7 +14,14 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/datasourc
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_matches_repository.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_schedule_repository.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_teams_repository.dart';
+import 'package:sport_platform/modules/events/shared/data/datasource/championship_service.dart';
+import 'package:sport_platform/modules/events/shared/data/datasource/events_catalog_service.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
+import 'package:sport_platform/modules/matches/data/datasource/match_events_service.dart';
+import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
+import 'package:sport_platform/modules/players/data/datasource/team_invitations_service.dart';
+import 'package:sport_platform/modules/players/presentation/providers/invitations_notifier.dart';
+import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/users/data/datasource/user_profile_service.dart';
 import 'package:sport_platform/modules/users/domain/repositories/i_user_profile_repository.dart';
 import 'package:sport_platform/shared/services/session_expired_handler.dart';
@@ -45,6 +52,15 @@ void setupServiceLocator() {
   getIt.registerLazySingleton<TeamsService>(() => TeamsService());
   getIt.registerLazySingleton<PlayersService>(() => PlayersService());
   getIt.registerLazySingleton<CourtsService>(() => CourtsService());
+  getIt.registerLazySingleton<EventsCatalogService>(() => EventsCatalogService());
+  getIt.registerLazySingleton<ChampionshipService>(() => ChampionshipService());
+  getIt.registerLazySingleton<MatchesService>(() => MatchesService());
+  getIt.registerLazySingleton<MatchEventsService>(() => MatchEventsService());
+  getIt.registerLazySingleton<PlayerStatsService>(() => PlayerStatsService());
+  getIt.registerLazySingleton<TeamInvitationsService>(() => TeamInvitationsService());
+  getIt.registerLazySingleton<InvitationsNotifier>(
+    () => InvitationsNotifier(getIt<TeamInvitationsService>()),
+  );
   getIt.registerLazySingleton<EventsNotifier>(
     () => EventsNotifier(LeagueService()),
     instanceName: _leaguesNotifierName,
@@ -56,5 +72,8 @@ void setupServiceLocator() {
 void _resetSessionScopedServices() {
   if (getIt.isRegistered<EventsNotifier>(instanceName: _leaguesNotifierName)) {
     getIt.resetLazySingleton<EventsNotifier>(instanceName: _leaguesNotifierName);
+  }
+  if (getIt.isRegistered<InvitationsNotifier>()) {
+    getIt.resetLazySingleton<InvitationsNotifier>();
   }
 }

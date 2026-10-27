@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
@@ -22,8 +23,12 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _emailController = TextEditingController(
+    text: AppConstants.fixedLoginEmail,
+  );
+  final _passwordController = TextEditingController(
+    text: AppConstants.fixedLoginPassword,
+  );
   bool _obscurePassword = true;
   bool _isLoading = false;
   final _client = DioClient();

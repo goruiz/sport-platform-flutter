@@ -6,7 +6,9 @@ class LeagueFab extends StatefulWidget {
   final TabController tabController;
   final VoidCallback onAddTeam;
   final VoidCallback onCreateMatch;
-  final VoidCallback onAutoSchedule;
+
+  /// Null cuando el evento no admite el calendario automático (los de un campeonato con fases).
+  final VoidCallback? onAutoSchedule;
 
   const LeagueFab({
     super.key,
@@ -63,7 +65,9 @@ class _LeagueFabState extends State<LeagueFab> {
         2 => _MatchFabMenu(
             expanded: _expanded,
             onToggle: _toggle,
-            onAutoSchedule: () => _runAndCollapse(widget.onAutoSchedule),
+            onAutoSchedule: widget.onAutoSchedule == null
+                ? null
+                : () => _runAndCollapse(widget.onAutoSchedule!),
             onCreateMatch: () => _runAndCollapse(widget.onCreateMatch),
           ),
         _ => const SizedBox.shrink(),
@@ -77,7 +81,7 @@ class _LeagueFabState extends State<LeagueFab> {
 class _MatchFabMenu extends StatelessWidget {
   final bool expanded;
   final VoidCallback onToggle;
-  final VoidCallback onAutoSchedule;
+  final VoidCallback? onAutoSchedule;
   final VoidCallback onCreateMatch;
 
   const _MatchFabMenu({
@@ -94,12 +98,14 @@ class _MatchFabMenu extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         if (expanded) ...[
-          _MiniActionButton(
-            label: 'leagues.auto_schedule_title'.tr(),
-            icon: Icons.auto_awesome,
-            onTap: onAutoSchedule,
-          ),
-          const SizedBox(height: 8),
+          if (onAutoSchedule != null) ...[
+            _MiniActionButton(
+              label: 'leagues.auto_schedule_title'.tr(),
+              icon: Icons.auto_awesome,
+              onTap: onAutoSchedule!,
+            ),
+            const SizedBox(height: 8),
+          ],
           _MiniActionButton(
             label: 'leagues.new_match'.tr(),
             icon: Icons.edit_calendar_outlined,

@@ -1,10 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/network/api_endpoints.dart';
-import 'package:sport_platform/core/network/dio_client.dart';
-import 'package:sport_platform/core/network/response_parser.dart';
+import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/pages/league_detail_page.dart';
+import 'package:sport_platform/modules/events/shared/data/datasource/events_catalog_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/event_card.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
@@ -21,7 +20,6 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
-  final _client = DioClient();
   late Future<List<EventModel>> _eventsFuture;
   String? _selectedType;
 
@@ -32,13 +30,8 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   Future<List<EventModel>> _loadEvents() async {
-    final response = await _client.get(ApiEndpoints.events);
-    final events =
-        ResponseParser.toList(response.data)
-            .map((item) => EventModel.fromJson(item as Map<String, dynamic>))
-            .toList()
-          ..sort((a, b) => a.startDate.compareTo(b.startDate));
-    return events;
+    final events = await getIt<EventsCatalogService>().getAll();
+    return events..sort((a, b) => a.startDate.compareTo(b.startDate));
   }
 
   Future<void> _refresh() async {

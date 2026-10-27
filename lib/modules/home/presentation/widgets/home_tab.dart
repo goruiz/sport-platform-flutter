@@ -11,6 +11,7 @@ import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/home/presentation/enums/menu_style.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/drawer_hint_card.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/greeting_banner.dart';
+import 'package:sport_platform/modules/home/presentation/widgets/invitations_card.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/quick_actions_carousel.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/section_header.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/empty_card.dart';
@@ -92,10 +93,7 @@ class _HomeTabState extends State<HomeTab> {
               title: HomeStringsConstants.sectionInvitations.tr(),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: EmptyCard(
-                  icon: Icons.mark_email_unread_outlined,
-                  message: 'mobile.home.invitations_note'.tr(),
-                ),
+                child: const InvitationsCard(),
               ),
             ),
             const SizedBox(height: 24),
@@ -126,13 +124,13 @@ class _HomeTabState extends State<HomeTab> {
                   children: [
                     _section(
                       title: HomeStringsConstants.sectionNextEvent.tr(),
-                      child: _eventPreview(data.nextEvent),
+                      child: _eventPreview(data.nextEvent()),
                     ),
                     const SizedBox(height: 24),
                     _section(
                       title: 'mobile.home.next_match'.tr(),
                       child: _matchPreview(
-                        data.nextMatch,
+                        data.nextMatch(),
                         data.teamName,
                         data.eventName,
                       ),
@@ -146,7 +144,7 @@ class _HomeTabState extends State<HomeTab> {
                     _section(
                       title: HomeStringsConstants.sectionRecentActivity.tr(),
                       child: _activityPreview(
-                        data.latestResult,
+                        data.latestResult(),
                         data.teamName,
                         data.eventName,
                       ),

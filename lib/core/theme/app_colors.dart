@@ -20,4 +20,6 @@ class AppColors {
   static const Color podiumGold = Color(0xFFFFD700);
   static const Color podiumSilver = Color(0xFFB0B8C1);
   static const Color podiumBronze = Color(0xFFCD7F32);
+  static const Color cardYellow = Color(0xFFFFEB3B);
+  static const Color cardRed = Color(0xFFE53935);
 }

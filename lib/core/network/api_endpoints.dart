@@ -24,6 +24,7 @@ class ApiEndpoints {
   static const String players = '/players';
   static String playerById(String id) => '/players/$id';
   static const String playersSearch = '/players/search';
+  static const String playersMe = '/players/me';
   static const String playersInvite = '/players/invite';
   static const String playersInviteRegister = '/players/invite-register';
   static const String playersAuthRegister = '/players/auth/register';
@@ -42,6 +43,18 @@ class ApiEndpoints {
   static const String matches = '/matches';
   static String matchById(String id) => '/matches/$id';
   static String matchesByEvent(String eventId) => '/matches/by-event/$eventId';
+  static const String matchesMine = '/matches/mine';
+
+  // Match events (goals, assists, cards and fouls of a match): the app only reads them
+  static String matchEventsByMatch(String matchId) =>
+      '/match-events/by-match/$matchId';
+
+  // Team invitations (answered by the invited person)
+  static const String teamInvitationsMine = '/team-invitations/mine';
+  static String teamInvitationAccept(String id) =>
+      '/team-invitations/$id/accept';
+  static String teamInvitationDecline(String id) =>
+      '/team-invitations/$id/decline';
 
   // Teams-events
   static String teamsEventsByEvent(String eventId) =>
@@ -88,4 +101,12 @@ class ApiEndpoints {
   static const String standings = '/events';
   static String standingsByEvent(String eventId) =>
       '/events/$eventId/standings';
+
+  // Championship (phases, tables and knockout bracket according to the event's format)
+  static String championshipByEvent(String eventId) =>
+      '/events/$eventId/championship';
+
+  // Scorers, assists and cards of an event
+  static String playerStatsByEvent(String eventId) =>
+      '/events/$eventId/player-stats';
 }

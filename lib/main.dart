@@ -9,6 +9,7 @@ import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/modules/modules_setup.dart';
 import 'package:sport_platform/core/routes/app_navigator.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
+import 'package:sport_platform/core/services/locale_storage.dart';
 import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_theme.dart';
@@ -22,18 +23,15 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   setupServiceLocator();
   registerModules();
+  final startLocale = await LocaleStorage.load();
   EasyLocalization.logger.enableBuildModes = [];
   runApp(
     EasyLocalization(
-      supportedLocales: const [
-        Locale('es'),
-        Locale('en'),
-        Locale('fr'),
-        Locale('de'),
-      ],
+      supportedLocales: LocaleStorage.supportedLocales,
       path: 'assets/translations',
-      fallbackLocale: const Locale('es'),
-      startLocale: const Locale('es'),
+      fallbackLocale: LocaleStorage.defaultLocale,
+      // El idioma que el usuario eligió la última vez (español si nunca eligió).
+      startLocale: startLocale,
       child: const SportsPlatform(),
     ),
   );

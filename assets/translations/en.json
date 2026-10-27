@@ -108,7 +108,6 @@
   },
   "mobile": {
     "home": {
-      "invitations_note": "Team invitations are sent to your registered email; the app does not yet have an invitation inbox.",
       "load_error": "The overview could not be loaded.",
       "retry_hint": "Pull down to try again.",
       "next_match": "Next match",
@@ -136,7 +135,10 @@
       "all": "All",
       "load_error": "Matches could not be loaded.",
       "empty_title": "No matches to show",
-      "empty_subtitle": "The schedule and results will appear here."
+      "empty_subtitle": "The schedule and results will appear here.",
+      "scope_mine": "My team",
+      "scope_all": "All",
+      "empty_mine_subtitle": "Your team's matches will appear here."
     },
     "courts": {
       "load_error": "Courts could not be loaded.",
@@ -344,7 +346,8 @@
     "match_action_error": "Error updating the match",
     "schedule_blocked_dates": "Blocked dates",
     "schedule_add_blocked_date": "Add blocked date",
-    "schedule_pick_blocked_date": "Select a date to block"
+    "schedule_pick_blocked_date": "Select a date to block",
+    "standings_col_gd": "GD"
   },
   "menu": {
     "home": "Home",
@@ -354,7 +357,10 @@
     "courts": "Courts",
     "admin": {
       "events": "Events",
-      "teams": "Teams"
+      "teams": "Teams",
+      "group_competition": "Competition",
+      "group_teams": "Teams and categories",
+      "group_facilities": "Facilities"
     },
     "leagues": {
       "title": "Leagues",
@@ -367,7 +373,7 @@
       "tooltip": "View available tournaments"
     }
   },
-    "events": {
+  "events": {
     "event_league": {
       "name": "Leagues",
       "description": "Leagues"
@@ -460,5 +466,136 @@
     "delete": "Delete",
     "retry": "Retry",
     "create": "Create"
+  },
+  "championship": {
+    "tab_title": "Championship",
+    "load_error": "The championship could not be loaded.",
+    "none_title": "This event has no stages",
+    "none_subtitle": "Only events with a championship format show stages, tables and a bracket.",
+    "nothing_generated": "No championship matches have been generated yet.",
+    "bracket": "KNOCKOUT",
+    "champion": "Champion: {}",
+    "tbd": "To be decided",
+    "bye": "Bye",
+    "needs_tiebreak": "Level: the organizer decides who advances",
+    "owner_hint": "You manage this stage from the admin panel.",
+    "round_final": "Final",
+    "round_semifinals": "Semi-finals",
+    "round_quarterfinals": "Quarter-finals",
+    "round_round_of_16": "Round of 16",
+    "round_number": "Round {}",
+    "table_group": "Group {}",
+    "tables": {
+      "LEAGUE": "League table",
+      "GROUPS": "Groups",
+      "SWISS": "Swiss standings",
+      "KNOCKOUT": "Knockout",
+      "DOUBLE_ELIMINATION": "Double elimination"
+    },
+    "structures": {
+      "ROUND_ROBIN": "League (round robin)",
+      "SWISS": "Swiss system",
+      "KNOCKOUT": "Single elimination",
+      "DOUBLE_ELIMINATION": "Double elimination",
+      "GROUPS_KNOCKOUT": "Groups + knockout",
+      "LEAGUE_KNOCKOUT": "League + playoffs",
+      "SWISS_KNOCKOUT": "Swiss + playoffs"
+    },
+    "phases": {
+      "LEAGUE": "League",
+      "GROUPS": "Groups",
+      "SWISS": "Swiss",
+      "KNOCKOUT": "Knockout",
+      "DOUBLE_ELIMINATION": "Double elimination"
+    },
+    "next_step": {
+      "NO_FORMAT": "This event has no championship.",
+      "NOT_ENOUGH_TEAMS": "Not enough teams: {registered} registered, {required} needed.",
+      "GENERATE_CALENDAR": "The organizer must generate the calendar.",
+      "GENERATE_ROUND": "The organizer must generate the next round.",
+      "WAITING_RESULTS": "Waiting for {pending} results to continue.",
+      "NEEDS_TIEBREAK": "A tie ended level: the organizer must decide who advances.",
+      "FINISHED": "The championship is over."
+    },
+    "stages": {
+      "LEAGUE": "League",
+      "GROUP": "Group",
+      "SWISS": "Swiss",
+      "KNOCKOUT": "Knockout",
+      "THIRD_PLACE": "Third place",
+      "WINNERS": "Winners bracket",
+      "LOSERS": "Losers bracket",
+      "GRAND_FINAL": "Grand final"
+    }
+  },
+  "match_events": {
+    "types": {
+      "GOAL": "Goal",
+      "ASSIST": "Assist",
+      "YELLOW_CARD": "Yellow card",
+      "RED_CARD": "Red card",
+      "FOUL": "Foul"
+    }
+  },
+  "match_detail": {
+    "title": "Match details",
+    "timeline": "TIMELINE",
+    "error_load": "The match timeline could not be loaded.",
+    "empty_title": "No events recorded",
+    "empty_subtitle": "The goals, cards and fouls of the match will appear here.",
+    "unknown_player": "Unknown player"
+  },
+  "invitations": {
+    "title": "Invitations",
+    "empty_title": "No pending invitations",
+    "empty_subtitle": "When a team invites you to join, you will see it here.",
+    "unknown_team": "Team",
+    "invited_you": "Invited you to join their team.",
+    "expires": "Expires on {}",
+    "accept": "Accept",
+    "decline": "Decline",
+    "accepted": "You are now part of {}.",
+    "declined": "Invitation declined.",
+    "pending_count": "You have {count} pending invitations",
+    "error_generic": "The action could not be completed. Please try again.",
+    "errors": {
+      "NOT_PENDING": "This invitation was already answered.",
+      "EXPIRED": "This invitation has expired.",
+      "TEAM_NOT_FOUND": "The team that invited you no longer exists.",
+      "PLAYER_NOT_FOUND": "You need to register as a player to accept this invitation."
+    }
+  },
+  "rankings": {
+    "standings": "Standings",
+    "scorers": "Top scorers",
+    "assists": "Assists",
+    "cards": "Cards",
+    "event": "Event",
+    "empty_title": "No data yet",
+    "empty_subtitle": "Leaders will appear once goals and cards are recorded.",
+    "load_error": "The rankings could not be loaded.",
+    "no_events_title": "No events",
+    "no_events_subtitle": "Rankings will appear when there are events."
+  },
+  "reports": {
+    "load_error": "The report could not be loaded.",
+    "no_team_title": "You do not have a team yet",
+    "no_team_subtitle": "Once you are added to a team, its report will appear here.",
+    "no_results_title": "No results yet",
+    "no_results_subtitle": "The report is built from matches that already have a result.",
+    "played": "Played",
+    "won": "Won",
+    "drawn": "Drawn",
+    "lost": "Lost",
+    "win_rate": "{}% of matches won",
+    "goals_for": "Goals for",
+    "goals_against": "Goals against",
+    "goal_difference": "Difference",
+    "recent_form": "Recent form",
+    "form_win": "W",
+    "form_draw": "D",
+    "form_loss": "L",
+    "by_event": "By event",
+    "event_summary": "{won}W {drawn}D {lost}L"
   }
 }

@@ -13,6 +13,10 @@ class MatchModel {
   final String eventId;
   final DateTime createdAt;
 
+  /// Cuándo termina el partido (hora + duración + descanso); a partir de ahí se puede registrar su
+  /// resultado. Lo calcula el backend: es null si no lo envía.
+  final DateTime? endsAt;
+
   const MatchModel({
     required this.id,
     required this.homeTeamId,
@@ -25,7 +29,10 @@ class MatchModel {
     this.courtId,
     required this.eventId,
     required this.createdAt,
+    this.endsAt,
   });
+
+  bool get hasScore => homeScore != null && awayScore != null;
 
   factory MatchModel.fromJson(Map<String, dynamic> json) {
     return MatchModel(
@@ -44,6 +51,9 @@ class MatchModel {
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'].toString())
           : DateTime.now(),
+      endsAt: json['endsAt'] != null
+          ? DateTime.parse(json['endsAt'].toString())
+          : null,
     );
   }
 
@@ -71,6 +81,7 @@ class MatchModel {
     String? courtId,
     String? eventId,
     DateTime? createdAt,
+    DateTime? endsAt,
   }) =>
       MatchModel(
         id: id ?? this.id,
@@ -84,6 +95,7 @@ class MatchModel {
         courtId: courtId ?? this.courtId,
         eventId: eventId ?? this.eventId,
         createdAt: createdAt ?? this.createdAt,
+        endsAt: endsAt ?? this.endsAt,
       );
 
   static String apiDateTime(DateTime d) =>

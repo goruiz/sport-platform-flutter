@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
+import 'package:sport_platform/core/network/response_parser.dart';
 import '../models/player_model.dart';
 
 class PlayersService {
@@ -50,6 +51,18 @@ class PlayersService {
                   : null;
       if (data == null) return null;
       return PlayerModel.fromJson(data);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) return null;
+      rethrow;
+    }
+  }
+
+  /// El jugador que corresponde a la cuenta con sesión iniciada, o null si la cuenta aún no tiene
+  /// (un 404 del backend significa "no existe", no un error).
+  Future<PlayerModel?> getCurrent() async {
+    try {
+      final response = await _client.get(ApiEndpoints.playersMe);
+      return PlayerModel.fromJson(ResponseParser.toMap(response.data));
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return null;
       rethrow;

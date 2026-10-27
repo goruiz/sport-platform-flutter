@@ -19,6 +19,7 @@ class MatchDaySection extends StatelessWidget {
   final Future<void> Function(MatchModel)? onMatchPostpone;
   final Future<void> Function(MatchModel)? onMatchSuspend;
   final Future<void> Function(MatchModel, DateTime)? onMatchReschedule;
+  final void Function(MatchModel)? onOpen;
 
   const MatchDaySection({
     super.key,
@@ -33,6 +34,7 @@ class MatchDaySection extends StatelessWidget {
     this.onMatchPostpone,
     this.onMatchSuspend,
     this.onMatchReschedule,
+    this.onOpen,
   });
 
   Future<void> _handlePostpone(BuildContext context) async {
@@ -124,6 +126,7 @@ class MatchDaySection extends StatelessWidget {
               match: m,
               homeTeamName: teamMap[m.homeTeamId] ?? m.homeTeamId,
               awayTeamName: teamMap[m.awayTeamId] ?? m.awayTeamId,
+              onTap: onOpen == null ? null : () => onOpen!(m),
               onEdit: isOwner ? () => onEdit(m) : null,
               onDelete: isOwner ? () => onDelete(m) : null,
               onMatchPostpone: isOwner && onMatchPostpone != null

@@ -19,6 +19,7 @@ class LeagueMatchesTab extends StatelessWidget {
   final Future<void> Function(MatchModel)? onMatchPostpone;
   final Future<void> Function(MatchModel)? onMatchSuspend;
   final Future<void> Function(MatchModel, DateTime)? onMatchReschedule;
+  final void Function(MatchModel)? onOpen;
 
   const LeagueMatchesTab({
     super.key,
@@ -34,6 +35,7 @@ class LeagueMatchesTab extends StatelessWidget {
     this.onMatchPostpone,
     this.onMatchSuspend,
     this.onMatchReschedule,
+    this.onOpen,
   });
 
   @override
@@ -72,6 +74,7 @@ class LeagueMatchesTab extends StatelessWidget {
             onMatchPostpone: onMatchPostpone,
             onMatchSuspend: onMatchSuspend,
             onMatchReschedule: onMatchReschedule,
+            onOpen: onOpen,
           );
         },
       ),

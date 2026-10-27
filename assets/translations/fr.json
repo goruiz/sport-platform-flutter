@@ -108,7 +108,6 @@
   },
   "mobile": {
     "home": {
-      "invitations_note": "Les invitations d'équipe sont envoyées à votre adresse e-mail ; l'application ne dispose pas encore de boîte de réception.",
       "load_error": "Impossible de charger le résumé.",
       "retry_hint": "Tirez vers le bas pour réessayer.",
       "next_match": "Prochain match",
@@ -136,7 +135,10 @@
       "all": "Tous",
       "load_error": "Impossible de charger les matchs.",
       "empty_title": "Aucun match à afficher",
-      "empty_subtitle": "Le calendrier et les résultats apparaîtront ici."
+      "empty_subtitle": "Le calendrier et les résultats apparaîtront ici.",
+      "scope_mine": "Mon équipe",
+      "scope_all": "Tous",
+      "empty_mine_subtitle": "Les matchs de votre équipe apparaîtront ici."
     },
     "courts": {
       "load_error": "Impossible de charger les terrains.",
@@ -309,7 +311,43 @@
     "match_action_error": "Erreur lors de la mise à jour du match",
     "schedule_blocked_dates": "Dates bloquées",
     "schedule_add_blocked_date": "Ajouter une date bloquée",
-    "schedule_pick_blocked_date": "Sélectionner une date à bloquer"
+    "schedule_pick_blocked_date": "Sélectionner une date à bloquer",
+    "standings_col_gd": "DB",
+    "auto_schedule_title": "Programmation automatique",
+    "auto_schedule_subtitle": "Définissez l’horaire et générez automatiquement tous les matchs du tournoi en round-robin",
+    "schedule_play_days": "Jours de jeu",
+    "schedule_start_time": "Heure de début",
+    "schedule_durations": "Durées (minutes)",
+    "schedule_match_duration": "Durée du match",
+    "schedule_halves_break": "Pause entre les mi-temps",
+    "schedule_match_break": "Temps entre les matchs",
+    "schedule_save_config": "Enregistrer la configuration",
+    "schedule_generate": "Générer les matchs",
+    "schedule_config_saved": "Configuration enregistrée",
+    "schedule_generated": "{count} matchs générés avec succès",
+    "schedule_days_required": "Sélectionnez au moins un jour de jeu",
+    "schedule_no_space": "Pas assez de place dans le calendrier pour tous les matchs. Ajoutez des jours de jeu ou prolongez la période.",
+    "schedule_error_save": "Erreur lors de l’enregistrement de la configuration",
+    "schedule_error_generate": "Erreur lors de la génération des matchs",
+    "schedule_invalid_minutes": "Entrez une valeur valide",
+    "day_monday": "Lun",
+    "day_tuesday": "Mar",
+    "day_wednesday": "Mer",
+    "day_thursday": "Jeu",
+    "day_friday": "Ven",
+    "day_saturday": "Sam",
+    "day_sunday": "Dim",
+    "match_day_label": "Journée {n}",
+    "match_day_reschedule": "Reprogrammer la journée",
+    "match_day_postpone": "Reporter la journée",
+    "match_day_pick_date": "Sélectionnez la nouvelle date",
+    "match_day_confirm_reschedule": "Déplacer tous les matchs du {from} au {to} ?",
+    "match_day_confirm_postpone": "Reporter tous les matchs du {date} ? Ils seront marqués comme reportés.",
+    "match_day_reschedule_confirm": "Reprogrammer",
+    "match_day_postpone_confirm": "Reporter",
+    "match_day_rescheduled": "Journée reprogrammée avec succès",
+    "match_day_postponed": "Journée reportée",
+    "match_day_error": "Erreur lors de la mise à jour de la journée"
   },
   "menu": {
     "home": "Accueil",
@@ -319,7 +357,10 @@
     "courts": "Terrains",
     "admin": {
       "events": "Événements",
-      "teams": "Équipes"
+      "teams": "Équipes",
+      "group_competition": "Compétition",
+      "group_teams": "Équipes et catégories",
+      "group_facilities": "Installations"
     },
     "leagues": {
       "title": "Liges",
@@ -425,5 +466,136 @@
     "delete": "Supprimer",
     "retry": "Réessayer",
     "create": "Créer"
+  },
+  "championship": {
+    "tab_title": "Championnat",
+    "load_error": "Impossible de charger le championnat.",
+    "none_title": "Cet événement n’a pas de phases",
+    "none_subtitle": "Seuls les événements avec un format de championnat affichent des phases, des classements et un tableau.",
+    "nothing_generated": "Aucun match du championnat n’a encore été généré.",
+    "bracket": "PHASE FINALE",
+    "champion": "Champion : {}",
+    "tbd": "À définir",
+    "bye": "Qualifié d’office",
+    "needs_tiebreak": "Égalité : l’organisateur décide qui se qualifie",
+    "owner_hint": "Vous gérez cette phase depuis le panneau d’administration.",
+    "round_final": "Finale",
+    "round_semifinals": "Demi-finales",
+    "round_quarterfinals": "Quarts de finale",
+    "round_round_of_16": "Huitièmes de finale",
+    "round_number": "Tour {}",
+    "table_group": "Groupe {}",
+    "tables": {
+      "LEAGUE": "Classement du championnat",
+      "GROUPS": "Groupes",
+      "SWISS": "Classement suisse",
+      "KNOCKOUT": "Élimination directe",
+      "DOUBLE_ELIMINATION": "Double élimination"
+    },
+    "structures": {
+      "ROUND_ROBIN": "Championnat (tous contre tous)",
+      "SWISS": "Système suisse",
+      "KNOCKOUT": "Élimination directe",
+      "DOUBLE_ELIMINATION": "Double élimination",
+      "GROUPS_KNOCKOUT": "Groupes + phase finale",
+      "LEAGUE_KNOCKOUT": "Championnat + playoffs",
+      "SWISS_KNOCKOUT": "Suisse + playoffs"
+    },
+    "phases": {
+      "LEAGUE": "Championnat",
+      "GROUPS": "Groupes",
+      "SWISS": "Suisse",
+      "KNOCKOUT": "Élimination directe",
+      "DOUBLE_ELIMINATION": "Double élimination"
+    },
+    "next_step": {
+      "NO_FORMAT": "Cet événement n’a pas de championnat.",
+      "NOT_ENOUGH_TEAMS": "Pas assez d’équipes : {registered} inscrites, {required} nécessaires.",
+      "GENERATE_CALENDAR": "L’organisateur doit générer le calendrier.",
+      "GENERATE_ROUND": "L’organisateur doit générer le tour suivant.",
+      "WAITING_RESULTS": "En attente de {pending} résultats pour continuer.",
+      "NEEDS_TIEBREAK": "Une confrontation est à égalité : l’organisateur doit décider qui se qualifie.",
+      "FINISHED": "Le championnat est terminé."
+    },
+    "stages": {
+      "LEAGUE": "Championnat",
+      "GROUP": "Groupe",
+      "SWISS": "Suisse",
+      "KNOCKOUT": "Élimination directe",
+      "THIRD_PLACE": "Match pour la 3e place",
+      "WINNERS": "Tableau des vainqueurs",
+      "LOSERS": "Tableau des perdants",
+      "GRAND_FINAL": "Grande finale"
+    }
+  },
+  "match_events": {
+    "types": {
+      "GOAL": "But",
+      "ASSIST": "Passe décisive",
+      "YELLOW_CARD": "Carton jaune",
+      "RED_CARD": "Carton rouge",
+      "FOUL": "Faute"
+    }
+  },
+  "match_detail": {
+    "title": "Détail du match",
+    "timeline": "CHRONOLOGIE",
+    "error_load": "Impossible de charger la chronologie du match.",
+    "empty_title": "Aucun événement enregistré",
+    "empty_subtitle": "Les buts, cartons et fautes du match apparaîtront ici.",
+    "unknown_player": "Joueur inconnu"
+  },
+  "invitations": {
+    "title": "Invitations",
+    "empty_title": "Aucune invitation en attente",
+    "empty_subtitle": "Lorsqu’une équipe vous invite à la rejoindre, vous la verrez ici.",
+    "unknown_team": "Équipe",
+    "invited_you": "Vous a invité à rejoindre son équipe.",
+    "expires": "Expire le {}",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "accepted": "Vous faites maintenant partie de {}.",
+    "declined": "Invitation refusée.",
+    "pending_count": "Vous avez {count} invitations en attente",
+    "error_generic": "Impossible de terminer l’action. Réessayez.",
+    "errors": {
+      "NOT_PENDING": "Cette invitation a déjà reçu une réponse.",
+      "EXPIRED": "Cette invitation a expiré.",
+      "TEAM_NOT_FOUND": "L’équipe qui vous a invité n’existe plus.",
+      "PLAYER_NOT_FOUND": "Vous devez vous inscrire comme joueur pour accepter cette invitation."
+    }
+  },
+  "rankings": {
+    "standings": "Classement",
+    "scorers": "Buteurs",
+    "assists": "Passeurs",
+    "cards": "Cartons",
+    "event": "Événement",
+    "empty_title": "Pas encore de données",
+    "empty_subtitle": "Les meilleurs apparaîtront lorsque des buts et des cartons seront enregistrés.",
+    "load_error": "Impossible de charger les classements.",
+    "no_events_title": "Aucun événement",
+    "no_events_subtitle": "Les classements apparaîtront lorsqu’il y aura des événements."
+  },
+  "reports": {
+    "load_error": "Impossible de charger le rapport.",
+    "no_team_title": "Vous n’avez pas encore d’équipe",
+    "no_team_subtitle": "Lorsque vous serez ajouté à une équipe, son rapport apparaîtra ici.",
+    "no_results_title": "Pas encore de résultats",
+    "no_results_subtitle": "Le rapport est établi à partir des matchs qui ont déjà un résultat.",
+    "played": "Joués",
+    "won": "Gagnés",
+    "drawn": "Nuls",
+    "lost": "Perdus",
+    "win_rate": "{} % de matchs gagnés",
+    "goals_for": "Buts marqués",
+    "goals_against": "Buts encaissés",
+    "goal_difference": "Différence",
+    "recent_form": "Forme récente",
+    "form_win": "V",
+    "form_draw": "N",
+    "form_loss": "D",
+    "by_event": "Par événement",
+    "event_summary": "{won}V {drawn}N {lost}D"
   }
 }

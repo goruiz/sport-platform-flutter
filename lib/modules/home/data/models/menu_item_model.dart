@@ -103,6 +103,13 @@ class MenuItemModel {
     'sports_basketball': Icons.sports_basketball,
     'sports_tennis':     Icons.sports_tennis,
     'sports_volleyball': Icons.sports_volleyball,
+    // Icons the backend shares with the Angular panel, which names them after CoreUI.
+    'cilSoccer':         Icons.sports_soccer,
+    'cilGroup':          Icons.groups,
+    'cilHouse':          Icons.stadium,
+    'cilShieldAlt':      Icons.shield,
+    'cilCalendar':       Icons.event,
+    'cilLocationPin':    Icons.location_on,
   };
 
   static const Map<String, IconData> _outlinedIcons = {

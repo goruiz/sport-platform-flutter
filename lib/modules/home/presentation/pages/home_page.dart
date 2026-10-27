@@ -2,11 +2,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
+import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/home/data/datasource/menu_service.dart';
 import 'package:sport_platform/modules/home/presentation/enums/menu_style.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/home_tab.dart';
+import 'package:sport_platform/modules/home/presentation/widgets/notification_bell.dart';
+import 'package:sport_platform/modules/players/presentation/providers/invitations_notifier.dart';
 import 'package:sport_platform/core/routes/app_route_factory.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/quick_actions_drawer.dart';
 import 'package:sport_platform/shared/widgets/language_selector.dart';
@@ -34,6 +37,8 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _loadMenu();
+    // La campana y la tarjeta de invitaciones del inicio leen este mismo estado.
+    getIt<InvitationsNotifier>().load();
   }
 
   Future<void> _loadMenu() async {
@@ -166,10 +171,7 @@ class _HomePageState extends State<HomePage> {
           }),
         ),
         const LanguageSelector(),
-        const IconButton(
-          icon: Icon(Icons.notifications_outlined, color: AppColors.white),
-          onPressed: null,
-        ),
+        const NotificationBell(),
         const LogoutButton(),
         const SizedBox(width: 4),
       ],
