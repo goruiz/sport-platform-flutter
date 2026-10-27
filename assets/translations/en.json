@@ -360,7 +360,8 @@
       "teams": "Teams",
       "group_competition": "Competition",
       "group_teams": "Teams and categories",
-      "group_facilities": "Facilities"
+      "group_facilities": "Facilities",
+      "group_mobile_app": "My competition"
     },
     "leagues": {
       "title": "Leagues",

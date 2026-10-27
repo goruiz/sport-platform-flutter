@@ -110,6 +110,7 @@ class MenuItemModel {
     'cilShieldAlt':      Icons.shield,
     'cilCalendar':       Icons.event,
     'cilLocationPin':    Icons.location_on,
+    'cilMobile':         Icons.smartphone,
   };
 
   static const Map<String, IconData> _outlinedIcons = {

@@ -360,7 +360,8 @@
       "teams": "Équipes",
       "group_competition": "Compétition",
       "group_teams": "Équipes et catégories",
-      "group_facilities": "Installations"
+      "group_facilities": "Installations",
+      "group_mobile_app": "Ma compétition"
     },
     "leagues": {
       "title": "Liges",
