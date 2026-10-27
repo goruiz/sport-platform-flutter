@@ -463,6 +463,7 @@
     "phone": "Teléfono (opcional)",
     "register_button": "Crear cuenta",
     "success": "¡Cuenta creada! Ya eres parte del equipo.",
+    "success_sign_in": "¡Cuenta creada! Inicia sesión para continuar.",
     "error_token_used": "Este enlace ya fue utilizado o expiró.",
     "error_token_expired": "Este enlace ha expirado.",
     "error_token_invalid": "Enlace de invitación inválido.",

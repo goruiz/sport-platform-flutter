@@ -463,6 +463,7 @@
     "phone": "Telefon (optional)",
     "register_button": "Konto erstellen",
     "success": "Konto erstellt! Sie sind jetzt Teil des Teams.",
+    "success_sign_in": "Konto erstellt! Melden Sie sich an, um fortzufahren.",
     "error_token_used": "Dieser Link wurde bereits verwendet oder ist abgelaufen.",
     "error_token_expired": "Dieser Link ist abgelaufen.",
     "error_token_invalid": "Ungültiger Einladungslink.",

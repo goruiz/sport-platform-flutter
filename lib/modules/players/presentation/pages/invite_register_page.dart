@@ -2,7 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/modules/auth/data/datasource/login_service.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
+import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/modules/players/data/datasource/players_auth_service.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
@@ -31,6 +33,7 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
   bool _isLoading = false;
 
   final _authService = PlayersAuthService();
+  final _loginService = LoginService();
 
   @override
   void dispose() {
@@ -56,12 +59,9 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
         inviteToken: widget.inviteToken,
         phone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
       );
+      final isSignedIn = await _signInWithNewAccount();
       if (!mounted) return;
-      AppSnackbar.success(context, 'invite_register.success'.tr());
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-        (_) => false,
-      );
+      _openAppAfterRegistering(isSignedIn: isSignedIn);
     } on DioException catch (e) {
       if (!mounted) return;
       final body = e.response?.data;
@@ -83,6 +83,32 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  // El backend crea la cuenta junto con el jugador: entra con la contraseña que acaba de elegir.
+  // Si no se puede (p. ej. se cayó la red) la cuenta igual quedó creada, así que no es un error del registro.
+  Future<bool> _signInWithNewAccount() async {
+    try {
+      await _loginService.signIn(
+        email: _emailCtrl.text.trim(),
+        password: _passwordCtrl.text,
+      );
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  void _openAppAfterRegistering({required bool isSignedIn}) {
+    final messageKey =
+        isSignedIn ? 'invite_register.success' : 'invite_register.success_sign_in';
+    AppSnackbar.success(context, messageKey.tr());
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => isSignedIn ? const HomePage() : const LoginPage(),
+      ),
+      (_) => false,
+    );
   }
 
   @override

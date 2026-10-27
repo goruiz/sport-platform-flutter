@@ -2,10 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
-import 'package:sport_platform/core/network/api_endpoints.dart';
-import 'package:sport_platform/core/network/dio_client.dart';
-import 'package:sport_platform/core/services/auth_storage.dart';
-import 'package:sport_platform/core/services/user_session.dart';
+import 'package:sport_platform/modules/auth/data/datasource/login_service.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/register_page.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/password_recovery_page.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/login_body.dart';
@@ -31,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   );
   bool _obscurePassword = true;
   bool _isLoading = false;
-  final _client = DioClient();
+  final _loginService = LoginService();
 
   @override
   void dispose() {
@@ -45,17 +42,10 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await _client.post(
-        ApiEndpoints.login,
-        data: {
-          'email': _emailController.text.trim(),
-          'password': _passwordController.text,
-          'clientType': 'MOBILE_APP',
-        },
+      await _loginService.signIn(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
       );
-      final token = response.data['data']['token'] as String;
-      await AuthStorage.saveToken(token);
-      await UserSession.loadFromToken(token);
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const HomePage()),
