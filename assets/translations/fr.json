@@ -361,18 +361,36 @@
       "group_competition": "Compétition",
       "group_teams": "Équipes et catégories",
       "group_facilities": "Installations",
-      "group_mobile_app": "Ma compétition"
+      "group_results": "Résultats et statistiques",
+      "group_mobile_app": "Ligues et tournois",
+      "group_competition_description": "Les événements de votre compétition",
+      "group_results_description": "Ligues, matchs, classements et rapports",
+      "group_teams_description": "Les équipes et leurs joueurs",
+      "group_facilities_description": "Les terrains où l’on joue",
+      "group_mobile_app_description": "Les ligues et tournois de la compétition",
+      "events_description": "Les événements de la compétition et leurs dates",
+      "teams_description": "Votre équipe et les autres équipes de la compétition",
+      "courts_description": "Où se jouent les matchs"
     },
     "leagues": {
-      "title": "Liges",
+      "title": "Ligues",
       "create_league": "Créer une ligue",
-      "tooltip": "Voir les ligues disponibles"
+      "tooltip": "Voir les ligues disponibles",
+      "description": "Les ligues auxquelles vous participez et toutes les autres"
     },
     "tournaments": {
-      "title": "Torneos",
+      "title": "Tournois",
       "create_tournament": "Créer un tournoi",
-      "tooltip": "Voir les tournois disponibles"
-    }
+      "tooltip": "Voir les tournois disponibles",
+      "description": "Les tournois de la compétition"
+    },
+    "league_ranking": "Classement de la ligue",
+    "league_ranking_description": "Le classement de la ligue",
+    "home_description": "Votre prochain match, votre équipe et vos invitations",
+    "matches_description": "Les matchs de votre équipe et de toute la compétition",
+    "rankings_description": "Classements et leaders de chaque événement",
+    "reports_description": "Le bilan de votre équipe dans chaque événement",
+    "profile_description": "Vos informations et votre compte"
   },
   "events": {
     "event_league": {

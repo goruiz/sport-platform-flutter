@@ -55,7 +55,7 @@ class _EventsPageState extends State<EventsPage> {
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
         title: Text(
-          widget.item.displayName.tr(),
+          widget.item.localizedName,
           style: const TextStyle(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.white),

@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/routes/app_route_factory.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
@@ -85,7 +84,7 @@ class QuickActionCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6),
               child: Text(
-                item.displayName.tr(),
+                item.localizedName,
                 style: const TextStyle(
                   color: AppColors.white,
                   fontSize: 11,

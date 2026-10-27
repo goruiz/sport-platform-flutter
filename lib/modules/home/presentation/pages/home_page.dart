@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> {
           .map((item) => BottomNavigationBarItem(
                 icon: Icon(MenuItemModel.iconOutlinedFromString(item.icon)),
                 activeIcon: Icon(MenuItemModel.iconFromString(item.icon)),
-                label: item.displayName.tr(),
+                label: item.localizedName,
               ))
           .toList(),
     );

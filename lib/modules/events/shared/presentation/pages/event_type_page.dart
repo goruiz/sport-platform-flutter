@@ -108,7 +108,7 @@ class _EventTypePageState extends State<EventTypePage> {
         appBar: AppBar(
           backgroundColor: AppColors.primaryDark,
           title: Text(
-            widget.menuItem.displayName.tr(),
+            widget.menuItem.localizedName,
             style: const TextStyle(color: AppColors.white),
           ),
           iconTheme: const IconThemeData(color: AppColors.white),

@@ -361,18 +361,36 @@
       "group_competition": "Competition",
       "group_teams": "Teams and categories",
       "group_facilities": "Facilities",
-      "group_mobile_app": "My competition"
+      "group_results": "Results and statistics",
+      "group_mobile_app": "Leagues and tournaments",
+      "group_competition_description": "Your competition’s events",
+      "group_results_description": "Leagues, matches, rankings and reports",
+      "group_teams_description": "Teams and their players",
+      "group_facilities_description": "The courts where games are played",
+      "group_mobile_app_description": "The competition’s leagues and tournaments",
+      "events_description": "The competition’s events and their dates",
+      "teams_description": "Your team and the competition’s other teams",
+      "courts_description": "Where the matches are played"
     },
     "leagues": {
       "title": "Leagues",
       "create_league": "View available leagues",
-      "tooltip": "View available leagues"
+      "tooltip": "View available leagues",
+      "description": "The leagues you take part in and all the others"
     },
     "tournaments": {
       "title": "Tournaments",
       "create_tournament": "View available tournaments",
-      "tooltip": "View available tournaments"
-    }
+      "tooltip": "View available tournaments",
+      "description": "The competition’s tournaments"
+    },
+    "league_ranking": "League ranking",
+    "league_ranking_description": "The league’s standings table",
+    "home_description": "Your next match, your team and your invitations",
+    "matches_description": "Your team’s matches and the whole competition’s",
+    "rankings_description": "Standings and leaders of each event",
+    "reports_description": "Your team’s record in each event",
+    "profile_description": "Your details and your account"
   },
   "events": {
     "event_league": {

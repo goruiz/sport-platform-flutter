@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class MenuItemModel {
@@ -5,6 +6,7 @@ class MenuItemModel {
   final String name;
   final String? translationKey;
   final String? description;
+  final String? descriptionTranslationKey;
   final String? icon;
   final String? url;
   final int order;
@@ -17,6 +19,7 @@ class MenuItemModel {
     required this.name,
     this.translationKey,
     this.description,
+    this.descriptionTranslationKey,
     this.icon,
     this.url,
     this.order = 0,
@@ -25,9 +28,22 @@ class MenuItemModel {
     this.children = const [],
   });
 
-  /// Returns the translation key when available, otherwise the raw name.
-  /// Call .tr() on this value to get the localized string.
-  String get displayName => translationKey ?? name;
+  /// The name in the app's language: the dictionary's text for [translationKey], or the [name] the database stores
+  /// when there is no key or the dictionary does not have it.
+  String get localizedName => _translateOr(translationKey, name);
+
+  /// The description in the app's language, resolved like [localizedName]; null when the item has none.
+  String? get localizedDescription {
+    final text = _translateOr(descriptionTranslationKey, description ?? '');
+    return text.isEmpty ? null : text;
+  }
+
+  /// `tr()` answers the key itself when the dictionary does not know it, which would show "menu.something" on screen.
+  static String _translateOr(String? key, String fallback) {
+    if (key == null || key.isEmpty) return fallback;
+    final translated = key.tr();
+    return translated == key ? fallback : translated;
+  }
 
   factory MenuItemModel.fromJson(Map<String, dynamic> json) {
     // Handles both nested (submenus/children arrays) and flat (id_parent_menu) responses
@@ -45,6 +61,7 @@ class MenuItemModel {
       name: json['name'] as String? ?? '',
       translationKey: json['translationKey'] as String?,
       description: json['description'] as String?,
+      descriptionTranslationKey: json['descriptionTranslationKey'] as String?,
       icon: json['icon'] as String?,
       url: json['url'] as String?,
       order: (json['order'] as num?)?.toInt() ?? 0,
@@ -59,6 +76,7 @@ class MenuItemModel {
         name: name,
         translationKey: translationKey,
         description: description,
+        descriptionTranslationKey: descriptionTranslationKey,
         icon: icon,
         url: url,
         order: order,
@@ -111,6 +129,7 @@ class MenuItemModel {
     'cilCalendar':       Icons.event,
     'cilLocationPin':    Icons.location_on,
     'cilMobile':         Icons.smartphone,
+    'cilChart':          Icons.bar_chart,
   };
 
   static const Map<String, IconData> _outlinedIcons = {

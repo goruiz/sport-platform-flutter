@@ -74,7 +74,7 @@ class _RankingsPageState extends State<RankingsPage>
       backgroundColor: AppColors.backgroundEnd,
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
-        title: Text(widget.item.displayName.tr(),
+        title: Text(widget.item.localizedName,
             style: const TextStyle(color: AppColors.white)),
         iconTheme: const IconThemeData(color: AppColors.white),
         bottom: TabBar(

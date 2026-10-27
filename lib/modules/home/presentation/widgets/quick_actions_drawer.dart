@@ -109,16 +109,16 @@ class QuickActionsDrawer extends StatelessWidget {
             child: ExpansionTile(
               leading: leading,
               title: Text(
-                item.displayName.tr(),
+                item.localizedName,
                 style: const TextStyle(
                   color: AppColors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              subtitle: item.description != null && item.description!.isNotEmpty
+              subtitle: item.localizedDescription != null
                   ? Text(
-                      item.description!,
+                      item.localizedDescription!,
                       style: const TextStyle(
                           color: AppColors.whiteSubtle, fontSize: 12),
                     )
@@ -148,13 +148,12 @@ class QuickActionsDrawer extends StatelessWidget {
                     ),
                   ),
                   title: Text(
-                    child.displayName.tr(),
+                    child.localizedName,
                     style: const TextStyle(color: AppColors.white, fontSize: 13),
                   ),
-                  subtitle: child.description != null &&
-                          child.description!.isNotEmpty
+                  subtitle: child.localizedDescription != null
                       ? Text(
-                          child.description!,
+                          child.localizedDescription!,
                           style: const TextStyle(
                               color: AppColors.whiteSubtle, fontSize: 11),
                         )
@@ -174,16 +173,16 @@ class QuickActionsDrawer extends StatelessWidget {
               const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
           leading: leading,
           title: Text(
-            item.displayName.tr(),
+            item.localizedName,
             style: const TextStyle(
               color: AppColors.white,
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
           ),
-          subtitle: item.description != null && item.description!.isNotEmpty
+          subtitle: item.localizedDescription != null
               ? Text(
-                  item.description!,
+                  item.localizedDescription!,
                   style: const TextStyle(
                       color: AppColors.whiteSubtle, fontSize: 12),
                 )

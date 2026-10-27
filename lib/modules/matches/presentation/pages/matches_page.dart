@@ -66,7 +66,7 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
       backgroundColor: AppColors.backgroundEnd,
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
-        title: Text(widget.item.displayName.tr(),
+        title: Text(widget.item.localizedName,
             style: const TextStyle(color: AppColors.white)),
         iconTheme: const IconThemeData(color: AppColors.white),
         actions: [

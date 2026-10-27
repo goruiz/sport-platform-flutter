@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
@@ -54,7 +53,7 @@ class ChildrenSheet extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  parent.displayName.tr(),
+                  parent.localizedName,
                   style: const TextStyle(
                     color: AppColors.white,
                     fontSize: 16,
@@ -88,13 +87,12 @@ class ChildrenSheet extends StatelessWidget {
                     ),
                   ),
                   title: Text(
-                    child.displayName.tr(),
+                    child.localizedName,
                     style: const TextStyle(color: AppColors.white, fontSize: 14),
                   ),
-                  subtitle: child.description != null &&
-                          child.description!.isNotEmpty
+                  subtitle: child.localizedDescription != null
                       ? Text(
-                          child.description!,
+                          child.localizedDescription!,
                           style: const TextStyle(
                               color: AppColors.whiteSubtle, fontSize: 12),
                         )

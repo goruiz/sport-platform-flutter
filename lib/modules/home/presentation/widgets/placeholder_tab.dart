@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
@@ -31,7 +30,7 @@ class PlaceholderTab extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              item.displayName.tr(),
+              item.localizedName,
               style: const TextStyle(
                 color: AppColors.white,
                 fontSize: 22,

@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
@@ -48,7 +47,7 @@ class _GenericModulePage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
         title: Text(
-          item.displayName.tr(),
+          item.localizedName,
           style: const TextStyle(color: AppColors.white),
         ),
         iconTheme: const IconThemeData(color: AppColors.white),

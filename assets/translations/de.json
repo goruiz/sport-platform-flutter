@@ -361,18 +361,36 @@
       "group_competition": "Wettbewerb",
       "group_teams": "Teams und Kategorien",
       "group_facilities": "Anlagen",
-      "group_mobile_app": "Mein Wettbewerb"
+      "group_results": "Ergebnisse und Statistiken",
+      "group_mobile_app": "Ligen und Turniere",
+      "group_competition_description": "Die Veranstaltungen deines Wettbewerbs",
+      "group_results_description": "Ligen, Spiele, Ranglisten und Berichte",
+      "group_teams_description": "Teams und ihre Spieler",
+      "group_facilities_description": "Die Plätze, auf denen gespielt wird",
+      "group_mobile_app_description": "Die Ligen und Turniere des Wettbewerbs",
+      "events_description": "Die Veranstaltungen des Wettbewerbs und ihre Termine",
+      "teams_description": "Dein Team und die anderen Teams des Wettbewerbs",
+      "courts_description": "Wo die Spiele stattfinden"
     },
     "leagues": {
       "title": "Ligen",
       "create_league": "Liga erstellen",
-      "tooltip": "Ligen anzeigen"
+      "tooltip": "Ligen anzeigen",
+      "description": "Die Ligen, an denen du teilnimmst, und alle anderen"
     },
     "tournaments": {
       "title": "Turniere",
       "create_tournament": "Turnier erstellen",
-      "tooltip": "Turniere anzeigen"
-    }
+      "tooltip": "Turniere anzeigen",
+      "description": "Die Turniere des Wettbewerbs"
+    },
+    "league_ranking": "Ligarangliste",
+    "league_ranking_description": "Die Tabelle der Liga",
+    "home_description": "Dein nächstes Spiel, dein Team und deine Einladungen",
+    "matches_description": "Die Spiele deines Teams und des ganzen Wettbewerbs",
+    "rankings_description": "Tabellen und Spitzenreiter jeder Veranstaltung",
+    "reports_description": "Die Bilanz deines Teams in jeder Veranstaltung",
+    "profile_description": "Deine Daten und dein Konto"
   },
   "events": {
     "event_league": {
@@ -380,8 +398,8 @@
       "description": "Liga"
     },
     "event_tournament": {
-      "name": "Tournament",
-      "description": "Tournament"
+      "name": "Turnier",
+      "description": "Turnier"
     },
     "status_active": "Aktiv",
     "status_upcoming": "Bevorstehend",
