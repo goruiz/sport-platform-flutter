@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:sport_platform/core/services/session_service.dart';
 import 'package:sport_platform/modules/players/data/datasource/team_invitations_service.dart';
 import 'package:sport_platform/modules/players/data/models/team_invitation_model.dart';
 import 'package:sport_platform/modules/players/domain/enums/team_invitation_error.dart';
@@ -9,13 +10,14 @@ class InvitationsNotifier extends ChangeNotifier {
   static const _genericErrorKey = 'invitations.error_generic';
 
   final TeamInvitationsService _service;
+  final SessionService _sessionService;
 
   List<TeamInvitationModel> _invitations = [];
   bool _loading = false;
   bool _loadedOnce = false;
   String? _error;
 
-  InvitationsNotifier(this._service);
+  InvitationsNotifier(this._service, this._sessionService);
 
   List<TeamInvitationModel> get invitations => List.unmodifiable(_invitations);
   int get pendingCount => _invitations.length;
@@ -44,8 +46,11 @@ class InvitationsNotifier extends ChangeNotifier {
 
   /// Acepta la invitación. Si el backend la rechaza devuelve la clave del motivo y vuelve a leer la
   /// lista (la invitación ya no es respondible); null si todo salió bien.
-  Future<String?> accept(String invitationId) =>
-      _answer(() => _service.accept(invitationId));
+  Future<String?> accept(String invitationId) => _answer(() async {
+        final newToken = await _service.accept(invitationId);
+        // Aceptar cambia el equipo y, con él, la organización de la cuenta: se renueva la sesión para verla.
+        if (newToken != null) await _sessionService.replaceToken(newToken);
+      });
 
   Future<String?> decline(String invitationId) =>
       _answer(() => _service.decline(invitationId));

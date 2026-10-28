@@ -32,7 +32,10 @@ const _leaguesNotifierName = 'leagues';
 
 void setupServiceLocator() {
   getIt.registerLazySingleton<SessionService>(
-    () => SessionService(resetSessionScopedState: _resetSessionScopedServices),
+    () => SessionService(
+      resetSessionScopedState: _resetSessionScopedServices,
+      resetOrganizationScopedState: _resetOrganizationScopedServices,
+    ),
   );
   getIt.registerLazySingleton<SessionExpiredListener>(
     () => SessionExpiredHandler(
@@ -59,7 +62,7 @@ void setupServiceLocator() {
   getIt.registerLazySingleton<PlayerStatsService>(() => PlayerStatsService());
   getIt.registerLazySingleton<TeamInvitationsService>(() => TeamInvitationsService());
   getIt.registerLazySingleton<InvitationsNotifier>(
-    () => InvitationsNotifier(getIt<TeamInvitationsService>()),
+    () => InvitationsNotifier(getIt<TeamInvitationsService>(), getIt<SessionService>()),
   );
   getIt.registerLazySingleton<EventsNotifier>(
     () => EventsNotifier(LeagueService()),
@@ -67,12 +70,17 @@ void setupServiceLocator() {
   );
 }
 
-/// Estado en memoria que pertenece al usuario de la sesión: no debe sobrevivir a ella
-/// para que el siguiente usuario no vea datos del anterior.
-void _resetSessionScopedServices() {
+/// Lo que el jugador ve depende de la organización de su cuenta: si cambia, lo que había en memoria ya no vale.
+void _resetOrganizationScopedServices() {
   if (getIt.isRegistered<EventsNotifier>(instanceName: _leaguesNotifierName)) {
     getIt.resetLazySingleton<EventsNotifier>(instanceName: _leaguesNotifierName);
   }
+}
+
+/// Estado en memoria que pertenece al usuario de la sesión: no debe sobrevivir a ella
+/// para que el siguiente usuario no vea datos del anterior.
+void _resetSessionScopedServices() {
+  _resetOrganizationScopedServices();
   if (getIt.isRegistered<InvitationsNotifier>()) {
     getIt.resetLazySingleton<InvitationsNotifier>();
   }

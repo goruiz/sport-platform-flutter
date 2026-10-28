@@ -21,4 +21,24 @@ void main() {
     expect(UserSession.current, isNull);
     expect(stateResets, 1);
   });
+
+  test('replaceToken cambia la sesión por la nueva y descarta solo lo de la organización', () async {
+    await AuthStorage.saveToken('token-viejo');
+    var sessionResets = 0;
+    var organizationResets = 0;
+    final sessionService = SessionService(
+      resetSessionScopedState: () => sessionResets++,
+      resetOrganizationScopedState: () => organizationResets++,
+    );
+
+    // JWT sin firma verificable: el payload es {"id":"user-1","email":"juan@email.com"}.
+    await sessionService.replaceToken(
+      'eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoianVhbkBlbWFpbC5jb20ifQ.firma',
+    );
+
+    expect(await AuthStorage.getToken(), startsWith('eyJhbGciOiJIUzI1NiJ9'));
+    expect(UserSession.current?.id, 'user-1');
+    expect(organizationResets, 1);
+    expect(sessionResets, 0);
+  });
 }

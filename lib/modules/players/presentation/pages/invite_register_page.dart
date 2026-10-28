@@ -6,6 +6,7 @@ import 'package:sport_platform/modules/auth/data/datasource/login_service.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
 import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/modules/players/data/datasource/players_auth_service.dart';
+import 'package:sport_platform/modules/players/domain/enums/team_invitation_error.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
@@ -64,25 +65,21 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
       _openAppAfterRegistering(isSignedIn: isSignedIn);
     } on DioException catch (e) {
       if (!mounted) return;
-      final body = e.response?.data;
-      final message = body is Map ? (body['message'] as String? ?? '') : '';
-      final lower = message.toLowerCase();
-
-      if (lower.contains('already been used') || lower.contains('expired')) {
-        AppSnackbar.error(context, 'invite_register.error_token_used'.tr());
-      } else if (lower.contains('invalid invitation token')) {
-        AppSnackbar.error(context, 'invite_register.error_token_invalid'.tr());
-      } else if (e.response?.statusCode == 409) {
-        AppSnackbar.error(context, 'invite_register.error_email_taken'.tr());
-      } else {
-        AppSnackbar.error(context, 'invite_register.error_generic'.tr());
-      }
+      AppSnackbar.error(context, _registerErrorKey(e).tr());
     } catch (_) {
       if (!mounted) return;
       AppSnackbar.error(context, 'invite_register.error_generic'.tr());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  // El backend explica por qué rechaza el enlace con un código; sin código, un 409 es que el correo ya tiene cuenta.
+  String _registerErrorKey(DioException error) {
+    final invitationError = TeamInvitationError.fromException(error);
+    if (invitationError != null) return invitationError.registrationTranslationKey;
+    if (error.response?.statusCode == 409) return 'invite_register.error_email_taken';
+    return 'invite_register.error_generic';
   }
 
   // El backend crea la cuenta junto con el jugador: entra con la contraseña que acaba de elegir.

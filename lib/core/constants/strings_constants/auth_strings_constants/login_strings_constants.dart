@@ -32,7 +32,6 @@ class LoginStringsConstants {
   static const String passwordRequired = 'login.password_required';
   static const String passwordTooShort = 'login.password_too_short';
   static const String passwordTooLong = 'login.password_too_long';
-  static const String invalidCredentials = 'login.invalid_credentials';
 
   static const String google = 'login.google';
   static const String apple = 'login.apple';

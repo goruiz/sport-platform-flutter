@@ -1,5 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sport_platform/core/services/auth_storage.dart';
+import 'package:sport_platform/core/services/session_service.dart';
+import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/modules/players/data/datasource/team_invitations_service.dart';
 import 'package:sport_platform/modules/players/data/models/team_invitation_model.dart';
 import 'package:sport_platform/modules/players/domain/enums/team_invitation_error.dart';
@@ -8,6 +12,8 @@ import 'package:sport_platform/modules/players/presentation/providers/invitation
 class _FakeInvitationsService extends TeamInvitationsService {
   List<TeamInvitationModel> invitations = [];
   Object? failure;
+  /// La sesión nueva que el backend manda al aceptar (null: un backend que aún no la manda).
+  String? newToken;
   int loads = 0;
   final answered = <String>[];
 
@@ -18,12 +24,13 @@ class _FakeInvitationsService extends TeamInvitationsService {
   }
 
   @override
-  Future<void> accept(String invitationId) async {
+  Future<String?> accept(String invitationId) async {
     if (failure != null) throw failure!;
     answered.add('accept:$invitationId');
     invitations = invitations
         .where((invitation) => invitation.id != invitationId)
         .toList();
+    return newToken;
   }
 
   @override
@@ -45,8 +52,13 @@ DioException _backendRefusal(String code) => DioException(
   ),
 );
 
+// JWT sin firma verificable: el payload es {"id":"user-1","email":"juan@email.com"}.
+const _newToken =
+    'eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoianVhbkBlbWFpbC5jb20ifQ.firma';
+
 void main() {
   late _FakeInvitationsService service;
+  late int organizationStateResets;
   late InvitationsNotifier notifier;
 
   const tigres = TeamInvitationModel(
@@ -61,8 +73,16 @@ void main() {
   );
 
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    organizationStateResets = 0;
     service = _FakeInvitationsService()..invitations = [tigres, leones];
-    notifier = InvitationsNotifier(service);
+    notifier = InvitationsNotifier(
+      service,
+      SessionService(
+        resetSessionScopedState: () {},
+        resetOrganizationScopedState: () => organizationStateResets++,
+      ),
+    );
   });
 
   tearDown(() => notifier.dispose());
@@ -91,6 +111,29 @@ void main() {
     expect(failure, isNull);
     expect(service.answered, ['accept:inv-1']);
     expect(notifier.invitations.map((invitation) => invitation.id), ['inv-2']);
+  });
+
+  test(
+    'aceptar renueva la sesión con el token nuevo y descarta lo de la organización anterior',
+    () async {
+      await AuthStorage.saveToken('token-viejo');
+      service.newToken = _newToken;
+
+      await notifier.accept('inv-1');
+
+      expect(await AuthStorage.getToken(), _newToken);
+      expect(UserSession.current?.id, 'user-1');
+      expect(organizationStateResets, 1);
+    },
+  );
+
+  test('si el backend no manda sesión nueva, aceptar deja la que había', () async {
+    await AuthStorage.saveToken('token-viejo');
+
+    await notifier.accept('inv-1');
+
+    expect(await AuthStorage.getToken(), 'token-viejo');
+    expect(organizationStateResets, 0);
   });
 
   test('rechazar una invitación la quita de la lista', () async {
@@ -128,7 +171,10 @@ void main() {
   test(
     'si falla la carga guarda la clave del error y no inventa invitaciones',
     () async {
-      final failingNotifier = InvitationsNotifier(_FailingInvitationsService());
+      final failingNotifier = InvitationsNotifier(
+        _FailingInvitationsService(),
+        SessionService(resetSessionScopedState: () {}),
+      );
 
       await failingNotifier.load();
 

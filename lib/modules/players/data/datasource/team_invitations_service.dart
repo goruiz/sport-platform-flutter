@@ -16,9 +16,11 @@ class TeamInvitationsService {
         .toList();
   }
 
-  /// El jugador entra al equipo que lo invitó (y sale del que tenía).
-  Future<void> accept(String invitationId) async {
-    await _client.post(ApiEndpoints.teamInvitationAccept(invitationId));
+  /// El jugador entra al equipo que lo invitó (y sale del que tenía). Devuelve la sesión nueva que manda el
+  /// backend, porque la organización de la cuenta viaja en el token y ahora es la del equipo; null si no la manda.
+  Future<String?> accept(String invitationId) async {
+    final response = await _client.post(ApiEndpoints.teamInvitationAccept(invitationId));
+    return ResponseParser.toMap(response.data)['token'] as String?;
   }
 
   Future<void> decline(String invitationId) async {

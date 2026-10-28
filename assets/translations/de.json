@@ -18,7 +18,15 @@
     "password_required": "Passwort eingeben",
     "password_too_short": "Mindestens 8 Zeichen",
     "password_too_long": "Höchstens 72 Zeichen",
-    "invalid_credentials": "E-Mail oder Passwort falsch.",
+    "errors": {
+      "invalid_credentials": "E-Mail oder Passwort falsch.",
+      "administrator_account": "Administratorkonten melden sich über das Web-Panel an, nicht über die App.",
+      "organization_suspended": "Die Organisation Ihres Kontos ist gesperrt. Wenden Sie sich an Ihren Veranstalter.",
+      "organization_not_found": "Die Organisation Ihres Kontos existiert nicht mehr. Wenden Sie sich an Ihren Veranstalter.",
+      "access_denied": "Ihr Konto hat keinen Zugriff auf die App.",
+      "no_connection": "Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "unexpected": "Die Anmeldung ist fehlgeschlagen. Bitte versuchen Sie es später erneut."
+    },
     "recovery_title": "Passwort zurücksetzen",
     "recovery_subtitle": "Gib deine E-Mail-Adresse ein. Wenn ein Konto damit verknüpft ist, erhältst du einen Link zum Zurücksetzen.",
     "recovery_send": "Link senden",
@@ -378,14 +386,6 @@
       "tooltip": "Ligen anzeigen",
       "description": "Die Ligen, an denen du teilnimmst, und alle anderen"
     },
-    "tournaments": {
-      "title": "Turniere",
-      "create_tournament": "Turnier erstellen",
-      "tooltip": "Turniere anzeigen",
-      "description": "Die Turniere des Wettbewerbs"
-    },
-    "league_ranking": "Ligarangliste",
-    "league_ranking_description": "Die Tabelle der Liga",
     "home_description": "Dein nächstes Spiel, dein Team und deine Einladungen",
     "matches_description": "Die Spiele deines Teams und des ganzen Wettbewerbs",
     "rankings_description": "Tabellen und Spitzenreiter jeder Veranstaltung",
@@ -582,7 +582,8 @@
       "NOT_PENDING": "Diese Einladung wurde bereits beantwortet.",
       "EXPIRED": "Diese Einladung ist abgelaufen.",
       "TEAM_NOT_FOUND": "Das Team, das Sie eingeladen hat, existiert nicht mehr.",
-      "PLAYER_NOT_FOUND": "Sie müssen sich als Spieler registrieren, um diese Einladung anzunehmen."
+      "PLAYER_NOT_FOUND": "Sie müssen sich als Spieler registrieren, um diese Einladung anzunehmen.",
+      "INVITATION_NOT_FOUND": "Diese Einladung existiert nicht mehr."
     }
   },
   "rankings": {

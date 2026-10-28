@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
-import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
 import 'package:sport_platform/modules/auth/data/datasource/login_service.dart';
+import 'package:sport_platform/modules/auth/domain/enums/login_failure.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/register_page.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/password_recovery_page.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/login_body.dart';
@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     } catch (e) {
       if (!mounted) return;
-      AppSnackbar.error(context, LoginStringsConstants.invalidCredentials.tr());
+      AppSnackbar.error(context, LoginFailure.fromException(e).translationKey.tr());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

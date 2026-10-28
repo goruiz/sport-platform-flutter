@@ -28,16 +28,6 @@ List<MenuItemModel> _groupsOfTheUserRole() => [
           {'id': 'i2', 'name': 'Canchas', 'url': '/courts', 'translationKey': 'menu.courts', 'order': 1},
         ],
       }),
-      MenuItemModel.fromJson({
-        'id': 'g3',
-        'name': 'App móvil',
-        'translationKey': 'menu.admin.group_mobile_app',
-        'icon': 'cilMobile',
-        'order': 6,
-        'submenus': [
-          {'id': 'i3', 'name': 'Torneos', 'url': '/torneo', 'translationKey': 'menu.tournaments.title', 'order': 2},
-        ],
-      }),
     ];
 
 Widget _carousel(List<MenuItemModel> items) => Scaffold(
@@ -50,15 +40,11 @@ void main() {
   testWidgets('las tarjetas de grupo se leen con el nombre en el idioma de la app, nunca con la clave', (tester) async {
     await pumpWithRealTranslations(tester, home: (_) => _carousel(_groupsOfTheUserRole()));
 
-    // «App móvil» es «Ligas y torneos» en el diccionario de la app: el mismo texto de la base no es el que se ve.
     expect(find.text('Resultados y estadísticas'), findsOneWidget);
     expect(find.text('Instalaciones'), findsOneWidget);
-    expect(find.text('Ligas y torneos'), findsOneWidget);
-    expect(find.text('App móvil'), findsNothing);
 
     expect(find.text('menu.admin.group_results'), findsNothing);
     expect(find.text('menu.admin.group_facilities'), findsNothing);
-    expect(find.text('menu.admin.group_mobile_app'), findsNothing);
   });
 
   testWidgets('una clave que el diccionario no conoce enseña el nombre de la base y no la clave', (tester) async {
@@ -82,6 +68,5 @@ void main() {
 
     expect(find.text('Results and statistics'), findsOneWidget);
     expect(find.text('Facilities'), findsOneWidget);
-    expect(find.text('Leagues and tournaments'), findsOneWidget);
   });
 }

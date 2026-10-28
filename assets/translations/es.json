@@ -18,7 +18,15 @@
     "password_required": "Ingresa tu contraseña",
     "password_too_short": "Mínimo 8 caracteres",
     "password_too_long": "Máximo 72 caracteres",
-    "invalid_credentials": "Correo o contraseña incorrectos.",
+    "errors": {
+      "invalid_credentials": "Correo o contraseña incorrectos.",
+      "administrator_account": "Las cuentas de administrador entran por el panel web, no por la app.",
+      "organization_suspended": "La organización de tu cuenta está suspendida. Contacta a tu organizador.",
+      "organization_not_found": "La organización de tu cuenta ya no existe. Contacta a tu organizador.",
+      "access_denied": "Tu cuenta no tiene acceso a la app.",
+      "no_connection": "No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
+      "unexpected": "No se pudo iniciar sesión. Inténtalo más tarde."
+    },
     "recovery_title": "Recuperar contraseña",
     "recovery_subtitle": "Ingresa tu correo. Si existe una cuenta asociada, recibirás un enlace para restablecer tu contraseña.",
     "recovery_send": "Enviar enlace",
@@ -378,14 +386,6 @@
       "tooltip": "Ver ligas disponibles",
       "description": "Las ligas en las que participas y todas las demás"
     },
-    "tournaments": {
-      "title": "Torneos",
-      "create_tournament": "Ver torneos disponibles",
-      "tooltip": "Ver torneos disponibles",
-      "description": "Los torneos de la competición"
-    },
-    "league_ranking": "Ranking de la liga",
-    "league_ranking_description": "La tabla de posiciones de la liga",
     "home_description": "Tu próximo partido, tu equipo y tus invitaciones",
     "matches_description": "Los partidos de tu equipo y de toda la competición",
     "rankings_description": "Posiciones y líderes de cada evento",
@@ -582,7 +582,8 @@
       "NOT_PENDING": "Esta invitación ya fue respondida.",
       "EXPIRED": "Esta invitación venció.",
       "TEAM_NOT_FOUND": "El equipo que te invitó ya no existe.",
-      "PLAYER_NOT_FOUND": "Necesitas registrarte como jugador para aceptar esta invitación."
+      "PLAYER_NOT_FOUND": "Necesitas registrarte como jugador para aceptar esta invitación.",
+      "INVITATION_NOT_FOUND": "Esta invitación ya no existe."
     }
   },
   "rankings": {

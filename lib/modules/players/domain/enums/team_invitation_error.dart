@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 
-/// Por qué el backend no dejó aceptar o rechazar una invitación (`TeamInvitationError`). Llega como
-/// el `message` de un 400, para que cada app lo explique en su idioma.
+/// Por qué el backend no dejó aceptar, rechazar o usar una invitación (`TeamInvitationError`). Llega como
+/// el `message` de la respuesta de error, para que cada app lo explique en su idioma.
 enum TeamInvitationError {
-  /// Ya se aceptó o se rechazó.
+  /// Ya se aceptó, se rechazó o se usó para registrarse.
   notPending('NOT_PENDING'),
 
   /// Venció antes de que se respondiera.
@@ -13,7 +13,10 @@ enum TeamInvitationError {
   teamNotFound('TEAM_NOT_FOUND'),
 
   /// El correo invitado no tiene un jugador que meter al equipo: primero hay que registrarse.
-  playerNotFound('PLAYER_NOT_FOUND');
+  playerNotFound('PLAYER_NOT_FOUND'),
+
+  /// El enlace de registro no corresponde a ninguna invitación.
+  invitationNotFound('INVITATION_NOT_FOUND');
 
   const TeamInvitationError(this.code);
 
@@ -34,5 +37,16 @@ enum TeamInvitationError {
     return fromCode(message?.toString());
   }
 
+  /// El texto en la bandeja de invitaciones, donde la persona ya tiene cuenta.
   String get translationKey => 'invitations.errors.$code';
+
+  /// El texto en el registro con enlace, redactado para quien aún no tiene cuenta.
+  String get registrationTranslationKey => switch (this) {
+    notPending => 'invite_register.error_token_used',
+    expired => 'invite_register.error_token_expired',
+    invitationNotFound => 'invite_register.error_token_invalid',
+    teamNotFound => translationKey,
+    // Registrarse crea al jugador: este motivo solo existe al aceptar una invitación.
+    playerNotFound => 'invite_register.error_generic',
+  };
 }

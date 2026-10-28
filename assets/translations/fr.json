@@ -18,7 +18,15 @@
     "password_required": "Entrez votre mot de passe",
     "password_too_short": "Minimum 8 caractères",
     "password_too_long": "Maximum 72 caractères",
-    "invalid_credentials": "E-mail ou mot de passe incorrect.",
+    "errors": {
+      "invalid_credentials": "E-mail ou mot de passe incorrect.",
+      "administrator_account": "Les comptes administrateur se connectent via le panneau web, pas via l’application.",
+      "organization_suspended": "L’organisation de votre compte est suspendue. Contactez votre organisateur.",
+      "organization_not_found": "L’organisation de votre compte n’existe plus. Contactez votre organisateur.",
+      "access_denied": "Votre compte n’a pas accès à l’application.",
+      "no_connection": "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
+      "unexpected": "La connexion a échoué. Réessayez plus tard."
+    },
     "recovery_title": "Récupérer le mot de passe",
     "recovery_subtitle": "Saisissez votre adresse e-mail. Si un compte y est associé, vous recevrez un lien de réinitialisation.",
     "recovery_send": "Envoyer le lien",
@@ -378,14 +386,6 @@
       "tooltip": "Voir les ligues disponibles",
       "description": "Les ligues auxquelles vous participez et toutes les autres"
     },
-    "tournaments": {
-      "title": "Tournois",
-      "create_tournament": "Créer un tournoi",
-      "tooltip": "Voir les tournois disponibles",
-      "description": "Les tournois de la compétition"
-    },
-    "league_ranking": "Classement de la ligue",
-    "league_ranking_description": "Le classement de la ligue",
     "home_description": "Votre prochain match, votre équipe et vos invitations",
     "matches_description": "Les matchs de votre équipe et de toute la compétition",
     "rankings_description": "Classements et leaders de chaque événement",
@@ -582,7 +582,8 @@
       "NOT_PENDING": "Cette invitation a déjà reçu une réponse.",
       "EXPIRED": "Cette invitation a expiré.",
       "TEAM_NOT_FOUND": "L’équipe qui vous a invité n’existe plus.",
-      "PLAYER_NOT_FOUND": "Vous devez vous inscrire comme joueur pour accepter cette invitation."
+      "PLAYER_NOT_FOUND": "Vous devez vous inscrire comme joueur pour accepter cette invitation.",
+      "INVITATION_NOT_FOUND": "Cette invitation n’existe plus."
     }
   },
   "rankings": {
