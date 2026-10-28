@@ -7,6 +7,7 @@ class ModuleUrls {
   static const matches  = '/matches';
   static const reports  = '/reports';
   static const courts   = '/courts';
+  static const sportComplexes = '/sport-complexes';
   static const profile  = '/profile';
   static const leagues  = '/ligas';
 }

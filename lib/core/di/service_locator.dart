@@ -22,6 +22,7 @@ import 'package:sport_platform/modules/matches/data/datasource/matches_service.d
 import 'package:sport_platform/modules/players/data/datasource/team_invitations_service.dart';
 import 'package:sport_platform/modules/players/presentation/providers/invitations_notifier.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
+import 'package:sport_platform/modules/sport_complexes/data/datasource/sport_complexes_service.dart';
 import 'package:sport_platform/modules/users/data/datasource/user_profile_service.dart';
 import 'package:sport_platform/modules/users/domain/repositories/i_user_profile_repository.dart';
 import 'package:sport_platform/shared/services/session_expired_handler.dart';
@@ -55,6 +56,7 @@ void setupServiceLocator() {
   getIt.registerLazySingleton<TeamsService>(() => TeamsService());
   getIt.registerLazySingleton<PlayersService>(() => PlayersService());
   getIt.registerLazySingleton<CourtsService>(() => CourtsService());
+  getIt.registerLazySingleton<SportComplexesService>(() => SportComplexesService());
   getIt.registerLazySingleton<EventsCatalogService>(() => EventsCatalogService());
   getIt.registerLazySingleton<ChampionshipService>(() => ChampionshipService());
   getIt.registerLazySingleton<MatchesService>(() => MatchesService());

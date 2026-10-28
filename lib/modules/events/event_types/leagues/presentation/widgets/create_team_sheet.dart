@@ -127,18 +127,7 @@ class _CreateTeamSheetState extends State<CreateTeamSheet> with SnackMixin {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
     try {
-      String? logoUrl;
-
-      // TODO: Uncomment when cloud storage (TeamLogoStorageService) is configured.
-      // if (_pickedImage != null) {
-      //   final storageService = getIt<TeamLogoStorageService>();
-      //   logoUrl = await storageService.uploadLogo(_pickedImage!);
-      // }
-
-      final team = await _teamsService.create(
-        _nameCtrl.text.trim(),
-        logoUrl: logoUrl,
-      );
+      final team = await _teamsService.create(_nameCtrl.text.trim());
       if (!mounted) return;
       setState(() => _saving = false);
 

@@ -52,4 +52,19 @@ class AppConfig {
 
   // Formato de keys que devuelve el backend. Cambia aquí si el backend cambia.
   static const ApiKeyFormat apiKeyFormat = ApiKeyFormat.camelCase;
+
+  // Mapa de los complejos deportivos: teselas gratuitas de OpenStreetMap, cuyo servidor público pide un uso
+  // ligero. `--dart-define=MAP_TILE_URL=...` las cambia por otro servidor si el tráfico crece.
+  static const String mapTileUrlTemplate = String.fromEnvironment(
+    'MAP_TILE_URL',
+    defaultValue: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  );
+
+  // Quien sirve las teselas pide que la app se identifique: debe ser el applicationId de Android.
+  static const String mapUserAgentPackageName = 'com.example.sport_platform';
+
+  static const String mapAttribution = '© OpenStreetMap';
+
+  // Zoom con el que se abre el mapa de un complejo (el de calle, para ver dónde queda la entrada).
+  static const double mapComplexZoom = 16;
 }

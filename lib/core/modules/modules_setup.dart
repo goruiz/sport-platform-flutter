@@ -6,6 +6,7 @@ import 'package:sport_platform/modules/courts/presentation/pages/courts_page.dar
 import 'package:sport_platform/modules/matches/presentation/pages/matches_page.dart';
 import 'package:sport_platform/modules/rankings/presentation/pages/rankings_page.dart';
 import 'package:sport_platform/modules/reports/presentation/pages/reports_page.dart';
+import 'package:sport_platform/modules/sport_complexes/presentation/pages/sport_complexes_page.dart';
 import 'package:sport_platform/modules/teams/presentation/pages/teams_page.dart';
 import 'package:sport_platform/modules/users/presentation/pages/profile_page.dart';
 
@@ -18,6 +19,7 @@ void registerModules() {
   ModuleRegistry.register(ModuleUrls.rankings, (item) => RankingsPage(item: item));
   ModuleRegistry.register(ModuleUrls.matches,  (item) => MatchesPage(item: item));
   ModuleRegistry.register(ModuleUrls.courts,   (item) => CourtsPage(item: item));
+  ModuleRegistry.register(ModuleUrls.sportComplexes, (item) => SportComplexesPage(item: item));
   ModuleRegistry.register(ModuleUrls.reports,  (item) => ReportsPage(item: item));
   ModuleRegistry.register(ModuleUrls.profile,  (item) => ProfilePage(item: item));
   ModuleRegistry.register(ModuleUrls.leagues,  (item) => LeaguesPage(item: item));

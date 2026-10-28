@@ -128,6 +128,7 @@ class MenuItemModel {
     'cilShieldAlt':      Icons.shield,
     'cilCalendar':       Icons.event,
     'cilLocationPin':    Icons.location_on,
+    'cilMap':            Icons.map,
     'cilMobile':         Icons.smartphone,
     'cilChart':          Icons.bar_chart,
   };

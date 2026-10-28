@@ -135,7 +135,8 @@
       "no_membership": "Sobald Sie einem Team hinzugefügt wurden, sehen Sie hier die Spieler.",
       "players": "Spieler",
       "players_empty": "Dieses Team hat noch keine Spieler.",
-      "your_team": "Ihr Team"
+      "your_team": "Ihr Team",
+      "captain": "Kapitän"
     },
     "matches": {
       "upcoming": "Bevorstehend",
@@ -166,6 +167,20 @@
       "second_last_name": "Zweiter Nachname",
       "edit": "Profil bearbeiten",
       "incomplete": "Profil unvollständig"
+    },
+    "complexes": {
+      "load_error": "Die Anlagen konnten nicht geladen werden.",
+      "empty_title": "Noch keine Anlagen",
+      "empty_subtitle": "Die Anlagen Ihrer Organisation erscheinen hier.",
+      "search_hint": "Anlage oder Adresse suchen",
+      "filtered_empty_title": "Keine Ergebnisse",
+      "filtered_empty_subtitle": "Versuchen Sie eine andere Suche.",
+      "courts_count": "Plätze: {count}",
+      "no_location": "Keine Position auf der Karte",
+      "location_title": "Standort",
+      "no_location_detail": "Der Veranstalter hat diese Anlage noch nicht auf der Karte markiert.",
+      "courts_title": "Plätze der Anlage",
+      "no_courts": "Diese Anlage hat noch keine Plätze."
     }
   },
   "session": {
@@ -378,7 +393,9 @@
       "group_mobile_app_description": "Die Ligen und Turniere des Wettbewerbs",
       "events_description": "Die Veranstaltungen des Wettbewerbs und ihre Termine",
       "teams_description": "Dein Team und die anderen Teams des Wettbewerbs",
-      "courts_description": "Wo die Spiele stattfinden"
+      "courts_description": "Wo die Spiele stattfinden",
+      "sport_complexes": "Sportanlagen",
+      "sport_complexes_description": "Wo die Anlagen und Plätze Ihres Wettbewerbs liegen"
     },
     "leagues": {
       "title": "Ligen",

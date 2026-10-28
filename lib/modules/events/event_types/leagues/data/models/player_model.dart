@@ -9,6 +9,9 @@ class PlayerModel {
   final String? teamId;
   final String? teamName;
 
+  /// El capitán de su equipo (lo designa el administrador; hay uno por equipo).
+  final bool isCaptain;
+
   const PlayerModel({
     required this.id,
     required this.firstName,
@@ -19,6 +22,7 @@ class PlayerModel {
     this.status,
     this.teamId,
     this.teamName,
+    this.isCaptain = false,
   });
 
   String get fullName => '$firstName $lastName';
@@ -34,6 +38,7 @@ class PlayerModel {
       status: json['status']?.toString(),
       teamId: json['teamId']?.toString(),
       teamName: json['teamName']?.toString(),
+      isCaptain: json['isCaptain'] == true,
     );
   }
 
@@ -47,6 +52,7 @@ class PlayerModel {
         if (status != null) 'status': status,
         if (teamId != null) 'teamId': teamId,
         if (teamName != null) 'teamName': teamName,
+        if (isCaptain) 'isCaptain': isCaptain,
       };
 
   PlayerModel copyWith({
@@ -59,6 +65,7 @@ class PlayerModel {
     String? status,
     String? teamId,
     String? teamName,
+    bool? isCaptain,
   }) =>
       PlayerModel(
         id: id ?? this.id,
@@ -70,5 +77,6 @@ class PlayerModel {
         status: status ?? this.status,
         teamId: teamId ?? this.teamId,
         teamName: teamName ?? this.teamName,
+        isCaptain: isCaptain ?? this.isCaptain,
       );
 }

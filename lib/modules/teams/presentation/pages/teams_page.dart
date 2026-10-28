@@ -7,6 +7,7 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/datasourc
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/modules/teams/domain/team_members.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
@@ -46,7 +47,10 @@ class _TeamsPageState extends State<TeamsPage> {
       }
     }
     if (team == null) return null;
-    return _TeamData(team: team, members: results[1] as List<PlayerModel>);
+    return _TeamData(
+      team: team,
+      members: sortCaptainFirst(results[1] as List<PlayerModel>),
+    );
   }
 
   Future<void> _reload() async {
@@ -250,12 +254,38 @@ class _PlayerTile extends StatelessWidget {
               : const Icon(Icons.person_outline, color: AppColors.primaryLight),
         ),
         title: Text(name, style: const TextStyle(color: AppColors.white)),
+        trailing: player.isCaptain ? const _CaptainBadge() : null,
         subtitle: player.email.isEmpty
             ? null
             : Text(
                 player.email,
                 style: const TextStyle(color: AppColors.whiteSubtle),
               ),
+      ),
+    );
+  }
+}
+
+/// La insignia del capitán de su equipo.
+class _CaptainBadge extends StatelessWidget {
+  const _CaptainBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.warning.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.warning),
+      ),
+      child: Text(
+        'mobile.teams.captain'.tr(),
+        style: const TextStyle(
+          color: AppColors.warningLight,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

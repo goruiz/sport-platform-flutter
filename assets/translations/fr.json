@@ -135,7 +135,8 @@
       "no_membership": "Une fois ajouté à une équipe, vous pourrez consulter ses joueurs ici.",
       "players": "Joueurs",
       "players_empty": "Cette équipe n'a pas encore de joueurs.",
-      "your_team": "Votre équipe"
+      "your_team": "Votre équipe",
+      "captain": "Capitaine"
     },
     "matches": {
       "upcoming": "À venir",
@@ -166,6 +167,20 @@
       "second_last_name": "Deuxième nom",
       "edit": "Modifier le profil",
       "incomplete": "Profil incomplet"
+    },
+    "complexes": {
+      "load_error": "Impossible de charger les complexes.",
+      "empty_title": "Aucun complexe pour le moment",
+      "empty_subtitle": "Les complexes de votre organisation apparaîtront ici.",
+      "search_hint": "Rechercher un complexe ou une adresse",
+      "filtered_empty_title": "Aucun résultat",
+      "filtered_empty_subtitle": "Essayez une autre recherche.",
+      "courts_count": "Terrains : {count}",
+      "no_location": "Pas de position sur la carte",
+      "location_title": "Emplacement",
+      "no_location_detail": "L’organisateur n’a pas encore placé ce complexe sur la carte.",
+      "courts_title": "Terrains du complexe",
+      "no_courts": "Ce complexe n’a pas encore de terrains."
     }
   },
   "session": {
@@ -378,7 +393,9 @@
       "group_mobile_app_description": "Les ligues et tournois de la compétition",
       "events_description": "Les événements de la compétition et leurs dates",
       "teams_description": "Votre équipe et les autres équipes de la compétition",
-      "courts_description": "Où se jouent les matchs"
+      "courts_description": "Où se jouent les matchs",
+      "sport_complexes": "Complexes sportifs",
+      "sport_complexes_description": "Où se trouvent les complexes et les terrains de votre compétition"
     },
     "leagues": {
       "title": "Ligues",
