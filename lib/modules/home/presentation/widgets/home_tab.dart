@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
 import 'package:sport_platform/core/modules/module_urls.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
@@ -13,17 +15,27 @@ import 'package:sport_platform/modules/home/presentation/widgets/drawer_hint_car
 import 'package:sport_platform/modules/home/presentation/widgets/email_verification_banner.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/greeting_banner.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/invitations_card.dart';
-import 'package:sport_platform/modules/home/presentation/widgets/quick_actions_carousel.dart';
+import 'package:sport_platform/modules/home/presentation/widgets/join_team_card.dart';
+import 'package:sport_platform/modules/home/presentation/widgets/next_match_card.dart';
+import 'package:sport_platform/modules/home/presentation/widgets/quick_actions_grid.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/section_header.dart';
+import 'package:sport_platform/modules/home/presentation/widgets/summary_tile.dart';
+import 'package:sport_platform/modules/matches/presentation/pages/match_detail_page.dart';
+import 'package:sport_platform/modules/matches/presentation/widgets/match_summary_card.dart';
 import 'package:sport_platform/modules/players/presentation/pages/join_team_page.dart';
-import 'package:sport_platform/modules/home/presentation/widgets/empty_card.dart';
+import 'package:sport_platform/shared/widgets/app_card.dart';
+import 'package:sport_platform/shared/widgets/skeleton_box.dart';
+import 'package:sport_platform/shared/widgets/initials_avatar.dart';
 
+/// La pantalla de inicio: lo que le toca al jugador ahora mismo (su próximo partido, o cómo unirse a un equipo),
+/// los accesos a todo lo demás y un resumen de su equipo, su último resultado y el próximo evento.
 class HomeTab extends StatefulWidget {
   final HomeMenuStyle menuStyle;
   final List<MenuItemModel> menuItems;
   final bool isLoadingMenu;
   final bool menuError;
   final VoidCallback onRetryMenu;
+  final VoidCallback onToggleMenuStyle;
   final ValueChanged<String>? onNavigate;
 
   const HomeTab({
@@ -33,6 +45,7 @@ class HomeTab extends StatefulWidget {
     required this.isLoadingMenu,
     required this.menuError,
     required this.onRetryMenu,
+    required this.onToggleMenuStyle,
     this.onNavigate,
   });
 
@@ -60,6 +73,19 @@ class _HomeTabState extends State<HomeTab> {
     await _dashboardFuture;
   }
 
+  void _openMatch(MatchModel match, HomeDashboardData data) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MatchDetailPage(
+          match: match,
+          homeName: data.teamName(match.homeTeamId),
+          awayName: data.teamName(match.awayTeamId),
+          eventName: data.eventName(match.eventId),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     context.locale;
@@ -68,99 +94,29 @@ class _HomeTabState extends State<HomeTab> {
       color: AppColors.primaryLight,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(top: 20, bottom: 24),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.page,
+          AppSpacing.lg,
+          AppSpacing.page,
+          AppSpacing.xxl,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: GreetingBanner(),
-            ),
-            const SizedBox(height: 24),
-            // Solo se dibuja mientras el correo no esté confirmado (sin confirmarlo no se entra a un equipo).
+            const GreetingBanner(),
+            const SizedBox(height: AppSpacing.xl),
+            // Solo se dibujan cuando hay algo que atender: el correo sin confirmar y las invitaciones pendientes.
             const EmailVerificationBanner(),
-            _section(
-              title: HomeStringsConstants.sectionQuickActions.tr(),
-              child: widget.menuStyle == HomeMenuStyle.carousel
-                  ? QuickActionsCarousel(
-                      items: widget.menuItems,
-                      isLoading: widget.isLoadingMenu,
-                      hasError: widget.menuError,
-                      onRetry: widget.onRetryMenu,
-                    )
-                  : Builder(
-                      builder: (ctx) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: DrawerHintCard(
-                          onTap: () => Scaffold.of(ctx).openDrawer(),
-                        ),
-                      ),
-                    ),
-            ),
-            const SizedBox(height: 24),
-            _section(
-              title: HomeStringsConstants.sectionInvitations.tr(),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: const InvitationsCard(),
-              ),
-            ),
-            const SizedBox(height: 24),
+            const InvitationsCard(),
             FutureBuilder<HomeDashboardData>(
               future: _dashboardFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 36),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                          color: AppColors.primaryLight),
-                    ),
-                  );
-                }
-                if (snapshot.hasError) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: EmptyCard(
-                      icon: Icons.cloud_off_outlined,
-                      message: 'mobile.home.load_error'.tr(),
-                      subtitle: 'mobile.home.retry_hint'.tr(),
-                    ),
-                  );
-                }
-                final data = snapshot.data!;
-                return Column(
-                  children: [
-                    _section(
-                      title: HomeStringsConstants.sectionNextEvent.tr(),
-                      child: _eventPreview(data.nextEvent()),
-                    ),
-                    const SizedBox(height: 24),
-                    _section(
-                      title: 'mobile.home.next_match'.tr(),
-                      child: _matchPreview(
-                        data.nextMatch(),
-                        data.teamName,
-                        data.eventName,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    _section(
-                      title: HomeStringsConstants.sectionActiveTeams.tr(),
-                      child: _teamPreview(data),
-                    ),
-                    const SizedBox(height: 24),
-                    _section(
-                      title: HomeStringsConstants.sectionRecentActivity.tr(),
-                      child: _activityPreview(
-                        data.latestResult(),
-                        data.teamName,
-                        data.eventName,
-                      ),
-                    ),
-                  ],
-                );
-              },
+              builder: (context, snapshot) => _buildHeroSection(snapshot),
+            ),
+            const SizedBox(height: AppSpacing.section),
+            _buildQuickActionsSection(),
+            FutureBuilder<HomeDashboardData>(
+              future: _dashboardFuture,
+              builder: (context, snapshot) => _buildSummarySections(snapshot),
             ),
           ],
         ),
@@ -168,181 +124,184 @@ class _HomeTabState extends State<HomeTab> {
     );
   }
 
-  Widget _section({required String title, required Widget child}) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: SectionHeader(title: title),
-          ),
-          const SizedBox(height: 12),
-          child,
-        ],
-      );
+  // ---------------------------------------------------------------- partido destacado
 
-  Widget _eventPreview(EventModel? event) {
-    if (event == null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: EmptyCard(
-          icon: Icons.event_outlined,
-          message: HomeStringsConstants.noNextEvent.tr(),
-          subtitle: HomeStringsConstants.noNextEventSubtitle.tr(),
-        ),
+  /// Lo primero de la pantalla: el próximo partido y, si el jugador no tiene equipo, cómo unirse a uno.
+  Widget _buildHeroSection(AsyncSnapshot<HomeDashboardData> snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return _section(
+        title: 'mobile.home.next_match'.tr(),
+        child: const SkeletonBox(height: 190),
       );
     }
-    return _SummaryCard(
-      icon: Icons.emoji_events_outlined,
+    if (snapshot.hasError) return _buildLoadError();
+
+    final data = snapshot.data!;
+    if (data.currentTeam == null) return JoinTeamCard(onJoin: _joinWithCode);
+
+    final match = data.nextMatch();
+    return _section(
+      title: 'mobile.home.next_match'.tr(),
+      child: match == null
+          ? _buildNoNextMatch()
+          : NextMatchCard(
+              match: match,
+              homeName: data.teamName(match.homeTeamId),
+              awayName: data.teamName(match.awayTeamId),
+              eventName: data.eventName(match.eventId),
+              onTap: () => _openMatch(match, data),
+            ),
+    );
+  }
+
+  Widget _buildNoNextMatch() {
+    return SummaryTile(
+      leading: SummaryTile.iconBadge(Icons.sports_soccer_outlined),
+      title: 'mobile.home.no_next_match'.tr(),
+      subtitle: 'mobile.matches.empty_mine_subtitle'.tr(),
+      onTap: () => widget.onNavigate?.call(ModuleUrls.matches),
+    );
+  }
+
+  Widget _buildLoadError() {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.cloud_off_outlined, color: AppColors.whiteSubtle, size: 26),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text('mobile.home.load_error'.tr(), style: AppTextStyles.cardTitle),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          TextButton.icon(
+            onPressed: _refreshDashboard,
+            icon: const Icon(Icons.refresh, size: 18),
+            label: Text('common.retry'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------- accesos
+
+  Widget _buildQuickActionsSection() {
+    final isGrid = widget.menuStyle == HomeMenuStyle.grid;
+    return _section(
+      title: HomeStringsConstants.sectionQuickActions.tr(),
+      action: IconButton(
+        icon: Icon(
+          isGrid ? Icons.view_sidebar_outlined : Icons.grid_view_outlined,
+          color: AppColors.whiteSubtle,
+          size: 22,
+        ),
+        tooltip: isGrid
+            ? HomeStringsConstants.switchToDrawer.tr()
+            : HomeStringsConstants.switchToGrid.tr(),
+        onPressed: widget.onToggleMenuStyle,
+      ),
+      child: isGrid
+          ? QuickActionsGrid(
+              items: widget.menuItems,
+              isLoading: widget.isLoadingMenu,
+              hasError: widget.menuError,
+              onRetry: widget.onRetryMenu,
+            )
+          : Builder(
+              builder: (ctx) => DrawerHintCard(
+                onTap: () => Scaffold.of(ctx).openDrawer(),
+              ),
+            ),
+    );
+  }
+
+  // ---------------------------------------------------------------- resúmenes
+
+  /// Tu equipo, tu último resultado y el próximo evento. Cada bloque solo aparece si tiene algo que contar,
+  /// salvo el evento, que siempre invita a explorar.
+  Widget _buildSummarySections(AsyncSnapshot<HomeDashboardData> snapshot) {
+    final data = snapshot.data;
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Padding(
+        padding: EdgeInsets.only(top: AppSpacing.section),
+        child: SkeletonBox(height: 72),
+      );
+    }
+    if (data == null) return const SizedBox.shrink();
+
+    final team = data.currentTeam;
+    final latestResult = data.latestResult();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (team != null) ...[
+          const SizedBox(height: AppSpacing.section),
+          _section(
+            title: 'mobile.teams.your_team'.tr(),
+            child: SummaryTile(
+              leading: InitialsAvatar(name: team.name, logoUrl: team.logoUrl),
+              title: team.name,
+              subtitle: 'home.view_team'.tr(),
+              onTap: () => widget.onNavigate?.call(ModuleUrls.teams),
+            ),
+          ),
+        ],
+        if (latestResult != null) ...[
+          const SizedBox(height: AppSpacing.section),
+          _section(
+            title: HomeStringsConstants.sectionLatestResult.tr(),
+            child: MatchSummaryCard(
+              match: latestResult,
+              homeName: data.teamName(latestResult.homeTeamId),
+              awayName: data.teamName(latestResult.awayTeamId),
+              eventName: data.eventName(latestResult.eventId),
+              onTap: () => _openMatch(latestResult, data),
+            ),
+          ),
+        ],
+        const SizedBox(height: AppSpacing.section),
+        _section(
+          title: HomeStringsConstants.sectionNextEvent.tr(),
+          child: _buildEventTile(data.nextEvent()),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEventTile(EventModel? event) {
+    if (event == null) {
+      return SummaryTile(
+        leading: SummaryTile.iconBadge(Icons.event_outlined),
+        title: HomeStringsConstants.noNextEvent.tr(),
+        subtitle: HomeStringsConstants.noNextEventSubtitle.tr(),
+        onTap: () => widget.onNavigate?.call(ModuleUrls.events),
+      );
+    }
+    return SummaryTile(
+      leading: SummaryTile.iconBadge(Icons.emoji_events_outlined),
       title: event.name,
-      subtitle:
-          '${DateFormatters.date(event.startDate)} – ${DateFormatters.date(event.endDate)}',
+      subtitle: DateFormatters.shortRange(
+        event.startDate,
+        event.endDate,
+        context.locale.languageCode,
+      ),
       onTap: () => widget.onNavigate?.call(ModuleUrls.events),
     );
   }
 
-  Widget _matchPreview(
-    MatchModel? match,
-    String Function(String) teamName,
-    String Function(String) eventName,
-  ) {
-    if (match == null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: EmptyCard(
-          icon: Icons.sports_soccer_outlined,
-          message: 'mobile.home.no_next_match'.tr(),
-        ),
+  // ---------------------------------------------------------------- común
+
+  Widget _section({required String title, required Widget child, Widget? action}) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SectionHeader(title: title, action: action),
+          const SizedBox(height: AppSpacing.md),
+          child,
+        ],
       );
-    }
-    final event = eventName(match.eventId);
-    return _SummaryCard(
-      icon: Icons.sports_soccer_outlined,
-      title: '${teamName(match.homeTeamId)}  vs  ${teamName(match.awayTeamId)}',
-      subtitle: [
-        DateFormatters.dateTime(match.matchDate),
-        if (event.isNotEmpty) event,
-      ].join(' · '),
-      onTap: () => widget.onNavigate?.call(ModuleUrls.matches),
-    );
-  }
-
-  Widget _teamPreview(HomeDashboardData data) {
-    final team = data.currentTeam;
-    if (team == null) {
-      // Sin equipo, la tarjeta lleva directo a escribir el código de un equipo.
-      return _SummaryCard(
-        icon: Icons.vpn_key_outlined,
-        title: HomeStringsConstants.noTeamsTitle.tr(),
-        subtitle: 'join_team.home_hint'.tr(),
-        onTap: _joinWithCode,
-      );
-    }
-    return _SummaryCard(
-      icon: Icons.shield_outlined,
-      title: team.name,
-      subtitle: 'mobile.teams.your_team'.tr(),
-      onTap: () => widget.onNavigate?.call(ModuleUrls.teams),
-    );
-  }
-
-  Widget _activityPreview(
-    MatchModel? match,
-    String Function(String) teamName,
-    String Function(String) eventName,
-  ) {
-    if (match == null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: EmptyCard(
-          icon: Icons.timeline,
-          message: HomeStringsConstants.noActivityTitle.tr(),
-          subtitle: HomeStringsConstants.noActivitySubtitle.tr(),
-        ),
-      );
-    }
-    final event = eventName(match.eventId);
-    return _SummaryCard(
-      icon: Icons.sports_score_outlined,
-      title:
-          '${teamName(match.homeTeamId)} ${match.homeScore} – ${match.awayScore} ${teamName(match.awayTeamId)}',
-      subtitle: [
-        DateFormatters.date(match.matchDate),
-        if (event.isNotEmpty) event,
-      ].join(' · '),
-      onTap: () => widget.onNavigate?.call(ModuleUrls.matches),
-    );
-  }
-}
-
-class _SummaryCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback? onTap;
-
-  const _SummaryCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Material(
-        color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.inputBorder),
-            ),
-            child: Row(
-              children: [
-                Icon(icon, color: AppColors.primaryLight, size: 28),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: AppColors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      if (subtitle.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitle,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.whiteSubtle,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                if (onTap != null)
-                  const Icon(Icons.chevron_right,
-                      color: AppColors.whiteSubtle),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }

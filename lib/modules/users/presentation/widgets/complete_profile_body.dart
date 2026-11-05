@@ -230,13 +230,6 @@ class CompleteProfileBody extends StatelessWidget {
       height: 52,
       child: ElevatedButton(
         onPressed: isLoading ? null : onSubmit,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.white,
-          disabledBackgroundColor: AppColors.primaryLight.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          elevation: 0,
-        ),
         child: isLoading
             ? const SizedBox(
                 width: 22,

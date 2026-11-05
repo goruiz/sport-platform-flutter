@@ -22,4 +22,20 @@ class AppColors {
   static const Color podiumBronze = Color(0xFFCD7F32);
   static const Color cardYellow = Color(0xFFFFEB3B);
   static const Color cardRed = Color(0xFFE53935);
+
+  /// Fondo de los botones principales. Con texto blanco da un contraste de 5:1; el verde claro
+  /// ([primaryLight]) solo da 2,8:1, así que se reserva para iconos, enlaces y acentos sobre fondo oscuro.
+  static const Color action = primary;
+
+  /// Los colores de los escudos de equipo: cada equipo toma siempre el mismo según su nombre.
+  static const List<Color> crestPalette = [
+    Color(0xFF2E7D32),
+    Color(0xFF1565C0),
+    Color(0xFFE65100),
+    Color(0xFF6A1B9A),
+    Color(0xFF00838F),
+    Color(0xFFAD1457),
+    Color(0xFF9E7B00),
+    Color(0xFF37474F),
+  ];
 }

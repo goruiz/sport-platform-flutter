@@ -2,69 +2,43 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/services/locale_storage.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/shared/enums/app_language.dart';
 
+/// Cambia el idioma de la app y lo guarda para que la próxima vez abra en él.
+Future<void> applyAppLanguage(BuildContext context, AppLanguage language) async {
+  await context.setLocale(language.locale);
+  await LocaleStorage.save(language.locale);
+}
+
+/// El selector de idioma en forma de «píldora» con la bandera (para el login y el registro, donde aún no hay perfil).
 class LanguageSelector extends StatelessWidget {
   const LanguageSelector({super.key});
 
-  static const _languages = [
-    (name: 'Español', code: 'es', flag: '🇪🇸'),
-    (name: 'English', code: 'en', flag: '🇬🇧'),
-    (name: 'Français', code: 'fr', flag: '🇫🇷'),
-    (name: 'Deutsch', code: 'de', flag: '🇩🇪'),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final currentCode = context.locale.languageCode;
-    final current = _languages.firstWhere(
-      (l) => l.code == currentCode,
-      orElse: () => _languages.first,
-    );
+    final current = AppLanguage.fromCode(context.locale.languageCode);
 
-    return PopupMenuButton<String>(
+    return PopupMenuButton<AppLanguage>(
       tooltip: 'settings.language_tooltip'.tr(),
-      onSelected: (code) {
-        final locale = Locale(code);
-        context.setLocale(locale);
-        LocaleStorage.save(locale);
-      },
-      color: AppColors.primaryDark,
-      elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: AppColors.inputBorder),
-      ),
-      itemBuilder: (_) => _languages.map((lang) {
-        return PopupMenuItem<String>(
-          value: lang.code,
+      onSelected: (language) => applyAppLanguage(context, language),
+      itemBuilder: (_) => AppLanguage.values.map((language) {
+        return PopupMenuItem<AppLanguage>(
+          value: language,
           child: Row(
             children: [
-              Text(lang.flag, style: const TextStyle(fontSize: 20)),
+              Text(language.flag, style: const TextStyle(fontSize: 20)),
               const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      lang.name,
-                      style: const TextStyle(
-                        color: AppColors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      lang.code.toUpperCase(),
-                      style: const TextStyle(
-                        color: AppColors.whiteSubtle,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  language.nativeName,
+                  style: const TextStyle(
+                    color: AppColors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-              if (currentCode == lang.code) ...[
+              if (current == language) ...[
                 const SizedBox(width: 8),
                 const Icon(Icons.check_circle, color: AppColors.primaryLight, size: 18),
               ],
@@ -74,7 +48,7 @@ class LanguageSelector extends StatelessWidget {
       }).toList(),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
@@ -86,22 +60,18 @@ class LanguageSelector extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(current.flag, style: const TextStyle(fontSize: 16)),
-            const SizedBox(width: 5),
+            const SizedBox(width: 6),
             Text(
-              currentCode.toUpperCase(),
+              current.code.toUpperCase(),
               style: const TextStyle(
                 color: AppColors.white,
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.5,
               ),
             ),
             const SizedBox(width: 2),
-            const Icon(
-              Icons.keyboard_arrow_down,
-              color: AppColors.white,
-              size: 16,
-            ),
+            const Icon(Icons.keyboard_arrow_down, color: AppColors.white, size: 18),
           ],
         ),
       ),

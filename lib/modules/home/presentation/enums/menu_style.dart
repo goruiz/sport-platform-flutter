@@ -1,1 +1,1 @@
-enum HomeMenuStyle { carousel, drawer }
+enum HomeMenuStyle { grid, drawer }

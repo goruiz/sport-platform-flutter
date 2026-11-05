@@ -2,9 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
+import 'package:sport_platform/shared/widgets/status_badge.dart';
 
 class LeagueInfoCard extends StatefulWidget {
   final EventModel event;
@@ -149,6 +151,8 @@ class _LeagueInfoCardState extends State<LeagueInfoCard> {
             ],
           ),
         ),
+        const SizedBox(height: 12),
+        Align(alignment: Alignment.centerLeft, child: StatusBadge.forEvent(widget.event.status)),
         if (widget.event.description != null &&
             widget.event.description!.isNotEmpty) ...[
           const SizedBox(height: 12),
@@ -163,24 +167,31 @@ class _LeagueInfoCardState extends State<LeagueInfoCard> {
           behavior: HitTestBehavior.opaque,
           child: _InfoRow(
             icon: Icons.calendar_today,
-            label:
-                '${DateFormatters.date(widget.event.startDate)} - ${DateFormatters.date(widget.event.endDate)}',
+            title: 'leagues.info_dates'.tr(),
+            label: DateFormatters.shortRange(
+              widget.event.startDate,
+              widget.event.endDate,
+              context.locale.languageCode,
+            ),
           ),
         ),
         if (widget.event.format.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          _InfoRow(icon: Icons.format_list_bulleted, label: widget.event.format),
+          const SizedBox(height: 12),
+          _InfoRow(
+            icon: Icons.format_list_bulleted,
+            title: 'leagues.info_format'.tr(),
+            label: widget.event.format,
+          ),
         ],
         if (widget.event.eventTypeName != null &&
             widget.event.eventTypeName!.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          _InfoRow(icon: Icons.military_tech, label: widget.event.eventTypeName!),
+          const SizedBox(height: 12),
+          _InfoRow(
+            icon: Icons.military_tech,
+            title: 'leagues.info_type'.tr(),
+            label: widget.event.eventTypeName!,
+          ),
         ],
-        const SizedBox(height: 8),
-        _InfoRow(
-          icon: Icons.access_time,
-          label: DateFormatters.date(widget.event.createdAt),
-        ),
       ],
     );
   }
@@ -302,21 +313,28 @@ class _LeagueInfoCardState extends State<LeagueInfoCard> {
   }
 }
 
+/// Un dato del evento: icono, un rótulo pequeño (opcional) y el valor.
 class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
-  const _InfoRow({required this.icon, required this.label});
+  final String? title;
+
+  const _InfoRow({required this.icon, required this.label, this.title});
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: AppColors.whiteSubtle, size: 16),
-        const SizedBox(width: 8),
+        Icon(icon, color: AppColors.primaryLight, size: 18),
+        const SizedBox(width: 12),
         Expanded(
-          child: Text(
-            label,
-            style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (title != null) Text(title!, style: AppTextStyles.caption),
+              Text(label, style: AppTextStyles.body),
+            ],
           ),
         ),
       ],

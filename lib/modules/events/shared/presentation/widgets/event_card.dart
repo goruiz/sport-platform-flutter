@@ -1,9 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
+import 'package:sport_platform/shared/widgets/app_card.dart';
+import 'package:sport_platform/shared/widgets/status_badge.dart';
 
+/// Un evento en una lista: su nombre y formato, las fechas y, a la vista, en qué estado está
+/// (en curso, por iniciar, finalizado). Si recibe [onEdit] o [onDelete] muestra esos botones.
 class EventCard extends StatelessWidget {
   final EventModel event;
   final IconData typeIcon;
@@ -22,97 +28,100 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasActions = onEdit != null || onDelete != null;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          decoration: BoxDecoration(
-            color: AppColors.inputFill,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.inputBorder),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child:
-                      Icon(typeIcon, color: AppColors.primaryLight, size: 22),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        event.name,
-                        style: const TextStyle(
-                          color: AppColors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      if (event.format.isNotEmpty) ...[
-                        const SizedBox(height: 3),
-                        Text(
-                          event.format,
-                          style: const TextStyle(
-                              color: AppColors.whiteSubtle, fontSize: 12),
-                        ),
-                      ],
-                      const SizedBox(height: 4),
-                      Text(
-                        '${DateFormatters.date(event.startDate)} — ${DateFormatters.date(event.endDate)}',
-                        style: const TextStyle(
-                            color: AppColors.whiteSubtle, fontSize: 12),
-                      ),
+    return AppCard(
+      onTap: onTap,
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.page,
+        vertical: AppSpacing.xs + 2,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildTitleRow(),
+          const SizedBox(height: AppSpacing.md),
+          _buildFooterRow(context),
+        ],
+      ),
+    );
+  }
 
-                    ],
-                  ),
-                ),
-                if (hasActions) ...[
-                  const SizedBox(width: 8),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (onEdit != null)
-                        IconButton(
-                          onPressed: onEdit,
-                          icon: const Icon(Icons.edit_outlined,
-                              color: AppColors.primaryLight, size: 20),
-                          tooltip: 'common.edit'.tr(),
-                          padding: EdgeInsets.zero,
-                          constraints:
-                              const BoxConstraints(minWidth: 36, minHeight: 36),
-                        ),
-                      if (onDelete != null)
-                        IconButton(
-                          onPressed: onDelete,
-                          icon: const Icon(Icons.delete_outline,
-                              color: AppColors.error, size: 20),
-                          tooltip: 'common.delete'.tr(),
-                          padding: EdgeInsets.zero,
-                          constraints:
-                              const BoxConstraints(minWidth: 36, minHeight: 36),
-                        ),
-                    ],
-                  ),
-                ],
+  Widget _buildTitleRow() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: AppColors.primaryLight.withValues(alpha: 0.15),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(typeIcon, color: AppColors.primaryLight, size: 22),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                event.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.cardTitle.copyWith(fontSize: 16),
+              ),
+              if (event.format.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(event.format, style: AppTextStyles.caption),
               ],
-            ),
+            ],
           ),
         ),
-      ),
+        if (onEdit != null || onDelete != null) _buildActions(),
+      ],
+    );
+  }
+
+  /// La fecha a la izquierda y el estado a la derecha: lo primero que se quiere saber de un evento.
+  Widget _buildFooterRow(BuildContext context) {
+    return Row(
+      children: [
+        const Icon(Icons.calendar_today_outlined, size: 15, color: AppColors.whiteSubtle),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            DateFormatters.shortRange(
+              event.startDate,
+              event.endDate,
+              context.locale.languageCode,
+            ),
+            style: AppTextStyles.caption,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        StatusBadge.forEvent(event.status),
+      ],
+    );
+  }
+
+  Widget _buildActions() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (onEdit != null)
+          IconButton(
+            onPressed: onEdit,
+            icon: const Icon(Icons.edit_outlined, color: AppColors.primaryLight, size: 20),
+            tooltip: 'common.edit'.tr(),
+            visualDensity: VisualDensity.compact,
+          ),
+        if (onDelete != null)
+          IconButton(
+            onPressed: onDelete,
+            icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
+            tooltip: 'common.delete'.tr(),
+            visualDensity: VisualDensity.compact,
+          ),
+      ],
     );
   }
 }

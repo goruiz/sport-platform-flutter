@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/core/utils/date_formatters.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/modules/matches/presentation/widgets/match_scoreboard.dart';
+import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/status_badge.dart';
 
-/// El resumen de un partido en una lista: fecha, estado, equipos, marcador, evento y cancha.
+/// El resumen de un partido en una lista: el evento, los equipos con el marcador o la hora, y la cancha.
 /// Si [onTap] no es null la tarjeta se puede abrir para ver el detalle.
 class MatchSummaryCard extends StatelessWidget {
   final MatchModel match;
@@ -14,6 +18,9 @@ class MatchSummaryCard extends StatelessWidget {
   final String? courtName;
   final VoidCallback? onTap;
 
+  /// Escribe el día en la tarjeta. La lista de partidos lo apaga porque ya agrupa por día.
+  final bool showDay;
+
   const MatchSummaryCard({
     super.key,
     required this.match,
@@ -22,91 +29,59 @@ class MatchSummaryCard extends StatelessWidget {
     this.eventName = '',
     this.courtName,
     this.onTap,
+    this.showDay = true,
   });
+
+  /// Solo se rotula el estado cuando cuenta algo fuera de lo normal: un partido «programado» o «finalizado»
+  /// ya se reconoce por llevar hora o marcador, y repetirlo en cada tarjeta es ruido.
+  static bool shouldShowStatus(MatchStatus status) => switch (status) {
+        MatchStatus.scheduled ||
+        MatchStatus.finished ||
+        MatchStatus.completed =>
+          false,
+        _ => true,
+      };
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Material(
-        color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.inputBorder),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                const SizedBox(height: 14),
-                _buildTeams(),
-                if (eventName.isNotEmpty || courtName != null) ...[
-                  const SizedBox(height: 12),
-                  _buildMetadata(),
-                ],
-              ],
-            ),
+    return AppCard(
+      onTap: onTap,
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (_hasHeader) ...[
+            _buildHeader(),
+            const SizedBox(height: AppSpacing.md),
+          ],
+          MatchScoreboard(
+            match: match,
+            homeName: homeName,
+            awayName: awayName,
+            showDay: showDay,
           ),
-        ),
+          if (courtName != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            _Metadata(icon: Icons.location_on_outlined, text: courtName!),
+          ],
+        ],
       ),
     );
   }
 
+  bool get _hasHeader => eventName.isNotEmpty || shouldShowStatus(match.status);
+
   Widget _buildHeader() => Row(
         children: [
           Expanded(
-            child: Text(
-              DateFormatters.dateTime(match.matchDate),
-              style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
-            ),
+            child: eventName.isEmpty
+                ? const SizedBox.shrink()
+                : _Metadata(icon: Icons.emoji_events_outlined, text: eventName),
           ),
-          StatusBadge.forMatch(match.status),
-        ],
-      );
-
-  Widget _buildTeams() => Row(
-        children: [
-          Expanded(child: _teamName(homeName, TextAlign.right)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              match.hasScore ? '${match.homeScore} - ${match.awayScore}' : 'VS',
-              style: const TextStyle(
-                color: AppColors.primaryLight,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(child: _teamName(awayName, TextAlign.left)),
-        ],
-      );
-
-  Widget _teamName(String name, TextAlign align) => Text(
-        name,
-        textAlign: align,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          color: AppColors.white,
-          fontWeight: FontWeight.w600,
-        ),
-      );
-
-  Widget _buildMetadata() => Wrap(
-        spacing: 16,
-        runSpacing: 6,
-        children: [
-          if (eventName.isNotEmpty)
-            _Metadata(icon: Icons.emoji_events_outlined, text: eventName),
-          if (courtName != null)
-            _Metadata(icon: Icons.location_on_outlined, text: courtName!),
+          if (shouldShowStatus(match.status)) ...[
+            const SizedBox(width: AppSpacing.sm),
+            StatusBadge.forMatch(match.status),
+          ],
         ],
       );
 }
@@ -121,14 +96,14 @@ class _Metadata extends StatelessWidget {
   Widget build(BuildContext context) => Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppColors.whiteSubtle),
-          const SizedBox(width: 4),
+          Icon(icon, size: 15, color: AppColors.whiteSubtle),
+          const SizedBox(width: 5),
           Flexible(
             child: Text(
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+              style: AppTextStyles.caption,
             ),
           ),
         ],

@@ -31,6 +31,7 @@ class LoginStringsConstants {
   static const String emailInvalid = 'login.email_invalid';
   static const String passwordRequired = 'login.password_required';
   static const String passwordTooShort = 'login.password_too_short';
+  static const String showHidePassword = 'login.show_hide_password';
   static const String passwordTooLong = 'login.password_too_long';
 
   static const String google = 'login.google';

@@ -5,6 +5,7 @@ import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/courts_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/shared/widgets/app_search_field.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
@@ -36,17 +37,13 @@ class _CourtsPageState extends State<CourtsPage> {
   Widget build(BuildContext context) {
     context.locale;
     return Scaffold(
-      backgroundColor: AppColors.backgroundEnd,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryDark,
-        title: Text(widget.item.localizedName,
-            style: const TextStyle(color: AppColors.white)),
-        iconTheme: const IconThemeData(color: AppColors.white),
+        title: Text(widget.item.localizedName),
         actions: [
           IconButton(
             onPressed: _reload,
             tooltip: 'common.retry'.tr(),
-            icon: const Icon(Icons.refresh, color: AppColors.white),
+            icon: const Icon(Icons.refresh),
           ),
         ],
       ),
@@ -93,28 +90,9 @@ class _CourtsPageState extends State<CourtsPage> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                    child: TextField(
+                    child: AppSearchField(
+                      hint: 'mobile.courts.search_hint'.tr(),
                       onChanged: (value) => setState(() => _query = value),
-                      style: const TextStyle(color: AppColors.white),
-                      decoration: InputDecoration(
-                        hintText: 'mobile.courts.search_hint'.tr(),
-                        hintStyle:
-                            const TextStyle(color: AppColors.whiteSubtle),
-                        prefixIcon: const Icon(Icons.search,
-                            color: AppColors.whiteSubtle),
-                        filled: true,
-                        fillColor: AppColors.inputFill,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide:
-                              const BorderSide(color: AppColors.inputBorder),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide:
-                              const BorderSide(color: AppColors.inputBorder),
-                        ),
-                      ),
                     ),
                   ),
                 ),

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const supportedTestLocales = [Locale('es'), Locale('en'), Locale('fr'), Locale('de')];
@@ -11,6 +12,7 @@ Future<void> initRealTranslations() async {
   SharedPreferences.setMockInitialValues({});
   EasyLocalization.logger.enableBuildModes = [];
   await EasyLocalization.ensureInitialized();
+  await initializeDateFormatting();
 }
 
 /// Pinta [home] con los diccionarios reales de `assets/translations`, cargados como los carga la app (EasyLocalization

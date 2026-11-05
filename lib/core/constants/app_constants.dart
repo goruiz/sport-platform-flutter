@@ -3,8 +3,8 @@ class AppConstants {
   static const String appVersion = '1.0.0';
 
   // Credenciales con las que arranca el formulario de login.
-  static const String fixedLoginEmail = 'usuario@ejemplo.com';
-  static const String fixedLoginPassword = 'usuario@ejemplo.comA1';
+  static const String fixedLoginEmail = 'el.bambucas@gmail.com';
+  static const String fixedLoginPassword = 'el.bambucas@gmail.comA1';
 
   // La política de contraseñas del backend (PasswordPolicy): si cambia allá, cambia aquí.
   static const int minPasswordLength = 8;

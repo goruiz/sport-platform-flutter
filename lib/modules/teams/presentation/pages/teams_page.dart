@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/teams_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
@@ -9,8 +11,10 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/models/te
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/players/presentation/pages/join_team_page.dart';
 import 'package:sport_platform/modules/teams/domain/team_members.dart';
+import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
+import 'package:sport_platform/shared/widgets/initials_avatar.dart';
 
 class TeamsPage extends StatefulWidget {
   final MenuItemModel item;
@@ -62,19 +66,13 @@ class _TeamsPageState extends State<TeamsPage> {
   Widget build(BuildContext context) {
     context.locale;
     return Scaffold(
-      backgroundColor: AppColors.backgroundEnd,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryDark,
-        title: Text(
-          widget.item.localizedName,
-          style: const TextStyle(color: AppColors.white),
-        ),
-        iconTheme: const IconThemeData(color: AppColors.white),
+        title: Text(widget.item.localizedName),
         actions: [
           IconButton(
             onPressed: _reload,
             tooltip: 'common.retry'.tr(),
-            icon: const Icon(Icons.refresh, color: AppColors.white),
+            icon: const Icon(Icons.refresh),
           ),
         ],
       ),
@@ -82,9 +80,7 @@ class _TeamsPageState extends State<TeamsPage> {
         future: _teamData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primaryLight),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
             return ErrorRetry(
@@ -109,29 +105,19 @@ class _TeamsPageState extends State<TeamsPage> {
             color: AppColors.primaryLight,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.page,
+                AppSpacing.lg,
+                AppSpacing.page,
+                AppSpacing.listBottom,
+              ),
               children: [
-                _TeamHeader(team: data.team),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'mobile.teams.players'.tr(),
-                        style: const TextStyle(
-                          color: AppColors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      '${data.members.length}',
-                      style: const TextStyle(color: AppColors.whiteSubtle),
-                    ),
-                  ],
+                _TeamHeader(team: data.team, playerCount: data.members.length),
+                const SizedBox(height: AppSpacing.xxl),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: Text('mobile.teams.players'.tr(), style: AppTextStyles.sectionTitle),
                 ),
-                const SizedBox(height: 10),
                 if (data.members.isEmpty)
                   EmptyState(
                     icon: Icons.person_search_outlined,
@@ -158,60 +144,34 @@ class _TeamData {
 
 class _TeamHeader extends StatelessWidget {
   final TeamModel team;
+  final int playerCount;
 
-  const _TeamHeader({required this.team});
+  const _TeamHeader({required this.team, required this.playerCount});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.inputBorder),
-      ),
+    final count = 'mobile.teams.players_count'.tr(namedArgs: {'count': '$playerCount'});
+    return AppCard(
+      accent: AppColors.primaryLight,
+      padding: const EdgeInsets.all(AppSpacing.xl),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-            child: team.logoUrl?.isNotEmpty == true
-                ? ClipOval(
-                    child: Image.network(
-                      team.logoUrl!,
-                      width: 56,
-                      height: 56,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(
-                        Icons.shield_outlined,
-                        color: AppColors.primaryLight,
-                        size: 28,
-                      ),
-                    ),
-                  )
-                : const Icon(
-                    Icons.shield_outlined,
-                    color: AppColors.primaryLight,
-                    size: 28,
-                  ),
-          ),
-          const SizedBox(width: 14),
+          InitialsAvatar(name: team.name, logoUrl: team.logoUrl, size: 68),
+          const SizedBox(width: AppSpacing.lg),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   team.name,
-                  style: const TextStyle(
-                    color: AppColors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.pageTitle,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
-                  'mobile.teams.your_team'.tr(),
-                  style: const TextStyle(color: AppColors.whiteSubtle),
+                  '${'mobile.teams.your_team'.tr()} · $count',
+                  style: AppTextStyles.bodyMuted,
                 ),
               ],
             ),
@@ -232,39 +192,30 @@ class _PlayerTile extends StatelessWidget {
     final name = player.fullName.trim().isEmpty
         ? player.email
         : player.fullName.trim();
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.inputBorder),
-      ),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: AppColors.primary.withValues(alpha: 0.2),
-          child: player.profilePhotoUrl?.isNotEmpty == true
-              ? ClipOval(
-                  child: Image.network(
-                    player.profilePhotoUrl!,
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => const Icon(
-                      Icons.person_outline,
-                      color: AppColors.primaryLight,
-                    ),
-                  ),
-                )
-              : const Icon(Icons.person_outline, color: AppColors.primaryLight),
-        ),
-        title: Text(name, style: const TextStyle(color: AppColors.white)),
-        trailing: player.isCaptain ? const _CaptainBadge() : null,
-        subtitle: player.email.isEmpty
-            ? null
-            : Text(
-                player.email,
-                style: const TextStyle(color: AppColors.whiteSubtle),
-              ),
+    return AppCard(
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+      child: Row(
+        children: [
+          InitialsAvatar(name: name, logoUrl: player.profilePhotoUrl, size: 42),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.cardTitle),
+                if (player.email.isNotEmpty && player.email != name) ...[
+                  const SizedBox(height: 2),
+                  Text(player.email, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption),
+                ],
+              ],
+            ),
+          ),
+          if (player.isCaptain) ...[
+            const SizedBox(width: AppSpacing.sm),
+            const _CaptainBadge(),
+          ],
+        ],
       ),
     );
   }

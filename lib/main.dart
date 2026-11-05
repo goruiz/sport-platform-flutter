@@ -4,6 +4,7 @@ import 'package:app_links/app_links.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/modules/modules_setup.dart';
@@ -19,10 +20,13 @@ import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/modules/players/presentation/pages/invite_register_page.dart';
 import 'package:sport_platform/modules/users/presentation/providers/email_verification_notifier.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
+import 'package:sport_platform/shared/widgets/app_viewport.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  // Los nombres de días y meses («mié, 12 nov») de las fechas que se escriben en el idioma del usuario.
+  await initializeDateFormatting();
   setupServiceLocator();
   registerModules();
   final startLocale = await LocaleStorage.load();
@@ -52,6 +56,7 @@ class SportsPlatform extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,
+      builder: (context, child) => AppViewport(child: child ?? const SizedBox.shrink()),
       home: const _AppRouter(),
     );
   }

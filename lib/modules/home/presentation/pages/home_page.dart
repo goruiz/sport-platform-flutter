@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
+import 'package:sport_platform/core/constants/strings_constants/logout_strings_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
@@ -13,8 +14,9 @@ import 'package:sport_platform/modules/players/presentation/providers/invitation
 import 'package:sport_platform/modules/users/presentation/providers/email_verification_notifier.dart';
 import 'package:sport_platform/core/routes/app_route_factory.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/quick_actions_drawer.dart';
-import 'package:sport_platform/shared/widgets/language_selector.dart';
-import 'package:sport_platform/shared/widgets/logout_button.dart';
+import 'package:sport_platform/shared/widgets/error_retry.dart';
+import 'package:sport_platform/shared/widgets/language_sheet.dart';
+import 'package:sport_platform/shared/widgets/logout_flow.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,7 +27,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-  HomeMenuStyle _menuStyle = HomeMenuStyle.carousel;
+  HomeMenuStyle _menuStyle = HomeMenuStyle.grid;
 
   List<MenuItemModel> _navItems = [];
   List<MenuItemModel> _menuItems = [];
@@ -69,8 +71,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     context.locale;
     return Scaffold(
-      backgroundColor: AppColors.backgroundEnd,
-      appBar: _buildAppBar(),
+      // Las demás pestañas (Equipos, Eventos, Perfil) traen su propia barra con su título: dos barras seguidas
+      // gastarían espacio y confundirían.
+      appBar: _isOnHomeTab ? _buildAppBar() : null,
       drawer: _menuStyle == HomeMenuStyle.drawer
           ? QuickActionsDrawer(
               items: _menuItems,
@@ -85,6 +88,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  bool get _isOnHomeTab =>
+      _navItems.isEmpty || _currentIndex.clamp(0, _navItems.length - 1) == 0;
+
   Widget _buildTabBody() {
     if (_navItems.isEmpty && _isLoadingMenu) {
       return const Center(
@@ -92,15 +98,9 @@ class _HomePageState extends State<HomePage> {
       );
     }
     if (_navItems.isEmpty && _menuError) {
-      return Center(
-        child: TextButton.icon(
-          onPressed: _loadMenu,
-          icon: const Icon(Icons.refresh, color: AppColors.primaryLight),
-          label: Text(
-            'common.retry'.tr(),
-            style: const TextStyle(color: AppColors.primaryLight),
-          ),
-        ),
+      return ErrorRetry(
+        message: HomeStringsConstants.menuError.tr(),
+        onRetry: _loadMenu,
       );
     }
     if (_navItems.isEmpty) return const SizedBox.shrink();
@@ -112,6 +112,7 @@ class _HomePageState extends State<HomePage> {
         isLoadingMenu: _isLoadingMenu,
         menuError: _menuError,
         onRetryMenu: _loadMenu,
+        onToggleMenuStyle: _toggleMenuStyle,
         onNavigate: _navigateToUrl,
       );
     }
@@ -135,48 +136,54 @@ class _HomePageState extends State<HomePage> {
     return null;
   }
 
+  void _toggleMenuStyle() {
+    setState(() {
+      _menuStyle = _menuStyle == HomeMenuStyle.grid
+          ? HomeMenuStyle.drawer
+          : HomeMenuStyle.grid;
+    });
+  }
+
+  /// La barra superior solo lleva lo que se usa a diario: el nombre de la app y la campana de invitaciones.
+  /// El idioma y cerrar sesión van en un menú aparte (y también en el perfil), para que un toque sin querer no cierre la sesión.
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: AppColors.primaryDark,
-      elevation: 0,
       automaticallyImplyLeading: false,
       leading: _menuStyle == HomeMenuStyle.drawer
           ? Builder(
               builder: (ctx) => IconButton(
-                icon: const Icon(Icons.menu, color: AppColors.white),
+                icon: const Icon(Icons.menu),
+                tooltip: HomeStringsConstants.openSideMenu.tr(),
                 onPressed: () => Scaffold.of(ctx).openDrawer(),
               ),
             )
           : null,
-      title: Text(
-        AppStringsConstants.appName.tr(),
-        style: const TextStyle(
-          color: AppColors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      title: Text(AppStringsConstants.appName.tr()),
       actions: [
-        IconButton(
-          icon: Icon(
-            _menuStyle == HomeMenuStyle.carousel
-                ? Icons.view_sidebar_outlined
-                : Icons.view_carousel_outlined,
-            color: AppColors.white,
-          ),
-          tooltip: _menuStyle == HomeMenuStyle.carousel
-              ? HomeStringsConstants.switchToDrawer.tr()
-              : HomeStringsConstants.switchToCarousel.tr(),
-          onPressed: () => setState(() {
-            _menuStyle = _menuStyle == HomeMenuStyle.carousel
-                ? HomeMenuStyle.drawer
-                : HomeMenuStyle.carousel;
-          }),
-        ),
-        const LanguageSelector(),
         const NotificationBell(),
-        const LogoutButton(),
+        _buildAccountMenu(),
         const SizedBox(width: 4),
+      ],
+    );
+  }
+
+  Widget _buildAccountMenu() {
+    return PopupMenuButton<_AccountMenuAction>(
+      tooltip: 'common.more_options'.tr(),
+      icon: const Icon(Icons.more_vert),
+      onSelected: (action) => switch (action) {
+        _AccountMenuAction.language => showLanguageSheet(context),
+        _AccountMenuAction.logout => confirmAndLogOut(context),
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: _AccountMenuAction.language,
+          child: _AccountMenuRow(icon: Icons.language, label: 'mobile.profile.language'.tr()),
+        ),
+        PopupMenuItem(
+          value: _AccountMenuAction.logout,
+          child: _AccountMenuRow(icon: Icons.logout, label: LogoutStringsConstants.button.tr()),
+        ),
       ],
     );
   }
@@ -186,23 +193,36 @@ class _HomePageState extends State<HomePage> {
 
     final safeIndex = _currentIndex.clamp(0, _navItems.length - 1);
 
-    return BottomNavigationBar(
-      currentIndex: safeIndex,
-      onTap: (i) => setState(() => _currentIndex = i),
-      backgroundColor: AppColors.primaryDark,
-      selectedItemColor: AppColors.primaryLight,
-      unselectedItemColor: AppColors.whiteSubtle,
-      type: BottomNavigationBarType.fixed,
-      selectedLabelStyle:
-          const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-      unselectedLabelStyle: const TextStyle(fontSize: 11),
-      items: _navItems
-          .map((item) => BottomNavigationBarItem(
+    return NavigationBar(
+      selectedIndex: safeIndex,
+      onDestinationSelected: (i) => setState(() => _currentIndex = i),
+      destinations: _navItems
+          .map((item) => NavigationDestination(
                 icon: Icon(MenuItemModel.iconOutlinedFromString(item.icon)),
-                activeIcon: Icon(MenuItemModel.iconFromString(item.icon)),
+                selectedIcon: Icon(MenuItemModel.iconFromString(item.icon)),
                 label: item.localizedName,
               ))
           .toList(),
+    );
+  }
+}
+
+enum _AccountMenuAction { language, logout }
+
+class _AccountMenuRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _AccountMenuRow({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: AppColors.whiteSubtle, size: 20),
+        const SizedBox(width: 12),
+        Text(label, style: const TextStyle(color: AppColors.white, fontSize: 15)),
+      ],
     );
   }
 }

@@ -309,13 +309,6 @@ class _PrimaryButton extends StatelessWidget {
       height: 52,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
         child: isLoading
             ? const SizedBox(
                 width: 22,

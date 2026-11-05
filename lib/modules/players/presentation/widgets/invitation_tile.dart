@@ -1,8 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/players/data/models/team_invitation_model.dart';
+import 'package:sport_platform/shared/widgets/app_card.dart';
+import 'package:sport_platform/shared/widgets/initials_avatar.dart';
 
 /// Una invitación a un equipo con sus dos respuestas: aceptar o rechazar.
 class InvitationTile extends StatelessWidget {
@@ -24,76 +28,61 @@ class InvitationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final expiresAt = invitation.expiresAt;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.inputBorder),
-      ),
+    final teamName = invitation.teamName ?? 'invitations.unknown_team'.tr();
+    return AppCard(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.shield_outlined, color: AppColors.primaryLight),
-              const SizedBox(width: 10),
+              InitialsAvatar(name: teamName, size: 46),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: Text(
-                  invitation.teamName ?? 'invitations.unknown_team'.tr(),
-                  style: const TextStyle(
-                    color: AppColors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(teamName, style: AppTextStyles.cardTitle.copyWith(fontSize: 16)),
+                    const SizedBox(height: 2),
+                    Text('invitations.invited_you'.tr(), style: AppTextStyles.caption),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            'invitations.invited_you'.tr(),
-            style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
-          ),
           if (expiresAt != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              'invitations.expires'.tr(args: [DateFormatters.date(expiresAt)]),
-              style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                const Icon(Icons.schedule, size: 15, color: AppColors.whiteSubtle),
+                const SizedBox(width: 6),
+                Text(
+                  'invitations.expires'.tr(args: [DateFormatters.date(expiresAt)]),
+                  style: AppTextStyles.caption,
+                ),
+              ],
             ),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: AppSpacing.lg),
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
                   onPressed: busy ? null : onDecline,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.whiteSubtle,
-                    side: const BorderSide(color: AppColors.inputBorder),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
                   child: Text('invitations.decline'.tr()),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: FilledButton(
                   onPressed: busy ? null : onAccept,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primaryLight,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
                   child: busy
                       ? const SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: AppColors.white),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
                         )
-                      : Text('invitations.accept'.tr(),
-                          style: const TextStyle(color: AppColors.white)),
+                      : Text('invitations.accept'.tr()),
                 ),
               ),
             ],

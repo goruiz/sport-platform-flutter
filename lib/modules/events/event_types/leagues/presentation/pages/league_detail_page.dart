@@ -233,7 +233,6 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     return ListenableBuilder(
       listenable: _notifier,
       builder: (context, _) => Scaffold(
-        backgroundColor: AppColors.backgroundEnd,
         appBar: _buildAppBar(),
         body: TabBarView(
           controller: _tabController,
@@ -260,16 +259,12 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: AppColors.primaryDark,
-      title: Text(_event.name, style: const TextStyle(color: AppColors.white)),
-      iconTheme: const IconThemeData(color: AppColors.white),
-      elevation: 0,
+      title: Text(_event.name),
       bottom: TabBar(
         controller: _tabController,
-        labelColor: AppColors.primaryLight,
-        unselectedLabelColor: AppColors.whiteSubtle,
-        indicatorColor: AppColors.primaryLight,
-        dividerColor: AppColors.inputBorder,
+        // Con cuatro pestañas en un teléfono los nombres no caben fijos y se cortaban («Informaci…»).
+        isScrollable: true,
+        tabAlignment: TabAlignment.start,
         tabs: [
           Tab(text: 'leagues.detail_tab_info'.tr()),
           Tab(text: 'leagues.detail_tab_teams'.tr()),

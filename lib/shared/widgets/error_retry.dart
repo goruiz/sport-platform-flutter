@@ -1,7 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 
+/// El estado «algo salió mal»: qué falló y un botón para volver a intentarlo.
 class ErrorRetry extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -12,28 +15,26 @@ class ErrorRetry extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xxl + AppSpacing.sm),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, color: AppColors.error, size: 48),
-            const SizedBox(height: 16),
-            Text(
-              message,
-              style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
-              textAlign: TextAlign.center,
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: AppColors.error.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.cloud_off_outlined, color: AppColors.error, size: 34),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.lg),
+            Text(message, textAlign: TextAlign.center, style: AppTextStyles.bodyMuted),
+            const SizedBox(height: AppSpacing.xl),
             OutlinedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: Text('common.retry'.tr()),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primaryLight,
-                side: const BorderSide(color: AppColors.primaryLight),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-              ),
             ),
           ],
         ),

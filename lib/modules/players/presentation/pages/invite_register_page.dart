@@ -310,16 +310,6 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
       height: 52,
       child: ElevatedButton(
         onPressed: _isLoading ? null : _onRegister,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.white,
-          disabledBackgroundColor:
-              AppColors.primaryLight.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          elevation: 0,
-        ),
         child: _isLoading
             ? const SizedBox(
                 width: 22,

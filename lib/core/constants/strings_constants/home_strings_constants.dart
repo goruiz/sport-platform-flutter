@@ -16,6 +16,8 @@ class HomeStringsConstants {
 
   // Quick actions
   static const String sectionQuickActions = 'home.section_quick_actions';
+  static const String menuError = 'home.menu_error';
+  static const String menuEmpty = 'home.menu_empty';
   static const String actionCreateTeam = 'home.action_create_team';
   static const String actionCreateTournament = 'home.action_create_tournament';
   static const String actionCreateLeague = 'home.action_create_league';
@@ -41,10 +43,11 @@ class HomeStringsConstants {
   static const String sectionRecentActivity = 'home.section_recent_activity';
   static const String noActivityTitle = 'home.no_activity_title';
   static const String noActivitySubtitle = 'home.no_activity_subtitle';
+  static const String sectionLatestResult = 'home.section_latest_result';
 
   // Menu style toggle
   static const String switchToDrawer = 'home.switch_to_drawer';
-  static const String switchToCarousel = 'home.switch_to_carousel';
+  static const String switchToGrid = 'home.switch_to_grid';
   static const String openSideMenu = 'home.open_side_menu';
 
   // Legacy (kept for compatibility)

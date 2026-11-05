@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
+import 'package:sport_platform/shared/widgets/initials_avatar.dart';
 
 class TeamEventCard extends StatelessWidget {
   final TeamEventModel team;
@@ -31,19 +32,7 @@ class TeamEventCard extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryLight.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.groups_outlined,
-                  color: AppColors.primaryLight,
-                  size: 20,
-                ),
-              ),
+              InitialsAvatar(name: team.teamName, size: 42),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(

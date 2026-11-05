@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
+/// El campo de texto de los formularios: icono a la izquierda y el aspecto que define el tema.
+/// Pensado para formularios rápidos: [textInputAction] y [onSubmitted] permiten avanzar de campo o enviar
+/// desde el teclado, y [autofillHints] deja que el gestor de contraseñas del sistema lo rellene.
 class SportTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
@@ -11,6 +14,12 @@ class SportTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final List<TextInputFormatter>? inputFormatters;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
+  final Iterable<String>? autofillHints;
+
+  /// Una pista fija bajo el campo (p. ej. las reglas de una contraseña), visible antes de equivocarse.
+  final String? helperText;
 
   const SportTextField({
     super.key,
@@ -22,6 +31,10 @@ class SportTextField extends StatelessWidget {
     this.suffixIcon,
     this.validator,
     this.inputFormatters,
+    this.textInputAction,
+    this.onSubmitted,
+    this.autofillHints,
+    this.helperText,
   });
 
   @override
@@ -31,36 +44,18 @@ class SportTextField extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
+      textInputAction: textInputAction,
+      onFieldSubmitted: onSubmitted,
+      autofillHints: autofillHints,
       style: const TextStyle(color: AppColors.white, fontSize: 15),
       validator: validator,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: AppColors.whiteSubtle, fontSize: 15),
-        prefixIcon: Icon(icon, color: AppColors.whiteSubtle, size: 20),
+        prefixIcon: Icon(icon, size: 20),
         suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: AppColors.inputFill,
-        errorStyle: const TextStyle(color: AppColors.error),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.inputBorder),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.inputBorder),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
-        ),
+        helperText: helperText,
+        helperMaxLines: 3,
+        helperStyle: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12.5),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );

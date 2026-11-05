@@ -128,11 +128,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               height: 52,
               child: FilledButton(
                 onPressed: _saving ? null : _submit,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primaryLight,
-                  foregroundColor: AppColors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
                 child: _saving
                     ? const SizedBox(
                         width: 22,

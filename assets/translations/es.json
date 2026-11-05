@@ -43,7 +43,8 @@
     "passwords_do_not_match": "Las contraseñas no coinciden",
     "back_to_login": "Volver al inicio de sesión",
     "google": "Google",
-    "apple": "Apple"
+    "apple": "Apple",
+    "show_hide_password": "Mostrar u ocultar la contraseña"
   },
   "register": {
     "create_account": "Crear cuenta",
@@ -69,7 +70,8 @@
     "apple": "Apple",
     "success": "Registro exitoso",
     "error": "Error al registrarse. Intenta de nuevo.",
-    "email_already_exists": "Este correo ya está registrado. Por favor inicia sesión."
+    "email_already_exists": "Este correo ya está registrado. Por favor inicia sesión.",
+    "password_rules": "Mínimo 8 caracteres, con mayúscula, minúscula, número y un carácter especial."
   },
   "home": {
     "nav_home": "Inicio",
@@ -83,7 +85,7 @@
     "greeting_afternoon": "Buenas tardes,",
     "greeting_evening": "Buenas noches,",
     "guest_name": "Campeón",
-    "section_quick_actions": "Menú",
+    "section_quick_actions": "Explorar",
     "action_create_team": "Crear equipo",
     "action_create_tournament": "Crear torneo",
     "action_create_league": "Crear liga",
@@ -111,8 +113,12 @@
     "no_rankings_title": "Sin posiciones",
     "no_rankings_subtitle": "Participa en eventos para aparecer aquí",
     "switch_to_drawer": "Menú lateral",
-    "switch_to_carousel": "Vista carrusel",
-    "open_side_menu": "Abrir menú lateral para acciones rápidas"
+    "open_side_menu": "Abrir menú lateral para acciones rápidas",
+    "menu_error": "No se pudo cargar el menú. Toca para reintentar.",
+    "menu_empty": "No hay accesos disponibles",
+    "section_latest_result": "Último resultado",
+    "switch_to_grid": "Vista en cuadrícula",
+    "view_team": "Ver mi equipo"
   },
   "mobile": {
     "home": {
@@ -145,7 +151,8 @@
       "players": "Jugadores",
       "players_empty": "Este equipo aún no tiene jugadores.",
       "your_team": "Tu equipo",
-      "captain": "Capitán"
+      "captain": "Capitán",
+      "players_count": "{count} jugadores"
     },
     "matches": {
       "upcoming": "Próximos",
@@ -176,7 +183,11 @@
       "last_name": "Primer apellido",
       "second_last_name": "Segundo apellido",
       "edit": "Editar perfil",
-      "incomplete": "Perfil sin completar"
+      "incomplete": "Perfil sin completar",
+      "section_personal": "Datos personales",
+      "section_preferences": "Preferencias",
+      "section_account": "Cuenta",
+      "language": "Idioma"
     },
     "complexes": {
       "load_error": "No se pudieron cargar los complejos.",
@@ -382,7 +393,10 @@
     "schedule_blocked_dates": "Fechas bloqueadas",
     "schedule_add_blocked_date": "Agregar fecha bloqueada",
     "schedule_pick_blocked_date": "Selecciona una fecha a bloquear",
-    "standings_col_gd": "DG"
+    "standings_col_gd": "DG",
+    "info_dates": "Fechas",
+    "info_format": "Formato",
+    "info_type": "Tipo"
   },
   "menu": {
     "home": "Inicio",
@@ -515,7 +529,12 @@
     "delete": "Eliminar",
     "retry": "Reintentar",
     "create": "Crear",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "yesterday": "Ayer",
+    "more_options": "Más opciones",
+    "clear": "Borrar"
   },
   "championship": {
     "tab_title": "Campeonato",
@@ -621,7 +640,8 @@
       "PLAYER_NOT_FOUND": "Necesitas registrarte como jugador para aceptar esta invitación.",
       "INVITATION_NOT_FOUND": "Esta invitación ya no existe.",
       "EMAIL_NOT_VERIFIED": "Confirma tu correo antes de aceptar una invitación."
-    }
+    },
+    "pending_count_one": "Tienes 1 invitación pendiente"
   },
   "rankings": {
     "standings": "Posiciones",

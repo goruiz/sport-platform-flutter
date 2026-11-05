@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/register_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/auth_logo.dart';
 import 'package:sport_platform/shared/widgets/social_button.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
@@ -84,12 +85,13 @@ class RegisterBody extends StatelessWidget {
       key: formKey,
       child: Column(
         children: [
-          const SizedBox(height: 16),
           SportTextField(
             controller: emailController,
             hint: RegisterStringsConstants.emailHint.tr(),
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            autofillHints: const [AutofillHints.email],
             validator: (v) {
               if (v == null || v.isEmpty) return RegisterStringsConstants.emailRequired.tr();
               if (!v.contains('@')) return RegisterStringsConstants.emailInvalid.tr();
@@ -102,6 +104,10 @@ class RegisterBody extends StatelessWidget {
             hint: RegisterStringsConstants.passwordHint.tr(),
             icon: Icons.lock_outline,
             obscureText: showPassword,
+            textInputAction: TextInputAction.next,
+            autofillHints: const [AutofillHints.newPassword],
+            // Las reglas se dicen antes de teclear, no solo cuando la contraseña ya fue rechazada.
+            helperText: RegisterStringsConstants.passwordRules.tr(),
             suffixIcon: IconButton(
               icon: Icon(
                 showPassword
@@ -131,6 +137,10 @@ class RegisterBody extends StatelessWidget {
             hint: RegisterStringsConstants.confirmPasswordHint.tr(),
             icon: Icons.lock_outline,
             obscureText: showConfirmPassword,
+            textInputAction: TextInputAction.done,
+            onSubmitted: (_) {
+              if (!isLoading) onRegister();
+            },
             suffixIcon: IconButton(
               icon: Icon(
                 showConfirmPassword
@@ -155,16 +165,9 @@ class RegisterBody extends StatelessWidget {
   Widget _buildRegisterButton() {
     return SizedBox(
       width: double.infinity,
-      height: 52,
-      child: ElevatedButton(
+      height: AppSizes.button,
+      child: FilledButton(
         onPressed: isLoading ? null : onRegister,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.white,
-          disabledBackgroundColor: AppColors.primaryLight.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          elevation: 0,
-        ),
         child: isLoading
             ? const SizedBox(
                 width: 22,
@@ -174,14 +177,7 @@ class RegisterBody extends StatelessWidget {
                   strokeWidth: 2.5,
                 ),
               )
-            : Text(
-                RegisterStringsConstants.signUpButton.tr(),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
+            : Text(RegisterStringsConstants.signUpButton.tr()),
       ),
     );
   }
@@ -223,22 +219,19 @@ class RegisterBody extends StatelessWidget {
   }
 
   Widget _buildSignIn() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
           RegisterStringsConstants.alreadyHaveAccount.tr(),
           style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
         ),
-        GestureDetector(
-          onTap: onSignIn,
+        TextButton(
+          onPressed: onSignIn,
           child: Text(
             RegisterStringsConstants.signInLink.tr(),
-            style: const TextStyle(
-              color: AppColors.primaryLight,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
         ),
       ],

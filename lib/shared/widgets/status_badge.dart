@@ -47,7 +47,7 @@ class StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
@@ -68,8 +68,8 @@ class StatusBadge extends StatelessWidget {
             label,
             style: TextStyle(
               color: color,
-              fontSize: showDot ? 11 : 12,
-              fontWeight: FontWeight.w500,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -88,7 +88,8 @@ class StatusBadge extends StatelessWidget {
       case 'ACTIVE':
         return AppColors.success;
       case 'UPCOMING':
-        return AppColors.primaryLight;
+        // Distinto del verde de «en curso»: dos estados distintos no pueden verse igual.
+        return AppColors.info;
       case 'FINISHED':
         return AppColors.whiteSubtle;
       case 'CANCELLED':

@@ -2,8 +2,12 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/modules/matches/domain/match_day_groups.dart';
 import 'package:sport_platform/modules/matches/domain/match_rules.dart';
 import 'package:sport_platform/modules/matches/presentation/pages/match_detail_page.dart';
 import 'package:sport_platform/modules/matches/presentation/providers/matches_notifier.dart';
@@ -62,24 +66,17 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     context.locale;
     return Scaffold(
-      backgroundColor: AppColors.backgroundEnd,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryDark,
-        title: Text(widget.item.localizedName,
-            style: const TextStyle(color: AppColors.white)),
-        iconTheme: const IconThemeData(color: AppColors.white),
+        title: Text(widget.item.localizedName),
         actions: [
           IconButton(
             onPressed: _notifier.load,
             tooltip: 'common.retry'.tr(),
-            icon: const Icon(Icons.refresh, color: AppColors.white),
+            icon: const Icon(Icons.refresh),
           ),
         ],
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.primaryLight,
-          unselectedLabelColor: AppColors.whiteSubtle,
-          indicatorColor: AppColors.primaryLight,
           tabs: [
             Tab(text: 'mobile.matches.upcoming'.tr()),
             Tab(text: 'mobile.matches.results'.tr()),
@@ -93,9 +90,7 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
 
   Widget _buildBody() {
     if (_notifier.loading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.primaryLight),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
     final error = _notifier.error;
     if (error != null && _notifier.visibleMatches.isEmpty) {
@@ -150,20 +145,7 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
         isExpanded: true,
         dropdownColor: AppColors.sheetBackground,
         style: const TextStyle(color: AppColors.white),
-        decoration: InputDecoration(
-          labelText: 'mobile.matches.pick_event'.tr(),
-          labelStyle: const TextStyle(color: AppColors.whiteSubtle),
-          filled: true,
-          fillColor: AppColors.inputFill,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.inputBorder),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.inputBorder),
-          ),
-        ),
+        decoration: InputDecoration(labelText: 'mobile.matches.pick_event'.tr()),
         items: [
           for (final event in events)
             DropdownMenuItem(
@@ -186,7 +168,7 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
       children: [
         _buildMatchList(upcomingMatches(matches, now)),
         _buildMatchList(playedMatches(matches)),
-        _buildMatchList(matches),
+        _buildMatchList(matchesInCalendarOrder(matches)),
       ],
     );
   }
@@ -213,24 +195,59 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
         ),
       );
     }
+    final groups = groupMatchesByDay(matches);
     return RefreshIndicator(
       onRefresh: _notifier.load,
       color: AppColors.primaryLight,
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-        itemCount: matches.length,
-        itemBuilder: (context, index) {
-          final match = matches[index];
-          return MatchSummaryCard(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.page,
+          AppSpacing.sm,
+          AppSpacing.page,
+          AppSpacing.listBottom,
+        ),
+        itemCount: groups.length,
+        itemBuilder: (context, index) => _buildDayGroup(groups[index]),
+      ),
+    );
+  }
+
+  /// Un día con sus partidos: el día va una sola vez, en el encabezado, y no en cada tarjeta.
+  Widget _buildDayGroup(MatchDayGroup group) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _DayHeader(day: group.day),
+        for (final match in group.matches)
+          MatchSummaryCard(
             match: match,
             homeName: _notifier.homeName(match),
             awayName: _notifier.awayName(match),
             eventName: _notifier.eventNameOf(match),
             courtName: _notifier.courtName(match.courtId),
+            showDay: false,
             onTap: () => _openMatch(match),
-          );
-        },
+          ),
+      ],
+    );
+  }
+}
+
+/// El encabezado de cada día de la lista: «Hoy», «Mañana» o «mié, 12 nov».
+class _DayHeader extends StatelessWidget {
+  final DateTime day;
+
+  const _DayHeader({required this.day});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = DateFormatters.friendlyDay(day, context.locale.languageCode);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.xs, AppSpacing.md, 0, AppSpacing.sm),
+      child: Text(
+        toBeginningOfSentenceCase(label) ?? label,
+        style: AppTextStyles.overline.copyWith(letterSpacing: 0.4, fontSize: 13),
       ),
     );
   }

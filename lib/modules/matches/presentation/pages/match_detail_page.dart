@@ -4,16 +4,20 @@ import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/services/external_launcher.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/core/utils/external_links.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_events_service.dart';
 import 'package:sport_platform/modules/matches/presentation/providers/match_detail_notifier.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_event_tile.dart';
-import 'package:sport_platform/modules/matches/presentation/widgets/match_summary_card.dart';
+import 'package:sport_platform/modules/matches/presentation/widgets/match_scoreboard.dart';
+import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
+import 'package:sport_platform/shared/widgets/status_badge.dart';
 
 /// El detalle de un partido: marcador y cronología de goles, asistencias, tarjetas y faltas.
 /// Solo lectura: el organizador registra esos eventos desde el panel.
@@ -63,12 +67,7 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
     context.locale;
     return Scaffold(
       backgroundColor: AppColors.backgroundEnd,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryDark,
-        title: Text('match_detail.title'.tr(),
-            style: const TextStyle(color: AppColors.white)),
-        iconTheme: const IconThemeData(color: AppColors.white),
-      ),
+      appBar: AppBar(title: Text('match_detail.title'.tr())),
       body: ListenableBuilder(
         listenable: _notifier,
         builder: (context, _) => RefreshIndicator(
@@ -78,21 +77,64 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
             children: [
-              MatchSummaryCard(
-                match: widget.match,
-                homeName: widget.homeName,
-                awayName: widget.awayName,
-                eventName: widget.eventName,
-                courtName: widget.courtName,
-              ),
-              const SizedBox(height: 12),
+              _buildHeaderCard(),
+              const SizedBox(height: AppSpacing.md),
               _buildActions(),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.xxl),
               _buildTimelineTitle(),
               ..._buildTimeline(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// El marcador grande: evento y estado arriba, los equipos con su escudo, y el lugar abajo.
+  Widget _buildHeaderCard() {
+    final match = widget.match;
+    final place = widget.courtName ?? match.location;
+    return AppCard(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: widget.eventName.isEmpty
+                    ? const SizedBox.shrink()
+                    : Text(
+                        widget.eventName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.caption,
+                      ),
+              ),
+              StatusBadge.forMatch(match.status),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          MatchScoreboard(
+            match: match,
+            homeName: widget.homeName,
+            awayName: widget.awayName,
+            large: true,
+          ),
+          if (place != null && place.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.lg),
+            Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.location_on_outlined, size: 16, color: AppColors.whiteSubtle),
+                  const SizedBox(width: 6),
+                  Flexible(child: Text(place, style: AppTextStyles.caption)),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -104,20 +146,17 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
         Expanded(
           child: OutlinedButton.icon(
             onPressed: _share,
-            icon: const Icon(Icons.share_outlined, color: AppColors.white, size: 18),
-            label: Text('match_detail.share'.tr(), style: const TextStyle(color: AppColors.white)),
-            style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.inputBorder)),
+            icon: const Icon(Icons.share_outlined, size: 18),
+            label: Text('match_detail.share'.tr()),
           ),
         ),
         if (!widget.match.hasScore) ...[
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: OutlinedButton.icon(
               onPressed: _addToCalendar,
-              icon: const Icon(Icons.event_available_outlined, color: AppColors.white, size: 18),
-              label: Text('match_detail.add_to_calendar'.tr(),
-                  style: const TextStyle(color: AppColors.white)),
-              style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.inputBorder)),
+              icon: const Icon(Icons.event_available_outlined, size: 18),
+              label: Text('match_detail.add_to_calendar'.tr()),
             ),
           ),
         ],
@@ -159,16 +198,8 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
   }
 
   Widget _buildTimelineTitle() => Padding(
-        padding: const EdgeInsets.only(left: 4, bottom: 10),
-        child: Text(
-          'match_detail.timeline'.tr(),
-          style: const TextStyle(
-            color: AppColors.primaryLight,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.6,
-          ),
-        ),
+        padding: const EdgeInsets.only(left: AppSpacing.xs, bottom: AppSpacing.md),
+        child: Text('match_detail.timeline'.tr(), style: AppTextStyles.sectionTitle),
       );
 
   List<Widget> _buildTimeline() {

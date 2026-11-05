@@ -5,6 +5,8 @@ import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/services/session_service.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/modules/players/data/datasource/join_team_service.dart';
 import 'package:sport_platform/modules/players/domain/enums/join_team_error.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
@@ -62,24 +64,21 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
   Widget build(BuildContext context) {
     context.locale;
     return Scaffold(
-      backgroundColor: AppColors.backgroundEnd,
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryDark,
-        iconTheme: const IconThemeData(color: AppColors.white),
-        title: Text('join_team.title'.tr(), style: const TextStyle(color: AppColors.white)),
-      ),
+      appBar: AppBar(title: Text('join_team.title'.tr())),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         children: [
-          Text(
-            'join_team.hint'.tr(),
-            style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14, height: 1.4),
-          ),
-          const SizedBox(height: 20),
+          Text('join_team.hint'.tr(), style: AppTextStyles.bodyMuted.copyWith(height: 1.4)),
+          const SizedBox(height: AppSpacing.xl),
           SportTextField(
             controller: _codeController,
             hint: 'join_team.field'.tr(),
             icon: Icons.vpn_key_outlined,
+            textInputAction: TextInputAction.done,
+            // Enter en el teclado entra al equipo: es el único campo de la pantalla.
+            onSubmitted: (_) {
+              if (!_joining) _join();
+            },
             inputFormatters: [
               LengthLimitingTextInputFormatter(AppConstants.joinCodeMaxInputLength),
               // El código es en mayúsculas y sin ambigüedades: se escribe como llega.
@@ -88,16 +87,11 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
               ),
             ],
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: AppSpacing.xxl + AppSpacing.xs),
           SizedBox(
-            height: 52,
+            height: AppSizes.button,
             child: FilledButton(
               onPressed: _joining ? null : _join,
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primaryLight,
-                foregroundColor: AppColors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
               child: _joining
                   ? const SizedBox(
                       width: 22,

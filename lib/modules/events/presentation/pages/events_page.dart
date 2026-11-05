@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/pages/league_detail_page.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
@@ -12,6 +13,7 @@ import 'package:sport_platform/modules/events/shared/data/providers/events_explo
 import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/event_card.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/shared/widgets/app_search_field.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
@@ -85,18 +87,12 @@ class _EventsPageState extends State<EventsPage> {
   Widget build(BuildContext context) {
     context.locale;
     return Scaffold(
-      backgroundColor: AppColors.backgroundEnd,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryDark,
-        title: Text(
-          widget.item.localizedName,
-          style: const TextStyle(color: AppColors.white),
-        ),
-        iconTheme: const IconThemeData(color: AppColors.white),
+        title: Text(widget.item.localizedName),
         actions: [
           IconButton(
             onPressed: _explorer.load,
-            icon: const Icon(Icons.refresh, color: AppColors.white),
+            icon: const Icon(Icons.refresh),
             tooltip: 'common.retry'.tr(),
           ),
         ],
@@ -118,32 +114,11 @@ class _EventsPageState extends State<EventsPage> {
 
   Widget _buildSearchField() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: TextField(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.page, AppSpacing.md, AppSpacing.page, 0),
+      child: AppSearchField(
         controller: _searchController,
+        hint: 'mobile.events.search_hint'.tr(),
         onChanged: _onSearchChanged,
-        textInputAction: TextInputAction.search,
-        style: const TextStyle(color: AppColors.white),
-        decoration: InputDecoration(
-          hintText: 'mobile.events.search_hint'.tr(),
-          hintStyle: const TextStyle(color: AppColors.whiteSubtle),
-          prefixIcon: const Icon(Icons.search, color: AppColors.whiteSubtle),
-          filled: true,
-          fillColor: AppColors.inputFill,
-          contentPadding: const EdgeInsets.symmetric(vertical: 0),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.inputBorder),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.inputBorder),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: AppColors.primaryLight),
-          ),
-        ),
       ),
     );
   }
@@ -154,7 +129,7 @@ class _EventsPageState extends State<EventsPage> {
       builder: (context, _) => SizedBox(
         height: 58,
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.page, vertical: AppSpacing.md),
           scrollDirection: Axis.horizontal,
           children: [
             _buildStatusChip('mobile.events.all'.tr(), null),
@@ -166,18 +141,12 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   Widget _buildStatusChip(String label, EventStatus? status) {
-    final selected = _explorer.status == status;
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: const EdgeInsets.only(right: AppSpacing.sm),
       child: FilterChip(
         label: Text(label),
-        selected: selected,
+        selected: _explorer.status == status,
         onSelected: (_) => _explorer.selectStatus(status),
-        selectedColor: AppColors.primaryLight.withValues(alpha: 0.2),
-        backgroundColor: AppColors.inputFill,
-        checkmarkColor: AppColors.primaryLight,
-        labelStyle: TextStyle(color: selected ? AppColors.primaryLight : AppColors.whiteSubtle),
-        side: BorderSide(color: selected ? AppColors.primaryLight : AppColors.inputBorder),
       ),
     );
   }
@@ -197,7 +166,7 @@ class _EventsPageState extends State<EventsPage> {
       child: ListView.builder(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(bottom: 20),
+        padding: const EdgeInsets.only(bottom: AppSpacing.listBottom),
         itemCount: _explorer.events.length + 1,
         itemBuilder: (context, index) {
           if (index == _explorer.events.length) return _buildListFooter();

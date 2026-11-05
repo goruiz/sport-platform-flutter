@@ -72,4 +72,18 @@ void main() {
       expect(result.map((match) => match.id), ['newer', 'older']);
     });
   });
+
+  group('matchesInCalendarOrder', () {
+    test('ordena del más antiguo al más reciente sin tocar la lista original', () {
+      final first = matchOf(id: 'first', date: DateTime(2026, 9, 1));
+      final second = matchOf(id: 'second', date: DateTime(2026, 10, 1));
+      final third = matchOf(id: 'third', date: DateTime(2026, 11, 1));
+      final original = [third, first, second];
+
+      final result = matchesInCalendarOrder(original);
+
+      expect(result.map((match) => match.id), ['first', 'second', 'third']);
+      expect(original.map((match) => match.id), ['third', 'first', 'second']);
+    });
+  });
 }

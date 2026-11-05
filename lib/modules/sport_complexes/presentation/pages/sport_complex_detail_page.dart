@@ -83,10 +83,6 @@ class _DirectionsButton extends StatelessWidget {
         onPressed: () => _open(context),
         icon: const Icon(Icons.directions_outlined),
         label: Text('mobile.complexes.directions'.tr()),
-        style: FilledButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.white,
-        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/auth_logo.dart';
 import 'package:sport_platform/shared/widgets/social_button.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
@@ -80,13 +81,16 @@ class LoginBody extends StatelessWidget {
   Widget _buildForm() {
     return Form(
       key: formKey,
-      child: Column(
-        children: [
-          SportTextField(
-            controller: emailController,
-            hint: LoginStringsConstants.emailHint.tr(),
-            icon: Icons.email_outlined,
-            keyboardType: TextInputType.emailAddress,
+      child: AutofillGroup(
+        child: Column(
+          children: [
+            SportTextField(
+              controller: emailController,
+              hint: LoginStringsConstants.emailHint.tr(),
+              icon: Icons.email_outlined,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.email],
             validator: (v) {
               if (v == null || v.isEmpty) {
                 return LoginStringsConstants.emailRequired.tr();
@@ -103,6 +107,12 @@ class LoginBody extends StatelessWidget {
             hint: LoginStringsConstants.passwordHint.tr(),
             icon: Icons.lock_outline,
             obscureText: obscurePassword,
+            textInputAction: TextInputAction.done,
+            autofillHints: const [AutofillHints.password],
+            // Enter en el teclado inicia sesión: no hace falta buscar el botón.
+            onSubmitted: (_) {
+              if (!isLoading) onLogin();
+            },
             suffixIcon: IconButton(
               icon: Icon(
                 obscurePassword
@@ -111,6 +121,7 @@ class LoginBody extends StatelessWidget {
                 color: AppColors.whiteSubtle,
                 size: 20,
               ),
+              tooltip: LoginStringsConstants.showHidePassword.tr(),
               onPressed: onTogglePassword,
             ),
             validator: (v) {
@@ -124,6 +135,7 @@ class LoginBody extends StatelessWidget {
             },
           ),
         ],
+        ),
       ),
     );
   }
@@ -145,20 +157,9 @@ class LoginBody extends StatelessWidget {
   Widget _buildLoginButton() {
     return SizedBox(
       width: double.infinity,
-      height: 52,
-      child: ElevatedButton(
+      height: AppSizes.button,
+      child: FilledButton(
         onPressed: isLoading ? null : onLogin,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryLight,
-          foregroundColor: AppColors.white,
-          disabledBackgroundColor: AppColors.primaryLight.withValues(
-            alpha: 0.5,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          elevation: 0,
-        ),
         child: isLoading
             ? const SizedBox(
                 width: 22,
@@ -168,14 +169,7 @@ class LoginBody extends StatelessWidget {
                   strokeWidth: 2.5,
                 ),
               )
-            : Text(
-                LoginStringsConstants.signIn.tr(),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
+            : Text(LoginStringsConstants.signIn.tr()),
       ),
     );
   }
@@ -221,22 +215,19 @@ class LoginBody extends StatelessWidget {
   }
 
   Widget _buildSignUp() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
           LoginStringsConstants.noAccount.tr(),
           style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
         ),
-        GestureDetector(
-          onTap: onSignUp,
+        TextButton(
+          onPressed: onSignUp,
           child: Text(
             LoginStringsConstants.signUp.tr(),
-            style: const TextStyle(
-              color: AppColors.primaryLight,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
         ),
       ],

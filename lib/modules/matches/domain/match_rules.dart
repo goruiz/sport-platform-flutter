@@ -17,3 +17,8 @@ List<MatchModel> playedMatches(List<MatchModel> matches) {
   return matches.where((match) => match.hasScore).toList()
     ..sort((a, b) => b.matchDate.compareTo(a.matchDate));
 }
+
+/// Todos los partidos en orden de calendario: el más antiguo primero.
+List<MatchModel> matchesInCalendarOrder(List<MatchModel> matches) {
+  return [...matches]..sort((a, b) => a.matchDate.compareTo(b.matchDate));
+}

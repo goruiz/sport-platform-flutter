@@ -86,19 +86,12 @@ class _RankingsPageState extends State<RankingsPage>
   Widget build(BuildContext context) {
     context.locale;
     return Scaffold(
-      backgroundColor: AppColors.backgroundEnd,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryDark,
-        title: Text(widget.item.localizedName,
-            style: const TextStyle(color: AppColors.white)),
-        iconTheme: const IconThemeData(color: AppColors.white),
+        title: Text(widget.item.localizedName),
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          labelColor: AppColors.primaryLight,
-          unselectedLabelColor: AppColors.whiteSubtle,
-          indicatorColor: AppColors.primaryLight,
           tabs: [
             Tab(text: 'rankings.standings'.tr()),
             for (final kind in LeaderboardKind.values) Tab(text: kind.translationKey.tr()),
@@ -152,7 +145,7 @@ class _RankingsPageState extends State<RankingsPage>
 
   Widget _buildEventSelector(List<EventModel> events) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
       child: DropdownButtonFormField<String>(
         // ignore: deprecated_member_use
         value: _selectedEvent!.id,

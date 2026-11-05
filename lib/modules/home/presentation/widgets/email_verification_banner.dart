@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/modules/users/presentation/providers/email_verification_notifier.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 
@@ -37,7 +38,7 @@ class _EmailVerificationBannerState extends State<EmailVerificationBanner> {
       builder: (context, _) {
         if (!notifier.needsVerification) return const SizedBox.shrink();
         return Container(
-          margin: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+          margin: const EdgeInsets.only(bottom: AppSpacing.xl),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.warning.withValues(alpha: 0.12),
