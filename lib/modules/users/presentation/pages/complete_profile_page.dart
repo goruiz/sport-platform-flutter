@@ -4,6 +4,7 @@ import 'package:sport_platform/core/constants/strings_constants/profile_strings_
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
+import 'package:sport_platform/modules/users/domain/name_rules.dart';
 import 'package:sport_platform/modules/users/domain/entities/user_profile_update.dart';
 import 'package:sport_platform/modules/users/domain/repositories/i_user_profile_repository.dart';
 import 'package:sport_platform/modules/users/presentation/widgets/complete_profile_body.dart';
@@ -75,15 +76,15 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   }
 
   UserProfileUpdate _buildProfileUpdate() => UserProfileUpdate(
-        firstName: _firstNameController.text.trim(),
+        firstName: normalizePersonName(_firstNameController.text),
         middleName: _optionalText(_middleNameController),
-        lastName: _lastNameController.text.trim(),
+        lastName: normalizePersonName(_lastNameController.text),
         secondLastName: _optionalText(_secondLastNameController),
         username: _usernameController.text.trim(),
       );
 
   String? _optionalText(TextEditingController controller) {
-    final text = controller.text.trim();
+    final text = normalizePersonName(controller.text);
     return text.isEmpty ? null : text;
   }
 

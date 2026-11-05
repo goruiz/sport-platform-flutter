@@ -237,7 +237,8 @@
     "skip_button": "Compléter plus tard",
     "skip_info": "Vous pourrez compléter votre profil plus tard dans les paramètres.",
     "save_success": "Profil complété avec succès",
-    "save_error": "Impossible d'enregistrer le profil. Veuillez réessayer."
+    "save_error": "Impossible d'enregistrer le profil. Veuillez réessayer.",
+    "name_invalid": "Lettres uniquement. Espaces, tirets et apostrophes autorisés ; ni chiffres ni symboles."
   },
   "settings": {
     "select_language": "Choisir la langue",

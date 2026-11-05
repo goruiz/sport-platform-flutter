@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/profile_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/modules/users/domain/name_rules.dart';
+import 'package:sport_platform/modules/users/presentation/utils/person_name_input.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
 
 class CompleteProfileBody extends StatelessWidget {
@@ -163,22 +165,20 @@ class CompleteProfileBody extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: SportTextField(
+                child: _buildNameField(
                   controller: firstNameController,
                   hint: ProfileStringsConstants.firstName.tr(),
                   icon: Icons.person_outline,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return ProfileStringsConstants.required.tr();
-                    return null;
-                  },
+                  isRequired: true,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: SportTextField(
+                child: _buildNameField(
                   controller: middleNameController,
                   hint: ProfileStringsConstants.middleName.tr(),
                   icon: Icons.person_outline,
+                  isRequired: false,
                 ),
               ),
             ],
@@ -187,22 +187,20 @@ class CompleteProfileBody extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: SportTextField(
+                child: _buildNameField(
                   controller: lastNameController,
                   hint: ProfileStringsConstants.lastName.tr(),
                   icon: Icons.badge_outlined,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return ProfileStringsConstants.required.tr();
-                    return null;
-                  },
+                  isRequired: true,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: SportTextField(
+                child: _buildNameField(
                   controller: secondLastNameController,
                   hint: ProfileStringsConstants.secondLastName.tr(),
                   icon: Icons.badge_outlined,
+                  isRequired: false,
                 ),
               ),
             ],
@@ -223,6 +221,29 @@ class CompleteProfileBody extends StatelessWidget {
       ),
     );
   }
+
+  /// Un nombre o apellido: el teclado no deja escribir números ni símbolos y el validador revisa lo que quede.
+  Widget _buildNameField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    required bool isRequired,
+  }) {
+    return SportTextField(
+      controller: controller,
+      hint: hint,
+      icon: icon,
+      textCapitalization: TextCapitalization.words,
+      inputFormatters: personNameInputFormatters,
+      validator: (value) => _nameErrorText(checkPersonName(value, required: isRequired)),
+    );
+  }
+
+  String? _nameErrorText(PersonNameIssue? issue) => switch (issue) {
+        null => null,
+        PersonNameIssue.empty => ProfileStringsConstants.required.tr(),
+        PersonNameIssue.invalidCharacters => PersonNameIssue.invalidCharacters.translationKey!.tr(),
+      };
 
   Widget _buildSubmitButton() {
     return SizedBox(

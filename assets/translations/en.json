@@ -237,7 +237,8 @@
     "skip_button": "Complete later",
     "skip_info": "You can complete your profile later from settings.",
     "save_success": "Profile completed successfully",
-    "save_error": "Could not save your profile. Please try again."
+    "save_error": "Could not save your profile. Please try again.",
+    "name_invalid": "Letters only. Spaces, hyphens and apostrophes are allowed; no numbers or symbols."
   },
   "settings": {
     "select_language": "Select language",

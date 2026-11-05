@@ -237,7 +237,8 @@
     "skip_button": "Completar después",
     "skip_info": "Puedes completar tu perfil más tarde desde ajustes.",
     "save_success": "Perfil completado exitosamente",
-    "save_error": "Error al guardar el perfil. Intenta de nuevo."
+    "save_error": "Error al guardar el perfil. Intenta de nuevo.",
+    "name_invalid": "Solo letras. Se permiten espacios, guion y apóstrofo; sin números ni símbolos."
   },
   "settings": {
     "select_language": "Seleccionar idioma",

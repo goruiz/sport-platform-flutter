@@ -17,6 +17,7 @@ class SportTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onSubmitted;
   final Iterable<String>? autofillHints;
+  final TextCapitalization textCapitalization;
 
   /// Una pista fija bajo el campo (p. ej. las reglas de una contraseña), visible antes de equivocarse.
   final String? helperText;
@@ -34,6 +35,7 @@ class SportTextField extends StatelessWidget {
     this.textInputAction,
     this.onSubmitted,
     this.autofillHints,
+    this.textCapitalization = TextCapitalization.none,
     this.helperText,
   });
 
@@ -47,6 +49,7 @@ class SportTextField extends StatelessWidget {
       textInputAction: textInputAction,
       onFieldSubmitted: onSubmitted,
       autofillHints: autofillHints,
+      textCapitalization: textCapitalization,
       style: const TextStyle(color: AppColors.white, fontSize: 15),
       validator: validator,
       decoration: InputDecoration(
@@ -55,6 +58,7 @@ class SportTextField extends StatelessWidget {
         suffixIcon: suffixIcon,
         helperText: helperText,
         helperMaxLines: 3,
+        errorMaxLines: 3,
         helperStyle: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12.5),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),

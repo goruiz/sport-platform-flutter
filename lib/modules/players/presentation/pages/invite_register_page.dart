@@ -7,6 +7,8 @@ import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
 import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/modules/players/data/datasource/players_auth_service.dart';
 import 'package:sport_platform/modules/players/domain/enums/team_invitation_error.dart';
+import 'package:sport_platform/modules/users/domain/name_rules.dart';
+import 'package:sport_platform/modules/users/presentation/utils/person_name_input.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
@@ -53,8 +55,8 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
 
     try {
       await _authService.registerWithToken(
-        firstName: _firstNameCtrl.text.trim(),
-        lastName: _lastNameCtrl.text.trim(),
+        firstName: normalizePersonName(_firstNameCtrl.text),
+        lastName: normalizePersonName(_lastNameCtrl.text),
         email: _emailCtrl.text.trim(),
         password: _passwordCtrl.text,
         inviteToken: widget.inviteToken,
@@ -186,6 +188,15 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
     );
   }
 
+  /// El motivo por el que un nombre o apellido no sirve, en el idioma activo; null si sirve.
+  String? _nameError(String? value, {required String requiredKey}) {
+    return switch (checkPersonName(value, required: true)) {
+      null => null,
+      PersonNameIssue.empty => requiredKey.tr(),
+      PersonNameIssue.invalidCharacters => PersonNameIssue.invalidCharacters.translationKey!.tr(),
+    };
+  }
+
   Widget _buildForm() {
     return Form(
       key: _formKey,
@@ -198,9 +209,9 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
                   controller: _firstNameCtrl,
                   hint: 'invite_register.first_name'.tr(),
                   icon: Icons.person_outline,
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'invite_register.first_name_required'.tr()
-                      : null,
+                  textCapitalization: TextCapitalization.words,
+                  inputFormatters: personNameInputFormatters,
+                  validator: (v) => _nameError(v, requiredKey: 'invite_register.first_name_required'),
                 ),
               ),
               const SizedBox(width: 12),
@@ -209,9 +220,9 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
                   controller: _lastNameCtrl,
                   hint: 'invite_register.last_name'.tr(),
                   icon: Icons.person_outline,
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'invite_register.last_name_required'.tr()
-                      : null,
+                  textCapitalization: TextCapitalization.words,
+                  inputFormatters: personNameInputFormatters,
+                  validator: (v) => _nameError(v, requiredKey: 'invite_register.last_name_required'),
                 ),
               ),
             ],

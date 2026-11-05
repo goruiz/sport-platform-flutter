@@ -237,7 +237,8 @@
     "skip_button": "Später vervollständigen",
     "skip_info": "Sie können Ihr Profil später in den Einstellungen vervollständigen.",
     "save_success": "Profil erfolgreich vervollständigt",
-    "save_error": "Das Profil konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+    "save_error": "Das Profil konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "name_invalid": "Nur Buchstaben. Leerzeichen, Bindestriche und Apostrophe sind erlaubt; keine Zahlen oder Symbole."
   },
   "settings": {
     "select_language": "Sprache auswählen",
