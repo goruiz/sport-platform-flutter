@@ -127,7 +127,16 @@
       "empty_title": "Aucun événement disponible",
       "empty_subtitle": "Les ligues et les tournois apparaîtront ici.",
       "filtered_empty_title": "Aucun événement de ce type",
-      "filtered_empty_subtitle": "Essayez une autre catégorie."
+      "filtered_empty_subtitle": "Essayez une autre catégorie.",
+      "search_hint": "Rechercher des événements",
+      "status_active": "En cours",
+      "status_upcoming": "À venir",
+      "status_finished": "Terminés",
+      "status_cancelled": "Annulés",
+      "results_count": "{count} événements",
+      "load_more": "Voir plus",
+      "no_results_title": "Aucun résultat",
+      "no_results_subtitle": "Essayez une autre recherche ou un autre statut."
     },
     "teams": {
       "load_error": "Impossible de charger votre équipe.",
@@ -147,7 +156,8 @@
       "empty_subtitle": "Le calendrier et les résultats apparaîtront ici.",
       "scope_mine": "Mon équipe",
       "scope_all": "Tous",
-      "empty_mine_subtitle": "Les matchs de votre équipe apparaîtront ici."
+      "empty_mine_subtitle": "Les matchs de votre équipe apparaîtront ici.",
+      "pick_event": "Choisissez un événement"
     },
     "courts": {
       "load_error": "Impossible de charger les terrains.",
@@ -180,7 +190,9 @@
       "location_title": "Emplacement",
       "no_location_detail": "L’organisateur n’a pas encore placé ce complexe sur la carte.",
       "courts_title": "Terrains du complexe",
-      "no_courts": "Ce complexe n’a pas encore de terrains."
+      "no_courts": "Ce complexe n’a pas encore de terrains.",
+      "directions": "Itinéraire",
+      "directions_error": "Impossible d’ouvrir la carte."
     }
   },
   "session": {
@@ -502,7 +514,8 @@
     "edit": "Modifier",
     "delete": "Supprimer",
     "retry": "Réessayer",
-    "create": "Créer"
+    "create": "Créer",
+    "cancel": "Annuler"
   },
   "championship": {
     "tab_title": "Championnat",
@@ -580,7 +593,13 @@
     "error_load": "Impossible de charger la chronologie du match.",
     "empty_title": "Aucun événement enregistré",
     "empty_subtitle": "Les buts, cartons et fautes du match apparaîtront ici.",
-    "unknown_player": "Joueur inconnu"
+    "unknown_player": "Joueur inconnu",
+    "share": "Partager",
+    "add_to_calendar": "Ajouter au calendrier",
+    "share_result": "⚽ {} {} – {} {}",
+    "share_upcoming": "⚽ {} vs {}",
+    "calendar_title": "{} vs {}",
+    "action_error": "L’action n’a pas pu aboutir."
   },
   "invitations": {
     "title": "Invitations",
@@ -600,7 +619,8 @@
       "EXPIRED": "Cette invitation a expiré.",
       "TEAM_NOT_FOUND": "L’équipe qui vous a invité n’existe plus.",
       "PLAYER_NOT_FOUND": "Vous devez vous inscrire comme joueur pour accepter cette invitation.",
-      "INVITATION_NOT_FOUND": "Cette invitation n’existe plus."
+      "INVITATION_NOT_FOUND": "Cette invitation n’existe plus.",
+      "EMAIL_NOT_VERIFIED": "Confirmez votre e-mail avant d’accepter une invitation."
     }
   },
   "rankings": {
@@ -613,7 +633,15 @@
     "empty_subtitle": "Les meilleurs apparaîtront lorsque des buts et des cartons seront enregistrés.",
     "load_error": "Impossible de charger les classements.",
     "no_events_title": "Aucun événement",
-    "no_events_subtitle": "Les classements apparaîtront lorsqu’il y aura des événements."
+    "no_events_subtitle": "Les classements apparaîtront lorsqu’il y aura des événements.",
+    "my_stats": {
+      "title": "Mes statistiques",
+      "goals": "Buts",
+      "assists": "Passes",
+      "yellow": "Jaunes",
+      "red": "Rouges",
+      "fouls": "Fautes"
+    }
   },
   "reports": {
     "load_error": "Impossible de charger le rapport.",
@@ -635,5 +663,66 @@
     "form_loss": "D",
     "by_event": "Par événement",
     "event_summary": "{won}V {drawn}N {lost}D"
+  },
+  "account": {
+    "change_password": {
+      "title": "Changer le mot de passe",
+      "current": "Mot de passe actuel",
+      "new": "Nouveau mot de passe",
+      "confirm": "Confirmer le nouveau mot de passe",
+      "submit": "Changer le mot de passe",
+      "success": "Votre mot de passe a été mis à jour."
+    },
+    "delete": {
+      "title": "Supprimer mon compte",
+      "warning": "Vos données personnelles seront effacées et vous quitterez votre équipe. Cette action est irréversible.",
+      "password": "Votre mot de passe",
+      "button": "Supprimer mon compte",
+      "confirm_title": "Supprimer votre compte ?",
+      "confirm_text": "Vous perdrez l’accès et ne pourrez pas le récupérer.",
+      "confirm_button": "Supprimer définitivement",
+      "done": "Votre compte a été supprimé."
+    },
+    "validation": {
+      "empty": "Ce champ est obligatoire",
+      "too_short": "Au moins {} caractères",
+      "too_long": "Au plus {} caractères",
+      "same_as_current": "Le nouveau mot de passe doit être différent de l’actuel",
+      "mismatch": "Les mots de passe ne correspondent pas"
+    },
+    "errors": {
+      "generic": "L’action n’a pas pu aboutir. Réessayez.",
+      "INCORRECT_CURRENT_PASSWORD": "Le mot de passe actuel est incorrect.",
+      "NEW_PASSWORD_SAME_AS_CURRENT": "Le nouveau mot de passe doit être différent de l’actuel.",
+      "INCORRECT_PASSWORD": "Le mot de passe est incorrect.",
+      "STAFF_ACCOUNT": "Les comptes administrateur se suppriment depuis le panneau.",
+      "INVALID_OR_EXPIRED": "Le lien n’est pas valide ou a expiré.",
+      "TOO_MANY_REQUESTS": "Trop de tentatives. Patientez quelques minutes."
+    }
+  },
+  "verify_email": {
+    "title": "Confirmez votre e-mail",
+    "text": "Pour rejoindre une équipe, confirmez d’abord votre e-mail. Nous avons envoyé un lien à {}.",
+    "resend": "Renvoyer l’e-mail",
+    "check": "Je l’ai déjà confirmé",
+    "resent": "Nous vous avons envoyé un nouveau lien.",
+    "confirmed": "Votre e-mail est confirmé.",
+    "still_pending": "Pas encore confirmé. Ouvrez le lien de l’e-mail."
+  },
+  "join_team": {
+    "title": "Rejoindre avec un code",
+    "hint": "Demandez le code à l’administrateur ou au capitaine de votre équipe et saisissez-le ici pour rejoindre sans attendre une invitation.",
+    "field": "Code de l’équipe",
+    "submit": "Rejoindre l’équipe",
+    "success": "Vous faites maintenant partie de l’équipe !",
+    "code_required": "Saisissez le code de l’équipe.",
+    "home_hint": "Rejoignez votre équipe avec le code donné par son administrateur.",
+    "errors": {
+      "generic": "Impossible de rejoindre l’équipe. Réessayez.",
+      "JOIN_CODE_NOT_FOUND": "Aucune équipe avec ce code. Vérifiez-le ou demandez-en un nouveau.",
+      "ALREADY_IN_TEAM": "Vous appartenez déjà à une équipe.",
+      "EMAIL_NOT_VERIFIED": "Confirmez votre e-mail avant de rejoindre une équipe.",
+      "TOO_MANY_REQUESTS": "Trop de tentatives. Patientez une minute."
+    }
   }
 }

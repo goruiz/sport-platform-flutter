@@ -32,8 +32,7 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
     _tabController = TabController(length: 3, vsync: this);
     _notifier = MatchesNotifier(
       matchesService: getIt(),
-      eventsService: getIt(),
-      teamsService: getIt(),
+      eventsSearchService: getIt(),
       courtsService: getIt(),
     )..load();
   }
@@ -50,9 +49,9 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
       MaterialPageRoute(
         builder: (_) => MatchDetailPage(
           match: match,
-          homeName: _notifier.teamName(match.homeTeamId),
-          awayName: _notifier.teamName(match.awayTeamId),
-          eventName: _notifier.eventName(match.eventId),
+          homeName: _notifier.homeName(match),
+          awayName: _notifier.awayName(match),
+          eventName: _notifier.eventNameOf(match),
           courtName: _notifier.courtName(match.courtId),
         ),
       ),
@@ -105,6 +104,7 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
     return Column(
       children: [
         _buildScopeSelector(),
+        if (_notifier.scope == MatchesScope.all) _buildEventPicker(),
         Expanded(
           child: _notifier.loadingAll
               ? const Center(
@@ -135,6 +135,45 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
         selected: {_notifier.scope},
         onSelectionChanged: (selection) => _notifier.selectScope(selection.first),
         showSelectedIcon: false,
+      ),
+    );
+  }
+
+  /// En «Todos» se ven los partidos de un evento a la vez: este es el que se elige.
+  Widget _buildEventPicker() {
+    final events = _notifier.eventOptions;
+    if (events.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: DropdownButtonFormField<String>(
+        initialValue: _notifier.selectedEventId,
+        isExpanded: true,
+        dropdownColor: AppColors.sheetBackground,
+        style: const TextStyle(color: AppColors.white),
+        decoration: InputDecoration(
+          labelText: 'mobile.matches.pick_event'.tr(),
+          labelStyle: const TextStyle(color: AppColors.whiteSubtle),
+          filled: true,
+          fillColor: AppColors.inputFill,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: AppColors.inputBorder),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: AppColors.inputBorder),
+          ),
+        ),
+        items: [
+          for (final event in events)
+            DropdownMenuItem(
+              value: event.id,
+              child: Text(event.name, overflow: TextOverflow.ellipsis),
+            ),
+        ],
+        onChanged: (eventId) {
+          if (eventId != null) _notifier.selectEvent(eventId);
+        },
       ),
     );
   }
@@ -185,9 +224,9 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
           final match = matches[index];
           return MatchSummaryCard(
             match: match,
-            homeName: _notifier.teamName(match.homeTeamId),
-            awayName: _notifier.teamName(match.awayTeamId),
-            eventName: _notifier.eventName(match.eventId),
+            homeName: _notifier.homeName(match),
+            awayName: _notifier.awayName(match),
+            eventName: _notifier.eventNameOf(match),
             courtName: _notifier.courtName(match.courtId),
             onTap: () => _openMatch(match),
           );

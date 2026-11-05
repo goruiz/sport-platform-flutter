@@ -10,6 +10,7 @@ import 'package:sport_platform/modules/home/presentation/enums/menu_style.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/home_tab.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/notification_bell.dart';
 import 'package:sport_platform/modules/players/presentation/providers/invitations_notifier.dart';
+import 'package:sport_platform/modules/users/presentation/providers/email_verification_notifier.dart';
 import 'package:sport_platform/core/routes/app_route_factory.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/quick_actions_drawer.dart';
 import 'package:sport_platform/shared/widgets/language_selector.dart';
@@ -39,6 +40,8 @@ class _HomePageState extends State<HomePage> {
     _loadMenu();
     // La campana y la tarjeta de invitaciones del inicio leen este mismo estado.
     getIt<InvitationsNotifier>().load();
+    // El aviso de «confirma tu correo» solo sale si el backend dice que aún no lo está.
+    getIt<EmailVerificationNotifier>().load();
   }
 
   Future<void> _loadMenu() async {

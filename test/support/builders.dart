@@ -12,6 +12,9 @@ MatchModel matchOf({
   int? homeScore,
   int? awayScore,
   String eventId = 'event-1',
+  String? homeTeamName,
+  String? awayTeamName,
+  String? eventName,
 }) {
   return MatchModel(
     id: id,
@@ -23,6 +26,9 @@ MatchModel matchOf({
     awayScore: awayScore,
     eventId: eventId,
     createdAt: DateTime(2026, 1, 1),
+    homeTeamName: homeTeamName,
+    awayTeamName: awayTeamName,
+    eventName: eventName,
   );
 }
 

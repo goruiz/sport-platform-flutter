@@ -19,7 +19,11 @@ import 'package:sport_platform/modules/events/shared/data/datasource/events_cata
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_events_service.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
+import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
+import 'package:sport_platform/modules/players/data/datasource/join_team_service.dart';
 import 'package:sport_platform/modules/players/data/datasource/team_invitations_service.dart';
+import 'package:sport_platform/modules/users/data/datasource/account_service.dart';
+import 'package:sport_platform/modules/users/presentation/providers/email_verification_notifier.dart';
 import 'package:sport_platform/modules/players/presentation/providers/invitations_notifier.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/sport_complexes/data/datasource/sport_complexes_service.dart';
@@ -66,6 +70,12 @@ void setupServiceLocator() {
   getIt.registerLazySingleton<InvitationsNotifier>(
     () => InvitationsNotifier(getIt<TeamInvitationsService>(), getIt<SessionService>()),
   );
+  getIt.registerLazySingleton<AccountService>(() => AccountService());
+  getIt.registerLazySingleton<EmailVerificationNotifier>(
+    () => EmailVerificationNotifier(getIt<AccountService>()),
+  );
+  getIt.registerLazySingleton<JoinTeamService>(() => JoinTeamService());
+  getIt.registerLazySingleton<EventsSearchService>(() => EventsSearchService());
   getIt.registerLazySingleton<EventsNotifier>(
     () => EventsNotifier(LeagueService()),
     instanceName: _leaguesNotifierName,
@@ -85,5 +95,8 @@ void _resetSessionScopedServices() {
   _resetOrganizationScopedServices();
   if (getIt.isRegistered<InvitationsNotifier>()) {
     getIt.resetLazySingleton<InvitationsNotifier>();
+  }
+  if (getIt.isRegistered<EmailVerificationNotifier>()) {
+    getIt.resetLazySingleton<EmailVerificationNotifier>();
   }
 }

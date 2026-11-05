@@ -17,6 +17,12 @@ class MatchModel {
   /// resultado. Lo calcula el backend: es null si no lo envía.
   final DateTime? endsAt;
 
+  /// Los nombres de lo que apuntan los ids, que el backend manda al leer partidos para no tener que bajar todos los
+  /// equipos y eventos solo para rotularlos. Null si el jugador no ve ese equipo o evento.
+  final String? homeTeamName;
+  final String? awayTeamName;
+  final String? eventName;
+
   const MatchModel({
     required this.id,
     required this.homeTeamId,
@@ -30,6 +36,9 @@ class MatchModel {
     required this.eventId,
     required this.createdAt,
     this.endsAt,
+    this.homeTeamName,
+    this.awayTeamName,
+    this.eventName,
   });
 
   bool get hasScore => homeScore != null && awayScore != null;
@@ -54,6 +63,9 @@ class MatchModel {
       endsAt: json['endsAt'] != null
           ? DateTime.parse(json['endsAt'].toString())
           : null,
+      homeTeamName: json['homeTeamName']?.toString(),
+      awayTeamName: json['awayTeamName']?.toString(),
+      eventName: json['eventName']?.toString(),
     );
   }
 
@@ -82,6 +94,9 @@ class MatchModel {
     String? eventId,
     DateTime? createdAt,
     DateTime? endsAt,
+    String? homeTeamName,
+    String? awayTeamName,
+    String? eventName,
   }) =>
       MatchModel(
         id: id ?? this.id,
@@ -96,6 +111,9 @@ class MatchModel {
         eventId: eventId ?? this.eventId,
         createdAt: createdAt ?? this.createdAt,
         endsAt: endsAt ?? this.endsAt,
+        homeTeamName: homeTeamName ?? this.homeTeamName,
+        awayTeamName: awayTeamName ?? this.awayTeamName,
+        eventName: eventName ?? this.eventName,
       );
 
   static String apiDateTime(DateTime d) =>

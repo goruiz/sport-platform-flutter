@@ -4,7 +4,9 @@ import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
+import 'package:sport_platform/modules/users/presentation/pages/change_password_page.dart';
 import 'package:sport_platform/modules/users/presentation/pages/complete_profile_page.dart';
+import 'package:sport_platform/modules/users/presentation/pages/delete_account_page.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -108,9 +110,57 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+              _AccountAction(
+                icon: Icons.lock_reset_outlined,
+                label: 'account.change_password.title'.tr(),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ChangePasswordPage()),
+                ),
+              ),
+              const SizedBox(height: 8),
+              _AccountAction(
+                icon: Icons.delete_outline,
+                label: 'account.delete.title'.tr(),
+                color: AppColors.error,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const DeleteAccountPage()),
+                ),
+              ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// Una acción de la cuenta (cambiar la contraseña, eliminarla) en el perfil.
+class _AccountAction extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color color;
+
+  const _AccountAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color = AppColors.white,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 48,
+      child: OutlinedButton.icon(
+        onPressed: onTap,
+        icon: Icon(icon, color: color),
+        label: Text(label, style: TextStyle(color: color)),
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: color.withValues(alpha: 0.5)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       ),
     );
   }

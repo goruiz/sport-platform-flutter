@@ -4,14 +4,17 @@ import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/standings_tab.dart';
-import 'package:sport_platform/modules/events/shared/data/datasource/events_catalog_service.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/championship_tab.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 import 'package:sport_platform/modules/rankings/domain/leaderboards.dart';
+import 'package:sport_platform/modules/rankings/domain/my_stats.dart';
 import 'package:sport_platform/modules/rankings/presentation/widgets/leaderboard_list.dart';
+import 'package:sport_platform/modules/rankings/presentation/widgets/my_stats_card.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
@@ -34,6 +37,7 @@ class _RankingsPageState extends State<RankingsPage>
   late Future<List<EventModel>> _eventsFuture;
   Future<List<PlayerStatsModel>>? _statsFuture;
   EventModel? _selectedEvent;
+  String? _currentPlayerId;
 
   @override
   void initState() {
@@ -49,10 +53,21 @@ class _RankingsPageState extends State<RankingsPage>
   }
 
   Future<List<EventModel>> _loadEvents() async {
-    final events = await getIt<EventsCatalogService>().getAll();
+    // La primera página que ordena el backend (lo que está en curso va primero), no todos los eventos de la plataforma.
+    final events = (await getIt<EventsSearchService>().search()).events;
+    _currentPlayerId = (await _readCurrentPlayerId());
     final defaultEvent = pickDefaultEvent(events);
     if (_selectedEvent == null && defaultEvent != null) _selectEvent(defaultEvent);
     return events;
+  }
+
+  /// El jugador de la cuenta, para mostrarle sus propias estadísticas; sin él (o si falla) solo se omite esa tarjeta.
+  Future<String?> _readCurrentPlayerId() async {
+    try {
+      return (await getIt<PlayersService>().getCurrent())?.id;
+    } catch (_) {
+      return null;
+    }
   }
 
   void _selectEvent(EventModel event) {
@@ -115,11 +130,23 @@ class _RankingsPageState extends State<RankingsPage>
           return Column(
             children: [
               _buildEventSelector(events),
+              _buildMyStats(),
               Expanded(child: _buildTabs(_selectedEvent!)),
             ],
           );
         },
       ),
+    );
+  }
+
+  /// Lo que hizo el propio jugador en el evento; no se dibuja nada mientras carga, si falla o si no tiene nada ahí.
+  Widget _buildMyStats() {
+    return FutureBuilder<List<PlayerStatsModel>>(
+      future: _statsFuture,
+      builder: (context, snapshot) {
+        final mine = findPlayerStats(snapshot.data ?? const [], _currentPlayerId);
+        return mine == null ? const SizedBox.shrink() : MyStatsCard(stats: mine);
+      },
     );
   }
 

@@ -1,8 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/shared/data/datasource/events_catalog_service.dart';
-import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
 import 'package:sport_platform/modules/reports/domain/team_report.dart';
 
@@ -13,15 +10,12 @@ class ReportsNotifier extends ChangeNotifier {
 
   final PlayersService _playersService;
   final MatchesService _matchesService;
-  final EventsCatalogService _eventsService;
 
   ReportsNotifier({
     required PlayersService playersService,
     required MatchesService matchesService,
-    required EventsCatalogService eventsService,
   }) : _playersService = playersService,
-       _matchesService = matchesService,
-       _eventsService = eventsService;
+       _matchesService = matchesService;
 
   bool _loading = true;
   String? _error;
@@ -69,13 +63,11 @@ class ReportsNotifier extends ChangeNotifier {
   }
 
   Future<void> _buildReport(String teamId) async {
-    final results = await Future.wait<dynamic>([
-      _matchesService.getMine(),
-      _eventsService.getAll(),
-    ]);
-    final matches = results[0] as List<MatchModel>;
-    final eventNames = {
-      for (final event in results[1] as List<EventModel>) event.id: event.name,
+    final matches = await _matchesService.getMine();
+    // El nombre del evento viene en cada partido: no hace falta bajar todos los eventos solo para rotular el reporte.
+    final eventNames = <String, String>{
+      for (final match in matches)
+        if (match.eventName != null) match.eventId: match.eventName!,
     };
     _record = buildTeamRecord(teamId, matches);
     _recentForm = buildRecentForm(teamId, matches, limit: recentFormLength);

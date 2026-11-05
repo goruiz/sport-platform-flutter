@@ -8,12 +8,18 @@ class EmptyState extends StatelessWidget {
   final String subtitle;
   final VoidCallback? onAdd;
 
+  /// El texto y el icono del botón de [onAdd]; sin ellos es «Crear» con un «+».
+  final String? actionLabel;
+  final IconData actionIcon;
+
   const EmptyState({
     super.key,
     required this.icon,
     required this.title,
     required this.subtitle,
     this.onAdd,
+    this.actionLabel,
+    this.actionIcon = Icons.add,
   });
 
   @override
@@ -54,8 +60,8 @@ class EmptyState extends StatelessWidget {
               const SizedBox(height: 28),
               FilledButton.icon(
                 onPressed: onAdd,
-                icon: const Icon(Icons.add),
-                label: Text('common.create'.tr()),
+                icon: Icon(actionIcon),
+                label: Text(actionLabel ?? 'common.create'.tr()),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primaryLight,
                   foregroundColor: AppColors.white,

@@ -12,8 +12,10 @@ class MatchesService {
   /// jugador aún no tiene equipo.
   Future<List<MatchModel>> getMine() => _read(ApiEndpoints.matchesMine);
 
-  /// Todos los partidos de la plataforma, por fecha: úsalo solo cuando el usuario lo pide.
-  Future<List<MatchModel>> getAll() => _read(ApiEndpoints.matches);
+  /// Los partidos de un evento, por fecha. Una lista acotada por el evento: ya no hay lectura de todos los de la
+  /// plataforma (con los eventos públicos de muchas organizaciones crecería sin tope).
+  Future<List<MatchModel>> getByEvent(String eventId) =>
+      _read(ApiEndpoints.matchesByEvent(eventId));
 
   Future<List<MatchModel>> _read(String path) async {
     final response = await _client.get(path);

@@ -16,7 +16,10 @@ enum TeamInvitationError {
   playerNotFound('PLAYER_NOT_FOUND'),
 
   /// El enlace de registro no corresponde a ninguna invitación.
-  invitationNotFound('INVITATION_NOT_FOUND');
+  invitationNotFound('INVITATION_NOT_FOUND'),
+
+  /// El correo de la cuenta aún no está confirmado: sin eso no se entra a un equipo (es un 403, no un 400).
+  emailNotVerified('EMAIL_NOT_VERIFIED');
 
   const TeamInvitationError(this.code);
 
@@ -48,5 +51,7 @@ enum TeamInvitationError {
     teamNotFound => translationKey,
     // Registrarse crea al jugador: este motivo solo existe al aceptar una invitación.
     playerNotFound => 'invite_register.error_generic',
+    // El registro con enlace deja el correo confirmado: tampoco puede pasar ahí.
+    emailNotVerified => 'invite_register.error_generic',
   };
 }

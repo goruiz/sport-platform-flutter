@@ -7,6 +7,7 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/datasourc
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/modules/players/presentation/pages/join_team_page.dart';
 import 'package:sport_platform/modules/teams/domain/team_members.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
@@ -34,18 +35,12 @@ class _TeamsPageState extends State<TeamsPage> {
     final teamId = player?.teamId;
     if (player == null || teamId == null || teamId.isEmpty) return null;
 
+    // Su equipo por id, no la lista de todos los que la app puede ver.
     final results = await Future.wait<dynamic>([
-      getIt<TeamsService>().getAll(),
+      getIt<TeamsService>().getById(teamId),
       getIt<PlayersService>().getByTeamId(teamId),
     ]);
-    final teams = results[0] as List<TeamModel>;
-    TeamModel? team;
-    for (final value in teams) {
-      if (value.id == teamId) {
-        team = value;
-        break;
-      }
-    }
+    final team = results[0] as TeamModel?;
     if (team == null) return null;
     return _TeamData(
       team: team,
@@ -56,6 +51,11 @@ class _TeamsPageState extends State<TeamsPage> {
   Future<void> _reload() async {
     setState(() => _teamData = _loadTeamData());
     await _teamData;
+  }
+
+  Future<void> _joinWithCode() async {
+    final joined = await JoinTeamPage.open(context);
+    if (joined && mounted) await _reload();
   }
 
   @override
@@ -98,6 +98,10 @@ class _TeamsPageState extends State<TeamsPage> {
               icon: Icons.groups_outlined,
               title: 'mobile.teams.empty_title'.tr(),
               subtitle: 'mobile.teams.no_membership'.tr(),
+              // Sin equipo: se puede entrar con el código que da su administrador, sin esperar una invitación.
+              onAdd: _joinWithCode,
+              actionLabel: 'join_team.title'.tr(),
+              actionIcon: Icons.vpn_key_outlined,
             );
           }
           return RefreshIndicator(

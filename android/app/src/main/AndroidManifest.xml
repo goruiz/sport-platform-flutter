@@ -49,6 +49,18 @@
                     android:pathPrefix="/reset-password"/>
             </intent-filter>
 
+            <!-- Deep link: email confirmation (development - localhost) -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="http"
+                    android:host="localhost"
+                    android:port="5021"
+                    android:pathPrefix="/verify-email"/>
+            </intent-filter>
+
             <!-- Deep link: invitation registration (production - HTTPS) -->
             <!-- Replace yourdomain.com with your actual domain when deploying -->
             <intent-filter android:autoVerify="true">

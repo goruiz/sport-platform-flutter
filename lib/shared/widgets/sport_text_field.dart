@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 class SportTextField extends StatelessWidget {
@@ -9,6 +10,7 @@ class SportTextField extends StatelessWidget {
   final TextInputType keyboardType;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
+  final List<TextInputFormatter>? inputFormatters;
 
   const SportTextField({
     super.key,
@@ -19,6 +21,7 @@ class SportTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.suffixIcon,
     this.validator,
+    this.inputFormatters,
   });
 
   @override
@@ -27,6 +30,7 @@ class SportTextField extends StatelessWidget {
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       style: const TextStyle(color: AppColors.white, fontSize: 15),
       validator: validator,
       decoration: InputDecoration(

@@ -17,6 +17,8 @@ import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/password_recovery_page.dart';
 import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/modules/players/presentation/pages/invite_register_page.dart';
+import 'package:sport_platform/modules/users/presentation/providers/email_verification_notifier.dart';
+import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -103,6 +105,13 @@ class _AppRouterState extends State<_AppRouter> {
   }
 
   void _handleLink(Uri uri, {bool isInitial = false}) {
+    final emailVerificationToken = _extractEmailVerificationToken(uri);
+    if (emailVerificationToken != null) {
+      // Con la app recién abierta el Navigator aún no existe: se confirma tras el primer cuadro.
+      WidgetsBinding.instance.addPostFrameCallback((_) => _confirmEmail(emailVerificationToken));
+      return;
+    }
+
     final passwordResetToken = _extractPasswordResetToken(uri);
     if (passwordResetToken != null) {
       if (isInitial) {
@@ -135,6 +144,25 @@ class _AppRouterState extends State<_AppRouter> {
       return uri.queryParameters['inviteToken'];
     }
     return null;
+  }
+
+  /// El token del enlace del correo de confirmación: `…/verify-email?token=…` o `sportplatform://verify-email?token=…`.
+  String? _extractEmailVerificationToken(Uri uri) {
+    if (uri.path == '/verify-email' || uri.host == 'verify-email') {
+      final token = uri.queryParameters['token'];
+      return (token == null || token.isEmpty) ? null : token;
+    }
+    return null;
+  }
+
+  Future<void> _confirmEmail(String token) async {
+    final messageKey = await getIt<EmailVerificationNotifier>().confirmWithToken(token);
+    final context = AppNavigator.key.currentContext;
+    if (context == null || !context.mounted) return;
+    final text = messageKey.tr();
+    messageKey == 'verify_email.confirmed'
+        ? AppSnackbar.success(context, text)
+        : AppSnackbar.warning(context, text);
   }
 
   String? _extractPasswordResetToken(Uri uri) {

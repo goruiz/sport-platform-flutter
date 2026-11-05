@@ -11,6 +11,11 @@ class ApiEndpoints {
   static const String logout = '/users/auth/logout';
   static const String refreshToken = '/users/auth/refresh';
   static const String updateProfile = '/users/auth/update-profile';
+  static const String changePassword = '/users/auth/change-password';
+  static const String deleteAccount = '/users/auth/delete-account';
+  static const String currentAccount = '/users/auth/me';
+  static const String verifyEmail = '/users/auth/verify-email';
+  static const String resendEmailVerification = '/users/auth/resend-verification';
 
   // Users
   static const String users = '/users';
@@ -28,12 +33,14 @@ class ApiEndpoints {
   static const String playersInvite = '/players/invite';
   static const String playersInviteRegister = '/players/invite-register';
   static const String playersAuthRegister = '/players/auth/register';
+  static const String playersJoinByCode = '/players/join-by-code';
   static String playersByTeam(String teamId) => '/players/by-team/$teamId';
   static String playerRemoveFromTeam(String id) =>
       '/players/$id/remove-from-team';
 
   // Events
   static const String events = '/events';
+  static const String eventsSearch = '/events/search';
   static String eventById(String id) => '/events/$id';
   static String eventsByType(String typeId) => '/events/by-event-type/$typeId';
   static String eventsByTypeAndUser(String typeId, String userId) =>

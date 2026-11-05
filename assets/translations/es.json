@@ -127,7 +127,16 @@
       "empty_title": "No hay eventos disponibles",
       "empty_subtitle": "Las ligas y torneos aparecerán aquí.",
       "filtered_empty_title": "No hay eventos de este tipo",
-      "filtered_empty_subtitle": "Prueba con otra categoría."
+      "filtered_empty_subtitle": "Prueba con otra categoría.",
+      "search_hint": "Buscar eventos",
+      "status_active": "En curso",
+      "status_upcoming": "Próximos",
+      "status_finished": "Finalizados",
+      "status_cancelled": "Cancelados",
+      "results_count": "{count} eventos",
+      "load_more": "Ver más",
+      "no_results_title": "Sin resultados",
+      "no_results_subtitle": "Prueba con otra búsqueda o con otro estado."
     },
     "teams": {
       "load_error": "No se pudo cargar tu equipo.",
@@ -147,7 +156,8 @@
       "empty_subtitle": "El calendario y los resultados aparecerán aquí.",
       "scope_mine": "Mi equipo",
       "scope_all": "Todos",
-      "empty_mine_subtitle": "Los partidos de tu equipo aparecerán aquí."
+      "empty_mine_subtitle": "Los partidos de tu equipo aparecerán aquí.",
+      "pick_event": "Elige un evento"
     },
     "courts": {
       "load_error": "No se pudieron cargar las canchas.",
@@ -180,7 +190,9 @@
       "location_title": "Ubicación",
       "no_location_detail": "El organizador aún no marcó este complejo en el mapa.",
       "courts_title": "Canchas del complejo",
-      "no_courts": "Este complejo aún no tiene canchas."
+      "no_courts": "Este complejo aún no tiene canchas.",
+      "directions": "Cómo llegar",
+      "directions_error": "No se pudo abrir el mapa."
     }
   },
   "session": {
@@ -502,7 +514,8 @@
     "edit": "Editar",
     "delete": "Eliminar",
     "retry": "Reintentar",
-    "create": "Crear"
+    "create": "Crear",
+    "cancel": "Cancelar"
   },
   "championship": {
     "tab_title": "Campeonato",
@@ -580,7 +593,13 @@
     "error_load": "No se pudo cargar la cronología del partido.",
     "empty_title": "Sin eventos registrados",
     "empty_subtitle": "Los goles, las tarjetas y las faltas del partido aparecerán aquí.",
-    "unknown_player": "Jugador desconocido"
+    "unknown_player": "Jugador desconocido",
+    "share": "Compartir",
+    "add_to_calendar": "Al calendario",
+    "share_result": "⚽ {} {} – {} {}",
+    "share_upcoming": "⚽ {} vs {}",
+    "calendar_title": "{} vs {}",
+    "action_error": "No se pudo completar la acción."
   },
   "invitations": {
     "title": "Invitaciones",
@@ -600,7 +619,8 @@
       "EXPIRED": "Esta invitación venció.",
       "TEAM_NOT_FOUND": "El equipo que te invitó ya no existe.",
       "PLAYER_NOT_FOUND": "Necesitas registrarte como jugador para aceptar esta invitación.",
-      "INVITATION_NOT_FOUND": "Esta invitación ya no existe."
+      "INVITATION_NOT_FOUND": "Esta invitación ya no existe.",
+      "EMAIL_NOT_VERIFIED": "Confirma tu correo antes de aceptar una invitación."
     }
   },
   "rankings": {
@@ -613,7 +633,15 @@
     "empty_subtitle": "Los líderes aparecerán cuando se registren goles y tarjetas.",
     "load_error": "No se pudieron cargar los rankings.",
     "no_events_title": "No hay eventos",
-    "no_events_subtitle": "Los rankings aparecerán cuando haya eventos."
+    "no_events_subtitle": "Los rankings aparecerán cuando haya eventos.",
+    "my_stats": {
+      "title": "Mis estadísticas",
+      "goals": "Goles",
+      "assists": "Asist.",
+      "yellow": "Amarillas",
+      "red": "Rojas",
+      "fouls": "Faltas"
+    }
   },
   "reports": {
     "load_error": "No se pudo cargar el reporte.",
@@ -635,5 +663,66 @@
     "form_loss": "P",
     "by_event": "Por evento",
     "event_summary": "{won}G {drawn}E {lost}P"
+  },
+  "account": {
+    "change_password": {
+      "title": "Cambiar contraseña",
+      "current": "Contraseña actual",
+      "new": "Nueva contraseña",
+      "confirm": "Confirmar nueva contraseña",
+      "submit": "Cambiar contraseña",
+      "success": "Tu contraseña se actualizó."
+    },
+    "delete": {
+      "title": "Eliminar mi cuenta",
+      "warning": "Se borrarán tus datos personales y saldrás de tu equipo. Esta acción no se puede deshacer.",
+      "password": "Tu contraseña",
+      "button": "Eliminar mi cuenta",
+      "confirm_title": "¿Eliminar tu cuenta?",
+      "confirm_text": "Perderás el acceso y no podrás recuperarla.",
+      "confirm_button": "Eliminar definitivamente",
+      "done": "Tu cuenta fue eliminada."
+    },
+    "validation": {
+      "empty": "Este campo es obligatorio",
+      "too_short": "Mínimo {} caracteres",
+      "too_long": "Máximo {} caracteres",
+      "same_as_current": "La nueva contraseña debe ser distinta de la actual",
+      "mismatch": "Las contraseñas no coinciden"
+    },
+    "errors": {
+      "generic": "No se pudo completar la acción. Inténtalo de nuevo.",
+      "INCORRECT_CURRENT_PASSWORD": "La contraseña actual no es correcta.",
+      "NEW_PASSWORD_SAME_AS_CURRENT": "La nueva contraseña debe ser distinta de la actual.",
+      "INCORRECT_PASSWORD": "La contraseña no es correcta.",
+      "STAFF_ACCOUNT": "Las cuentas de administrador se eliminan desde el panel.",
+      "INVALID_OR_EXPIRED": "El enlace no es válido o ya venció.",
+      "TOO_MANY_REQUESTS": "Demasiados intentos. Espera unos minutos."
+    }
+  },
+  "verify_email": {
+    "title": "Confirma tu correo",
+    "text": "Para unirte a un equipo primero confirma tu correo. Te enviamos un enlace a {}.",
+    "resend": "Reenviar correo",
+    "check": "Ya lo confirmé",
+    "resent": "Te enviamos un enlace nuevo.",
+    "confirmed": "Tu correo quedó confirmado.",
+    "still_pending": "Aún no está confirmado. Abre el enlace del correo."
+  },
+  "join_team": {
+    "title": "Unirme con un código",
+    "hint": "Pídele el código al administrador o capitán de tu equipo y escríbelo aquí para unirte sin esperar una invitación.",
+    "field": "Código del equipo",
+    "submit": "Unirme al equipo",
+    "success": "¡Ya eres parte del equipo!",
+    "code_required": "Escribe el código del equipo.",
+    "home_hint": "Únete a tu equipo con el código que te dio su administrador.",
+    "errors": {
+      "generic": "No se pudo unir al equipo. Inténtalo de nuevo.",
+      "JOIN_CODE_NOT_FOUND": "No encontramos un equipo con ese código. Revísalo o pide uno nuevo.",
+      "ALREADY_IN_TEAM": "Ya perteneces a un equipo.",
+      "EMAIL_NOT_VERIFIED": "Confirma tu correo antes de unirte a un equipo.",
+      "TOO_MANY_REQUESTS": "Demasiados intentos. Espera un minuto."
+    }
   }
 }

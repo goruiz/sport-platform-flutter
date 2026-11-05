@@ -10,10 +10,12 @@ import 'package:sport_platform/modules/home/data/datasource/home_dashboard_servi
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/home/presentation/enums/menu_style.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/drawer_hint_card.dart';
+import 'package:sport_platform/modules/home/presentation/widgets/email_verification_banner.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/greeting_banner.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/invitations_card.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/quick_actions_carousel.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/section_header.dart';
+import 'package:sport_platform/modules/players/presentation/pages/join_team_page.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/empty_card.dart';
 
 class HomeTab extends StatefulWidget {
@@ -48,6 +50,11 @@ class _HomeTabState extends State<HomeTab> {
     _dashboardFuture = _dashboardService.load();
   }
 
+  Future<void> _joinWithCode() async {
+    final joined = await JoinTeamPage.open(context);
+    if (joined && mounted) await _refreshDashboard();
+  }
+
   Future<void> _refreshDashboard() async {
     setState(() => _dashboardFuture = _dashboardService.load());
     await _dashboardFuture;
@@ -70,6 +77,8 @@ class _HomeTabState extends State<HomeTab> {
               child: GreetingBanner(),
             ),
             const SizedBox(height: 24),
+            // Solo se dibuja mientras el correo no esté confirmado (sin confirmarlo no se entra a un equipo).
+            const EmailVerificationBanner(),
             _section(
               title: HomeStringsConstants.sectionQuickActions.tr(),
               child: widget.menuStyle == HomeMenuStyle.carousel
@@ -220,13 +229,12 @@ class _HomeTabState extends State<HomeTab> {
   Widget _teamPreview(HomeDashboardData data) {
     final team = data.currentTeam;
     if (team == null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: EmptyCard(
-          icon: Icons.groups_outlined,
-          message: HomeStringsConstants.noTeamsTitle.tr(),
-          subtitle: 'mobile.teams.no_membership'.tr(),
-        ),
+      // Sin equipo, la tarjeta lleva directo a escribir el código de un equipo.
+      return _SummaryCard(
+        icon: Icons.vpn_key_outlined,
+        title: HomeStringsConstants.noTeamsTitle.tr(),
+        subtitle: 'join_team.home_hint'.tr(),
+        onTap: _joinWithCode,
       );
     }
     return _SummaryCard(

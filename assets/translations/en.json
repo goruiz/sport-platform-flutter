@@ -127,7 +127,16 @@
       "empty_title": "No events available",
       "empty_subtitle": "Leagues and tournaments will appear here.",
       "filtered_empty_title": "No events of this type",
-      "filtered_empty_subtitle": "Try another category."
+      "filtered_empty_subtitle": "Try another category.",
+      "search_hint": "Search events",
+      "status_active": "In progress",
+      "status_upcoming": "Upcoming",
+      "status_finished": "Finished",
+      "status_cancelled": "Cancelled",
+      "results_count": "{count} events",
+      "load_more": "Show more",
+      "no_results_title": "No results",
+      "no_results_subtitle": "Try another search or another status."
     },
     "teams": {
       "load_error": "Your team could not be loaded.",
@@ -147,7 +156,8 @@
       "empty_subtitle": "The schedule and results will appear here.",
       "scope_mine": "My team",
       "scope_all": "All",
-      "empty_mine_subtitle": "Your team's matches will appear here."
+      "empty_mine_subtitle": "Your team's matches will appear here.",
+      "pick_event": "Pick an event"
     },
     "courts": {
       "load_error": "Courts could not be loaded.",
@@ -180,7 +190,9 @@
       "location_title": "Location",
       "no_location_detail": "The organizer has not marked this complex on the map yet.",
       "courts_title": "Courts of the complex",
-      "no_courts": "This complex has no courts yet."
+      "no_courts": "This complex has no courts yet.",
+      "directions": "Get directions",
+      "directions_error": "Could not open the map."
     }
   },
   "session": {
@@ -502,7 +514,8 @@
     "edit": "Edit",
     "delete": "Delete",
     "retry": "Retry",
-    "create": "Create"
+    "create": "Create",
+    "cancel": "Cancel"
   },
   "championship": {
     "tab_title": "Championship",
@@ -580,7 +593,13 @@
     "error_load": "The match timeline could not be loaded.",
     "empty_title": "No events recorded",
     "empty_subtitle": "The goals, cards and fouls of the match will appear here.",
-    "unknown_player": "Unknown player"
+    "unknown_player": "Unknown player",
+    "share": "Share",
+    "add_to_calendar": "Add to calendar",
+    "share_result": "⚽ {} {} – {} {}",
+    "share_upcoming": "⚽ {} vs {}",
+    "calendar_title": "{} vs {}",
+    "action_error": "The action could not be completed."
   },
   "invitations": {
     "title": "Invitations",
@@ -600,7 +619,8 @@
       "EXPIRED": "This invitation has expired.",
       "TEAM_NOT_FOUND": "The team that invited you no longer exists.",
       "PLAYER_NOT_FOUND": "You need to register as a player to accept this invitation.",
-      "INVITATION_NOT_FOUND": "This invitation no longer exists."
+      "INVITATION_NOT_FOUND": "This invitation no longer exists.",
+      "EMAIL_NOT_VERIFIED": "Confirm your email before accepting an invitation."
     }
   },
   "rankings": {
@@ -613,7 +633,15 @@
     "empty_subtitle": "Leaders will appear once goals and cards are recorded.",
     "load_error": "The rankings could not be loaded.",
     "no_events_title": "No events",
-    "no_events_subtitle": "Rankings will appear when there are events."
+    "no_events_subtitle": "Rankings will appear when there are events.",
+    "my_stats": {
+      "title": "My stats",
+      "goals": "Goals",
+      "assists": "Assists",
+      "yellow": "Yellow",
+      "red": "Red",
+      "fouls": "Fouls"
+    }
   },
   "reports": {
     "load_error": "The report could not be loaded.",
@@ -635,5 +663,66 @@
     "form_loss": "L",
     "by_event": "By event",
     "event_summary": "{won}W {drawn}D {lost}L"
+  },
+  "account": {
+    "change_password": {
+      "title": "Change password",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "submit": "Change password",
+      "success": "Your password was updated."
+    },
+    "delete": {
+      "title": "Delete my account",
+      "warning": "Your personal data will be erased and you will leave your team. This cannot be undone.",
+      "password": "Your password",
+      "button": "Delete my account",
+      "confirm_title": "Delete your account?",
+      "confirm_text": "You will lose access and will not be able to recover it.",
+      "confirm_button": "Delete permanently",
+      "done": "Your account was deleted."
+    },
+    "validation": {
+      "empty": "This field is required",
+      "too_short": "At least {} characters",
+      "too_long": "At most {} characters",
+      "same_as_current": "The new password must be different from the current one",
+      "mismatch": "The passwords do not match"
+    },
+    "errors": {
+      "generic": "The action could not be completed. Please try again.",
+      "INCORRECT_CURRENT_PASSWORD": "The current password is not correct.",
+      "NEW_PASSWORD_SAME_AS_CURRENT": "The new password must be different from the current one.",
+      "INCORRECT_PASSWORD": "The password is not correct.",
+      "STAFF_ACCOUNT": "Administrator accounts are deleted from the panel.",
+      "INVALID_OR_EXPIRED": "The link is not valid or has expired.",
+      "TOO_MANY_REQUESTS": "Too many attempts. Wait a few minutes."
+    }
+  },
+  "verify_email": {
+    "title": "Confirm your email",
+    "text": "To join a team, first confirm your email. We sent a link to {}.",
+    "resend": "Resend email",
+    "check": "I already confirmed it",
+    "resent": "We sent you a new link.",
+    "confirmed": "Your email is confirmed.",
+    "still_pending": "It is not confirmed yet. Open the link in the email."
+  },
+  "join_team": {
+    "title": "Join with a code",
+    "hint": "Ask your team administrator or captain for the code and type it here to join without waiting for an invitation.",
+    "field": "Team code",
+    "submit": "Join the team",
+    "success": "You are now part of the team!",
+    "code_required": "Type the team code.",
+    "home_hint": "Join your team with the code its administrator gave you.",
+    "errors": {
+      "generic": "Could not join the team. Please try again.",
+      "JOIN_CODE_NOT_FOUND": "We did not find a team with that code. Check it or ask for a new one.",
+      "ALREADY_IN_TEAM": "You already belong to a team.",
+      "EMAIL_NOT_VERIFIED": "Confirm your email before joining a team.",
+      "TOO_MANY_REQUESTS": "Too many attempts. Wait a minute."
+    }
   }
 }

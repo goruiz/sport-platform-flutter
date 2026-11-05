@@ -1,8 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/services/external_launcher.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/utils/external_links.dart';
 import 'package:sport_platform/modules/sport_complexes/domain/complex_overview.dart';
 import 'package:sport_platform/modules/sport_complexes/presentation/widgets/complex_map.dart';
+import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 
 /// Un complejo: dónde queda (con su mapa, si el organizador lo marcó) y sus canchas.
 class SportComplexDetailPage extends StatelessWidget {
@@ -25,9 +28,11 @@ class SportComplexDetailPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           _SectionTitle('mobile.complexes.location_title'.tr()),
-          if (complex.hasMapPosition)
-            ComplexMap(latitude: complex.latitude!, longitude: complex.longitude!)
-          else
+          if (complex.hasMapPosition) ...[
+            ComplexMap(latitude: complex.latitude!, longitude: complex.longitude!),
+            const SizedBox(height: 10),
+            _DirectionsButton(latitude: complex.latitude!, longitude: complex.longitude!),
+          ] else
             _Hint('mobile.complexes.no_location_detail'.tr()),
           if (complex.location?.isNotEmpty ?? false) ...[
             const SizedBox(height: 10),
@@ -49,6 +54,39 @@ class SportComplexDetailPage extends StatelessWidget {
                 detail: court.description,
               ),
         ],
+      ),
+    );
+  }
+}
+
+/// Abre la ruta hasta el complejo en la aplicación de mapas del dispositivo.
+class _DirectionsButton extends StatelessWidget {
+  final double latitude;
+  final double longitude;
+
+  const _DirectionsButton({required this.latitude, required this.longitude});
+
+  Future<void> _open(BuildContext context) async {
+    final opened = await ExternalLauncher.open(
+      ExternalLinks.directionsTo(latitude: latitude, longitude: longitude),
+    );
+    if (!opened && context.mounted) {
+      AppSnackbar.error(context, 'mobile.complexes.directions_error'.tr());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton.icon(
+        onPressed: () => _open(context),
+        icon: const Icon(Icons.directions_outlined),
+        label: Text('mobile.complexes.directions'.tr()),
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.primaryLight,
+          foregroundColor: AppColors.white,
+        ),
       ),
     );
   }

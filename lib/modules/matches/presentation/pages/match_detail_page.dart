@@ -1,12 +1,17 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
+import 'package:sport_platform/core/services/external_launcher.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/utils/date_formatters.dart';
+import 'package:sport_platform/core/utils/external_links.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_events_service.dart';
 import 'package:sport_platform/modules/matches/presentation/providers/match_detail_notifier.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_event_tile.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_summary_card.dart';
+import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
@@ -81,6 +86,8 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
                 courtName: widget.courtName,
               ),
               const SizedBox(height: 12),
+              _buildActions(),
+              const SizedBox(height: 12),
               _buildTimelineTitle(),
               ..._buildTimeline(),
             ],
@@ -88,6 +95,67 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
         ),
       ),
     );
+  }
+
+  /// Compartir el partido y agregarlo al calendario del dispositivo.
+  Widget _buildActions() {
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: _share,
+            icon: const Icon(Icons.share_outlined, color: AppColors.white, size: 18),
+            label: Text('match_detail.share'.tr(), style: const TextStyle(color: AppColors.white)),
+            style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.inputBorder)),
+          ),
+        ),
+        if (!widget.match.hasScore) ...[
+          const SizedBox(width: 12),
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: _addToCalendar,
+              icon: const Icon(Icons.event_available_outlined, color: AppColors.white, size: 18),
+              label: Text('match_detail.add_to_calendar'.tr(),
+                  style: const TextStyle(color: AppColors.white)),
+              style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.inputBorder)),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// El resultado si ya hay, y si no, quién juega con quién y cuándo.
+  String _shareText() {
+    final match = widget.match;
+    final headline = match.hasScore
+        ? 'match_detail.share_result'.tr(
+            args: [widget.homeName, '${match.homeScore}', '${match.awayScore}', widget.awayName])
+        : 'match_detail.share_upcoming'.tr(args: [widget.homeName, widget.awayName]);
+    return [
+      headline,
+      if (widget.eventName.isNotEmpty) widget.eventName,
+      DateFormatters.dateTime(match.matchDate),
+      if (widget.courtName != null) widget.courtName!,
+    ].join('\n');
+  }
+
+  Future<void> _share() async {
+    final shared = await ExternalLauncher.shareText(_shareText());
+    if (!shared && mounted) AppSnackbar.error(context, 'match_detail.action_error'.tr());
+  }
+
+  Future<void> _addToCalendar() async {
+    final match = widget.match;
+    final uri = ExternalLinks.calendarEvent(
+      title: 'match_detail.calendar_title'.tr(args: [widget.homeName, widget.awayName]),
+      start: match.matchDate,
+      end: match.endsAt ?? match.matchDate.add(AppConstants.defaultMatchDuration),
+      location: widget.courtName ?? match.location,
+      details: widget.eventName,
+    );
+    final opened = await ExternalLauncher.open(uri);
+    if (!opened && mounted) AppSnackbar.error(context, 'match_detail.action_error'.tr());
   }
 
   Widget _buildTimelineTitle() => Padding(

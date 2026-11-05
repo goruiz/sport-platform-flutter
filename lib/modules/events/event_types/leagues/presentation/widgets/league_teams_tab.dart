@@ -50,7 +50,8 @@ class LeagueTeamsTab extends StatelessWidget {
         itemCount: teams.length,
         itemBuilder: (_, i) => TeamEventCard(
           team: teams[i],
-          onManagePlayers: () => onManagePlayers(teams[i]),
+          // Sin callback la tarjeta no es tocable ni muestra el botón: solo quien gestiona el evento administra plantillas.
+          onManagePlayers: isOwner ? () => onManagePlayers(teams[i]) : null,
           onRemove: isOwner ? () => onRemove?.call(teams[i]) : null,
         ),
       ),

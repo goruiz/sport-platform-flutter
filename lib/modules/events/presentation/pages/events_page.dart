@@ -1,15 +1,22 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/pages/league_detail_page.dart';
-import 'package:sport_platform/modules/events/shared/data/datasource/events_catalog_service.dart';
+import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
+import 'package:sport_platform/modules/events/shared/data/providers/events_explorer_notifier.dart';
+import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/event_card.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
+/// Explorar los eventos que el jugador ve (los de su organización y los públicos): se busca por texto, se filtra por estado
+/// y se descargan de a poco, porque la lista puede crecer con todos los eventos públicos de la plataforma.
 class EventsPage extends StatefulWidget {
   final MenuItemModel item;
 
@@ -20,23 +27,43 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
-  late Future<List<EventModel>> _eventsFuture;
-  String? _selectedType;
+  /// Los estados que se ofrecen para filtrar; «cancelado» no sirve para explorar.
+  static const _filterableStatuses = [EventStatus.active, EventStatus.upcoming, EventStatus.finished];
+
+  /// A cuántos píxeles del final de la lista se pide la página que sigue.
+  static const _loadMoreThreshold = 300.0;
+
+  late final EventsExplorerNotifier _explorer;
+  final _searchController = TextEditingController();
+  final _scrollController = ScrollController();
+  Timer? _searchDebounce;
 
   @override
   void initState() {
     super.initState();
-    _eventsFuture = _loadEvents();
+    _explorer = EventsExplorerNotifier(getIt<EventsSearchService>());
+    _scrollController.addListener(_loadMoreNearTheEnd);
+    _explorer.load();
   }
 
-  Future<List<EventModel>> _loadEvents() async {
-    final events = await getIt<EventsCatalogService>().getAll();
-    return events..sort((a, b) => a.startDate.compareTo(b.startDate));
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
+    _scrollController.dispose();
+    _explorer.dispose();
+    super.dispose();
   }
 
-  Future<void> _refresh() async {
-    setState(() => _eventsFuture = _loadEvents());
-    await _eventsFuture;
+  void _loadMoreNearTheEnd() {
+    final position = _scrollController.position;
+    if (position.extentAfter < _loadMoreThreshold) _explorer.loadMore();
+  }
+
+  /// Se busca cuando la persona deja de teclear, no con cada letra: una sola petición por «copa quito».
+  void _onSearchChanged(String text) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(AppConstants.searchDebounce, () => _explorer.search(text));
   }
 
   void _openEvent(EventModel event) {
@@ -46,6 +73,13 @@ class _EventsPageState extends State<EventsPage> {
       ),
     );
   }
+
+  String _statusLabel(EventStatus status) => switch (status) {
+        EventStatus.active => 'mobile.events.status_active'.tr(),
+        EventStatus.upcoming => 'mobile.events.status_upcoming'.tr(),
+        EventStatus.finished => 'mobile.events.status_finished'.tr(),
+        EventStatus.cancelled => 'mobile.events.status_cancelled'.tr(),
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -61,130 +95,170 @@ class _EventsPageState extends State<EventsPage> {
         iconTheme: const IconThemeData(color: AppColors.white),
         actions: [
           IconButton(
-            onPressed: () => setState(() => _eventsFuture = _loadEvents()),
+            onPressed: _explorer.load,
             icon: const Icon(Icons.refresh, color: AppColors.white),
             tooltip: 'common.retry'.tr(),
           ),
         ],
       ),
-      body: FutureBuilder<List<EventModel>>(
-        future: _eventsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.primaryLight),
-            );
-          }
-          if (snapshot.hasError) {
-            return ErrorRetry(
-              message: 'mobile.events.load_error'.tr(),
-              onRetry: () => setState(() => _eventsFuture = _loadEvents()),
-            );
-          }
-          final events = snapshot.data ?? const <EventModel>[];
-          if (events.isEmpty) {
-            return RefreshIndicator(
-              onRefresh: _refresh,
-              color: AppColors.primaryLight,
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  SizedBox(
-                    height: MediaQuery.sizeOf(context).height * 0.65,
-                    child: EmptyState(
-                      icon: Icons.emoji_events_outlined,
-                      title: 'mobile.events.empty_title'.tr(),
-                      subtitle: 'mobile.events.empty_subtitle'.tr(),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          final types =
-              events
-                  .map((event) => event.eventTypeName?.trim())
-                  .whereType<String>()
-                  .where((type) => type.isNotEmpty)
-                  .toSet()
-                  .toList()
-                ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
-          final filtered = _selectedType == null
-              ? events
-              : events
-                    .where((event) => event.eventTypeName == _selectedType)
-                    .toList();
-
-          return RefreshIndicator(
-            onRefresh: _refresh,
-            color: AppColors.primaryLight,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                if (types.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 58,
-                      child: ListView(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          _buildTypeChip('mobile.events.all'.tr(), null),
-                          ...types.map((type) => _buildTypeChip(type, type)),
-                        ],
-                      ),
-                    ),
-                  ),
-                if (filtered.isEmpty)
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: EmptyState(
-                      icon: Icons.filter_list_off,
-                      title: 'mobile.events.filtered_empty_title'.tr(),
-                      subtitle: 'mobile.events.filtered_empty_subtitle'.tr(),
-                    ),
-                  )
-                else
-                  SliverList.builder(
-                    itemCount: filtered.length,
-                    itemBuilder: (context, index) => EventCard(
-                      event: filtered[index],
-                      typeIcon: Icons.emoji_events_outlined,
-                      onTap: () => _openEvent(filtered[index]),
-                    ),
-                  ),
-                const SliverToBoxAdapter(child: SizedBox(height: 20)),
-              ],
+      body: Column(
+        children: [
+          _buildSearchField(),
+          _buildStatusChips(),
+          Expanded(
+            child: ListenableBuilder(
+              listenable: _explorer,
+              builder: (context, _) => _buildResults(),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchField() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: TextField(
+        controller: _searchController,
+        onChanged: _onSearchChanged,
+        textInputAction: TextInputAction.search,
+        style: const TextStyle(color: AppColors.white),
+        decoration: InputDecoration(
+          hintText: 'mobile.events.search_hint'.tr(),
+          hintStyle: const TextStyle(color: AppColors.whiteSubtle),
+          prefixIcon: const Icon(Icons.search, color: AppColors.whiteSubtle),
+          filled: true,
+          fillColor: AppColors.inputFill,
+          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: AppColors.inputBorder),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: AppColors.inputBorder),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: AppColors.primaryLight),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusChips() {
+    return ListenableBuilder(
+      listenable: _explorer,
+      builder: (context, _) => SizedBox(
+        height: 58,
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          scrollDirection: Axis.horizontal,
+          children: [
+            _buildStatusChip('mobile.events.all'.tr(), null),
+            ..._filterableStatuses.map((status) => _buildStatusChip(_statusLabel(status), status)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusChip(String label, EventStatus? status) {
+    final selected = _explorer.status == status;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: FilterChip(
+        label: Text(label),
+        selected: selected,
+        onSelected: (_) => _explorer.selectStatus(status),
+        selectedColor: AppColors.primaryLight.withValues(alpha: 0.2),
+        backgroundColor: AppColors.inputFill,
+        checkmarkColor: AppColors.primaryLight,
+        labelStyle: TextStyle(color: selected ? AppColors.primaryLight : AppColors.whiteSubtle),
+        side: BorderSide(color: selected ? AppColors.primaryLight : AppColors.inputBorder),
+      ),
+    );
+  }
+
+  Widget _buildResults() {
+    if (_explorer.loading && _explorer.events.isEmpty) {
+      return const Center(child: CircularProgressIndicator(color: AppColors.primaryLight));
+    }
+    if (_explorer.error != null && _explorer.events.isEmpty) {
+      return ErrorRetry(message: _explorer.error!.tr(), onRetry: _explorer.load);
+    }
+    if (_explorer.events.isEmpty) return _buildEmpty();
+
+    return RefreshIndicator(
+      onRefresh: _explorer.load,
+      color: AppColors.primaryLight,
+      child: ListView.builder(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(bottom: 20),
+        itemCount: _explorer.events.length + 1,
+        itemBuilder: (context, index) {
+          if (index == _explorer.events.length) return _buildListFooter();
+          final event = _explorer.events[index];
+          return EventCard(
+            event: event,
+            typeIcon: Icons.emoji_events_outlined,
+            onTap: () => _openEvent(event),
           );
         },
       ),
     );
   }
 
-  Widget _buildTypeChip(String label, String? type) => Padding(
-    padding: const EdgeInsets.only(right: 8),
-    child: FilterChip(
-      label: Text(label),
-      selected: _selectedType == type,
-      onSelected: (_) => setState(() => _selectedType = type),
-      selectedColor: AppColors.primaryLight.withValues(alpha: 0.2),
-      backgroundColor: AppColors.inputFill,
-      checkmarkColor: AppColors.primaryLight,
-      labelStyle: TextStyle(
-        color: _selectedType == type
-            ? AppColors.primaryLight
-            : AppColors.whiteSubtle,
+  /// Al final de la lista: el cargando de la página que sigue, o cuántos eventos hay si ya están todos.
+  Widget _buildListFooter() {
+    if (_explorer.loadingMore) {
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: Center(child: CircularProgressIndicator(color: AppColors.primaryLight, strokeWidth: 2.5)),
+      );
+    }
+    if (_explorer.hasMore) {
+      return TextButton(
+        onPressed: _explorer.loadMore,
+        child: Text('mobile.events.load_more'.tr()),
+      );
+    }
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Center(
+        child: Text(
+          'mobile.events.results_count'.tr(namedArgs: {'count': '${_explorer.totalElements}'}),
+          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+        ),
       ),
-      side: BorderSide(
-        color: _selectedType == type
-            ? AppColors.primaryLight
-            : AppColors.inputBorder,
+    );
+  }
+
+  Widget _buildEmpty() {
+    final isFiltering = _explorer.isFiltering;
+    return RefreshIndicator(
+      onRefresh: _explorer.load,
+      color: AppColors.primaryLight,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.5,
+            child: EmptyState(
+              icon: isFiltering ? Icons.filter_list_off : Icons.emoji_events_outlined,
+              title: isFiltering
+                  ? 'mobile.events.no_results_title'.tr()
+                  : 'mobile.events.empty_title'.tr(),
+              subtitle: isFiltering
+                  ? 'mobile.events.no_results_subtitle'.tr()
+                  : 'mobile.events.empty_subtitle'.tr(),
+            ),
+          ),
+        ],
       ),
-    ),
-  );
+    );
+  }
 }

@@ -127,7 +127,16 @@
       "empty_title": "Keine Veranstaltungen verfügbar",
       "empty_subtitle": "Ligen und Turniere werden hier angezeigt.",
       "filtered_empty_title": "Keine Veranstaltungen dieses Typs",
-      "filtered_empty_subtitle": "Versuchen Sie eine andere Kategorie."
+      "filtered_empty_subtitle": "Versuchen Sie eine andere Kategorie.",
+      "search_hint": "Events suchen",
+      "status_active": "Laufend",
+      "status_upcoming": "Bevorstehend",
+      "status_finished": "Beendet",
+      "status_cancelled": "Abgesagt",
+      "results_count": "{count} Events",
+      "load_more": "Mehr anzeigen",
+      "no_results_title": "Keine Ergebnisse",
+      "no_results_subtitle": "Versuche eine andere Suche oder einen anderen Status."
     },
     "teams": {
       "load_error": "Ihr Team konnte nicht geladen werden.",
@@ -147,7 +156,8 @@
       "empty_subtitle": "Spielplan und Ergebnisse werden hier angezeigt.",
       "scope_mine": "Mein Team",
       "scope_all": "Alle",
-      "empty_mine_subtitle": "Die Spiele Ihres Teams erscheinen hier."
+      "empty_mine_subtitle": "Die Spiele Ihres Teams erscheinen hier.",
+      "pick_event": "Event auswählen"
     },
     "courts": {
       "load_error": "Plätze konnten nicht geladen werden.",
@@ -180,7 +190,9 @@
       "location_title": "Standort",
       "no_location_detail": "Der Veranstalter hat diese Anlage noch nicht auf der Karte markiert.",
       "courts_title": "Plätze der Anlage",
-      "no_courts": "Diese Anlage hat noch keine Plätze."
+      "no_courts": "Diese Anlage hat noch keine Plätze.",
+      "directions": "Route anzeigen",
+      "directions_error": "Die Karte konnte nicht geöffnet werden."
     }
   },
   "session": {
@@ -502,7 +514,8 @@
     "edit": "Bearbeiten",
     "delete": "Löschen",
     "retry": "Erneut versuchen",
-    "create": "Erstellen"
+    "create": "Erstellen",
+    "cancel": "Abbrechen"
   },
   "championship": {
     "tab_title": "Meisterschaft",
@@ -580,7 +593,13 @@
     "error_load": "Der Spielverlauf konnte nicht geladen werden.",
     "empty_title": "Keine Ereignisse erfasst",
     "empty_subtitle": "Tore, Karten und Fouls des Spiels erscheinen hier.",
-    "unknown_player": "Unbekannter Spieler"
+    "unknown_player": "Unbekannter Spieler",
+    "share": "Teilen",
+    "add_to_calendar": "Zum Kalender",
+    "share_result": "⚽ {} {} – {} {}",
+    "share_upcoming": "⚽ {} vs {}",
+    "calendar_title": "{} vs {}",
+    "action_error": "Die Aktion konnte nicht abgeschlossen werden."
   },
   "invitations": {
     "title": "Einladungen",
@@ -600,7 +619,8 @@
       "EXPIRED": "Diese Einladung ist abgelaufen.",
       "TEAM_NOT_FOUND": "Das Team, das Sie eingeladen hat, existiert nicht mehr.",
       "PLAYER_NOT_FOUND": "Sie müssen sich als Spieler registrieren, um diese Einladung anzunehmen.",
-      "INVITATION_NOT_FOUND": "Diese Einladung existiert nicht mehr."
+      "INVITATION_NOT_FOUND": "Diese Einladung existiert nicht mehr.",
+      "EMAIL_NOT_VERIFIED": "Bestätige deine E-Mail, bevor du eine Einladung annimmst."
     }
   },
   "rankings": {
@@ -613,7 +633,15 @@
     "empty_subtitle": "Die Besten erscheinen, sobald Tore und Karten erfasst sind.",
     "load_error": "Die Ranglisten konnten nicht geladen werden.",
     "no_events_title": "Keine Ereignisse",
-    "no_events_subtitle": "Ranglisten erscheinen, sobald es Ereignisse gibt."
+    "no_events_subtitle": "Ranglisten erscheinen, sobald es Ereignisse gibt.",
+    "my_stats": {
+      "title": "Meine Statistik",
+      "goals": "Tore",
+      "assists": "Vorlagen",
+      "yellow": "Gelb",
+      "red": "Rot",
+      "fouls": "Fouls"
+    }
   },
   "reports": {
     "load_error": "Der Bericht konnte nicht geladen werden.",
@@ -635,5 +663,66 @@
     "form_loss": "N",
     "by_event": "Nach Ereignis",
     "event_summary": "{won}S {drawn}U {lost}N"
+  },
+  "account": {
+    "change_password": {
+      "title": "Passwort ändern",
+      "current": "Aktuelles Passwort",
+      "new": "Neues Passwort",
+      "confirm": "Neues Passwort bestätigen",
+      "submit": "Passwort ändern",
+      "success": "Dein Passwort wurde aktualisiert."
+    },
+    "delete": {
+      "title": "Mein Konto löschen",
+      "warning": "Deine persönlichen Daten werden gelöscht und du verlässt dein Team. Das lässt sich nicht rückgängig machen.",
+      "password": "Dein Passwort",
+      "button": "Mein Konto löschen",
+      "confirm_title": "Dein Konto löschen?",
+      "confirm_text": "Du verlierst den Zugang und kannst ihn nicht wiederherstellen.",
+      "confirm_button": "Endgültig löschen",
+      "done": "Dein Konto wurde gelöscht."
+    },
+    "validation": {
+      "empty": "Dieses Feld ist erforderlich",
+      "too_short": "Mindestens {} Zeichen",
+      "too_long": "Höchstens {} Zeichen",
+      "same_as_current": "Das neue Passwort muss sich vom aktuellen unterscheiden",
+      "mismatch": "Die Passwörter stimmen nicht überein"
+    },
+    "errors": {
+      "generic": "Die Aktion konnte nicht abgeschlossen werden. Versuche es erneut.",
+      "INCORRECT_CURRENT_PASSWORD": "Das aktuelle Passwort ist nicht korrekt.",
+      "NEW_PASSWORD_SAME_AS_CURRENT": "Das neue Passwort muss sich vom aktuellen unterscheiden.",
+      "INCORRECT_PASSWORD": "Das Passwort ist nicht korrekt.",
+      "STAFF_ACCOUNT": "Administratorkonten werden im Panel gelöscht.",
+      "INVALID_OR_EXPIRED": "Der Link ist ungültig oder abgelaufen.",
+      "TOO_MANY_REQUESTS": "Zu viele Versuche. Warte ein paar Minuten."
+    }
+  },
+  "verify_email": {
+    "title": "Bestätige deine E-Mail",
+    "text": "Um einem Team beizutreten, bestätige zuerst deine E-Mail. Wir haben einen Link an {} gesendet.",
+    "resend": "E-Mail erneut senden",
+    "check": "Ich habe sie bestätigt",
+    "resent": "Wir haben dir einen neuen Link gesendet.",
+    "confirmed": "Deine E-Mail ist bestätigt.",
+    "still_pending": "Noch nicht bestätigt. Öffne den Link in der E-Mail."
+  },
+  "join_team": {
+    "title": "Mit einem Code beitreten",
+    "hint": "Frag den Administrator oder Kapitän deines Teams nach dem Code und gib ihn hier ein, um ohne Einladung beizutreten.",
+    "field": "Team-Code",
+    "submit": "Dem Team beitreten",
+    "success": "Du gehörst jetzt zum Team!",
+    "code_required": "Gib den Team-Code ein.",
+    "home_hint": "Tritt deinem Team mit dem Code seines Administrators bei.",
+    "errors": {
+      "generic": "Dem Team konnte nicht beigetreten werden. Versuche es erneut.",
+      "JOIN_CODE_NOT_FOUND": "Wir haben kein Team mit diesem Code gefunden. Prüfe ihn oder frag nach einem neuen.",
+      "ALREADY_IN_TEAM": "Du gehörst bereits zu einem Team.",
+      "EMAIL_NOT_VERIFIED": "Bestätige deine E-Mail, bevor du einem Team beitrittst.",
+      "TOO_MANY_REQUESTS": "Zu viele Versuche. Warte eine Minute."
+    }
   }
 }

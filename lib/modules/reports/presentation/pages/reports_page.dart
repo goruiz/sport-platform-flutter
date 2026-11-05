@@ -29,7 +29,6 @@ class _ReportsPageState extends State<ReportsPage> {
     _notifier = ReportsNotifier(
       playersService: getIt(),
       matchesService: getIt(),
-      eventsService: getIt(),
     )..load();
   }
 
