@@ -9,11 +9,15 @@ class TeamEventCard extends StatelessWidget {
   final VoidCallback? onRemove;
   final VoidCallback? onManagePlayers;
 
+  /// Abre el detalle del equipo en el evento (balance, partidos, goleadores…). Con él la tarjeta se puede tocar.
+  final VoidCallback? onOpen;
+
   const TeamEventCard({
     super.key,
     required this.team,
     this.onRemove,
     this.onManagePlayers,
+    this.onOpen,
   });
 
   @override
@@ -26,7 +30,7 @@ class TeamEventCard extends StatelessWidget {
         border: Border.all(color: AppColors.inputBorder),
       ),
       child: InkWell(
-        onTap: onManagePlayers,
+        onTap: onOpen ?? onManagePlayers,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -46,10 +50,12 @@ class TeamEventCard extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    if (onManagePlayers != null) ...[
+                    if (onManagePlayers != null || onOpen != null) ...[
                       const SizedBox(height: 2),
                       Text(
-                        'leagues.tap_to_manage_players'.tr(),
+                        onOpen != null
+                            ? 'leagues.team_detail.tap_hint'.tr()
+                            : 'leagues.tap_to_manage_players'.tr(),
                         style: const TextStyle(
                           color: AppColors.whiteSubtle,
                           fontSize: 12,
@@ -72,6 +78,8 @@ class TeamEventCard extends StatelessWidget {
                   constraints:
                       const BoxConstraints(minWidth: 36, minHeight: 36),
                 ),
+              if (onOpen != null && onManagePlayers == null && onRemove == null)
+                const Icon(Icons.chevron_right, color: AppColors.whiteSubtle),
               if (onRemove != null)
                 IconButton(
                   onPressed: onRemove,

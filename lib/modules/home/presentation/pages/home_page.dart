@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/logout_strings_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
               ),
             )
           : null,
-      title: Text(AppStringsConstants.appName.tr()),
+      title: Text(AppConstants.appName.value),
       actions: [
         const NotificationBell(),
         _buildAccountMenu(),

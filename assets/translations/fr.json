@@ -1,6 +1,5 @@
 {
   "app": {
-    "name": "Sports Platform",
     "tagline": "Votre Compagnon Sportif Intelligent"
   },
   "login": {
@@ -16,8 +15,8 @@
     "email_required": "Entrez votre e-mail",
     "email_invalid": "Entrez un e-mail valide",
     "password_required": "Entrez votre mot de passe",
-    "password_too_short": "Minimum 8 caractères",
-    "password_too_long": "Maximum 72 caractères",
+    "password_too_short": "Minimum {} caractères",
+    "password_too_long": "Maximum {} caractères",
     "errors": {
       "invalid_credentials": "E-mail ou mot de passe incorrect.",
       "administrator_account": "Les comptes administrateur se connectent via le panneau web, pas via l’application.",
@@ -62,7 +61,7 @@
     "email_required": "Entrez votre e-mail",
     "email_invalid": "Entrez un e-mail valide",
     "password_required": "Entrez votre mot de passe",
-    "password_too_short": "Minimum 8 caractères",
+    "password_too_short": "Minimum {} caractères",
     "password_weak": "Doit inclure majuscule, minuscule, chiffre et caractère spécial",
     "confirm_password_required": "Confirmez votre mot de passe",
     "passwords_do_not_match": "Les mots de passe ne correspondent pas",
@@ -71,7 +70,7 @@
     "success": "Inscription réussie",
     "error": "Erreur lors de l'inscription. Veuillez réessayer.",
     "email_already_exists": "Cet e-mail est déjà enregistré. Veuillez vous connecter.",
-    "password_rules": "8 caractères minimum, avec une majuscule, une minuscule, un chiffre et un caractère spécial."
+    "password_rules": "{} caractères minimum, avec une majuscule, une minuscule, un chiffre et un caractère spécial."
   },
   "home": {
     "nav_home": "Accueil",
@@ -152,7 +151,14 @@
       "players_empty": "Cette équipe n'a pas encore de joueurs.",
       "your_team": "Votre équipe",
       "captain": "Capitaine",
-      "players_count": "{count} joueurs"
+      "players_count": "{count} joueurs",
+      "leave": "Quitter l’équipe",
+      "leave_title": "Quitter {} ?",
+      "leave_message": "Vous ne ferez plus partie de cette équipe : vous ne verrez plus ses matchs ni son rapport. Vous pourrez revenir avec une invitation ou avec le code de l’équipe.",
+      "leave_captain_note": "Vous ne serez plus non plus le capitaine.",
+      "leave_confirm": "Quitter",
+      "leave_success": "Vous avez quitté l’équipe.",
+      "leave_error": "Impossible de quitter l’équipe. Réessayez."
     },
     "matches": {
       "upcoming": "À venir",
@@ -172,7 +178,17 @@
       "empty_subtitle": "Les terrains enregistrés apparaîtront ici.",
       "search_hint": "Rechercher un terrain, un complexe ou un lieu",
       "filtered_empty_title": "Aucun résultat",
-      "filtered_empty_subtitle": "Essayez un autre terme."
+      "filtered_empty_subtitle": "Essayez un autre terme.",
+      "view_complex": "Voir le complexe et sa carte",
+      "schedule_title": "Horaires",
+      "opening_hours": "Ouvert de {} à {}",
+      "slot_free": "Libre",
+      "slot_busy": "Occupé",
+      "schedule_note": "Les créneaux occupés sont les matchs programmés sur ce terrain.",
+      "schedule_error": "Impossible de charger les horaires.",
+      "upcoming_title": "Prochains matchs",
+      "upcoming_empty": "Aucun match n'est programmé sur ce terrain.",
+      "upcoming_error": "Impossible de charger les matchs."
     },
     "profile": {
       "load_error": "Impossible de charger le profil.",
@@ -187,7 +203,30 @@
       "section_personal": "Informations personnelles",
       "section_preferences": "Préférences",
       "section_account": "Compte",
-      "language": "Langue"
+      "language": "Langue",
+      "section_team": "Mon équipe",
+      "team": "Équipe",
+      "no_team": "Vous n’avez pas encore d’équipe",
+      "team_role": "Votre rôle",
+      "role_player": "Joueur",
+      "role_captain": "Capitaine",
+      "stats_caption": "Total de tous les événements de votre équipe",
+      "stats_empty": "Vous n’avez pas encore de buts, de passes, de cartons ni de fautes enregistrés.",
+      "stats_error": "Impossible de charger vos statistiques.",
+      "photo": {
+        "change": "Changer la photo de profil",
+        "take": "Prendre une photo",
+        "choose": "Choisir dans la galerie",
+        "remove": "Supprimer la photo",
+        "updated": "Photo mise à jour.",
+        "removed": "Photo supprimée.",
+        "error_save": "Impossible d'enregistrer la photo. Réessayez.",
+        "error_remove": "Impossible de supprimer la photo. Réessayez.",
+        "error_empty": "L'image est vide.",
+        "error_type": "Utilisez une photo JPG, PNG ou WebP.",
+        "error_too_large": "La photo est trop lourde. Le maximum est de {} Mo.",
+        "error_no_player": "Vous n'avez pas encore de profil de joueur où enregistrer la photo."
+      }
     },
     "complexes": {
       "load_error": "Impossible de charger les complexes.",
@@ -397,7 +436,19 @@
     "match_day_error": "Erreur lors de la mise à jour de la journée",
     "info_dates": "Dates",
     "info_format": "Format",
-    "info_type": "Type"
+    "info_type": "Type",
+    "team_detail": {
+      "tap_hint": "Touchez pour voir le détail",
+      "record_title": "Bilan dans l'événement",
+      "no_matches": "Cette équipe n'a pas encore de match dans l'événement.",
+      "matches_error": "Impossible de charger les matchs de l'équipe.",
+      "upcoming_title": "Prochains matchs",
+      "results_title": "Derniers résultats",
+      "scorers_title": "Buteurs de l'équipe",
+      "scorers_empty": "Aucun but n'a encore été enregistré.",
+      "stats_error": "Impossible de charger les statistiques de l'équipe.",
+      "discipline_title": "Cartons et fautes"
+    }
   },
   "menu": {
     "home": "Accueil",
@@ -520,7 +571,7 @@
     "email_required": "L'e-mail est requis",
     "email_invalid": "Entrez un e-mail valide",
     "password_required": "Le mot de passe est requis",
-    "password_too_short": "Minimum 8 caractères",
+    "password_too_short": "Minimum {} caractères",
     "password_weak": "Doit inclure majuscule, minuscule, chiffre et caractère spécial",
     "confirm_password_required": "Veuillez confirmer votre mot de passe",
     "passwords_mismatch": "Les mots de passe ne correspondent pas"
@@ -598,6 +649,42 @@
       "GRAND_FINAL": "Grande finale"
     }
   },
+  "event_rules": {
+    "title": "Règlement du tournoi",
+    "kinds": {
+      "structure": "Système de jeu",
+      "points": "Points",
+      "tiebreakers": "Départage",
+      "round_trip": "Matchs entre équipes",
+      "knockout_round_trip": "Matchs à élimination directe",
+      "swiss_rounds": "Rondes du système suisse",
+      "group_count": "Groupes",
+      "teams_advancing_per_group": "Équipes qualifiées par groupe",
+      "playoff_teams": "Équipes qualifiées pour les playoffs",
+      "third_place_match": "Y a-t-il un match pour la troisième place ?",
+      "grand_final_reset": "Y a-t-il une revanche en grande finale ?",
+      "players_per_team": "Joueurs par équipe"
+    },
+    "values": {
+      "number": "{}",
+      "points": "Victoire {} · Nul {} · Défaite {}",
+      "round_trip_yes": "Aller-retour",
+      "round_trip_no": "Aller simple",
+      "single_match": "Match unique",
+      "yes": "Oui",
+      "no": "Non",
+      "players_between": "De {} à {}",
+      "players_min": "Au moins {}",
+      "players_max": "Au plus {}"
+    },
+    "tiebreaker": {
+      "GOAL_DIFFERENCE": "Différence de buts",
+      "GOALS_FOR": "Buts marqués",
+      "WINS": "Matchs gagnés",
+      "HEAD_TO_HEAD": "Confrontation directe",
+      "OPPONENTS_POINTS": "Points des adversaires (Buchholz)"
+    }
+  },
   "match_events": {
     "types": {
       "GOAL": "But",
@@ -619,7 +706,21 @@
     "share_result": "⚽ {} {} – {} {}",
     "share_upcoming": "⚽ {} vs {}",
     "calendar_title": "{} vs {}",
-    "action_error": "L’action n’a pas pu aboutir."
+    "action_error": "L’action n’a pas pu aboutir.",
+    "attendance": {
+      "title": "Serez-vous présent au match ?",
+      "confirm": "J'y vais",
+      "decline": "Je ne peux pas",
+      "clear": "Retirer ma réponse",
+      "summary": "Confirmés : {confirmed} · Absents : {declined}",
+      "answered_confirmed": "Vous avez confirmé votre présence au match.",
+      "answered_declined": "Vous avez indiqué que vous ne pouvez pas venir.",
+      "closed": "Les réponses sont closes : le match a commencé ou n'a pas de date ferme.",
+      "error_load": "Impossible de charger les présences.",
+      "error_save": "Impossible d'enregistrer votre réponse. Réessayez.",
+      "error_closed": "Le match n'accepte plus de réponses.",
+      "error_not_participant": "Seuls les joueurs des équipes du match peuvent répondre."
+    }
   },
   "invitations": {
     "title": "Invitations",
@@ -661,8 +762,13 @@
       "assists": "Passes",
       "yellow": "Jaunes",
       "red": "Rouges",
-      "fouls": "Fautes"
-    }
+      "fouls": "Fautes",
+      "matches": "Matchs"
+    },
+    "scope_event": "Tout l’événement",
+    "scope_team": "Mon équipe",
+    "empty_team_subtitle": "Les joueurs de votre équipe apparaîtront lorsque des buts et des cartons seront enregistrés.",
+    "you": "Vous"
   },
   "reports": {
     "load_error": "Impossible de charger le rapport.",
@@ -683,7 +789,13 @@
     "form_draw": "N",
     "form_loss": "D",
     "by_event": "Par événement",
-    "event_summary": "{won}V {drawn}N {lost}D"
+    "event_summary": "{won}V {drawn}N {lost}D",
+    "participation_and_discipline": "Participation et discipline",
+    "events_played": "Événements",
+    "yellow_cards": "Jaunes",
+    "red_cards": "Rouges",
+    "fouls": "Fautes",
+    "team_stats_error": "Impossible de charger les cartons et les fautes de l'équipe."
   },
   "account": {
     "change_password": {

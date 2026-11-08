@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
@@ -22,7 +23,7 @@ class _FakeSearchService extends EventsSearchService {
       eventOf(id: id, name: 'Evento $id', startDate: DateTime(2026, 1, 1), endDate: DateTime(2026, 2, 1));
 
   @override
-  Future<EventsPage> search({String? text, EventStatus? status, int page = 0, int size = 20}) {
+  Future<EventsPage> search({String? text, EventStatus? status, int page = 0, int? size}) {
     requests.add((text: text, status: status, page: page));
     if (fail) return Future.error(Exception('sin red'));
     final waiting = pending[text ?? ''];
@@ -169,6 +170,14 @@ void _registerSearchServiceTests() {
         await EventsSearchService(client: client).search(text: '  copa  ', status: EventStatus.upcoming, page: 1, size: 10);
 
         expect(client.queryParams, {'page': 1, 'size': 10, 'search': 'copa', 'status': 'UPCOMING'});
+      });
+
+      test('sin tamaño pide el de AppConstants', () async {
+        final client = _RecordingDioClient(apiPage);
+
+        await EventsSearchService(client: client).search();
+
+        expect(client.queryParams!['size'], AppConstants.listPageSize.value);
       });
 
       test('un texto en blanco y sin estado no se envía', () async {

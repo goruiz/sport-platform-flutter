@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
@@ -33,7 +34,7 @@ class AuthLogo extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          AppStringsConstants.appName.tr(),
+          AppConstants.appName.value,
           style: const TextStyle(
             color: AppColors.white,
             fontSize: 32,

@@ -80,7 +80,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
               if (!_joining) _join();
             },
             inputFormatters: [
-              LengthLimitingTextInputFormatter(AppConstants.joinCodeMaxInputLength),
+              LengthLimitingTextInputFormatter(AppConstants.joinCodeMaxInputLength.value),
               // El código es en mayúsculas y sin ambigüedades: se escribe como llega.
               TextInputFormatter.withFunction(
                 (oldValue, newValue) => newValue.copyWith(text: newValue.text.toUpperCase()),

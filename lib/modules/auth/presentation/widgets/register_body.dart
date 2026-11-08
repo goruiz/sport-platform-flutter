@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/register_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
@@ -107,7 +108,7 @@ class RegisterBody extends StatelessWidget {
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.newPassword],
             // Las reglas se dicen antes de teclear, no solo cuando la contraseña ya fue rechazada.
-            helperText: RegisterStringsConstants.passwordRules.tr(),
+            helperText: RegisterStringsConstants.passwordRules.tr(args: [AppConstants.minPasswordLength.asText]),
             suffixIcon: IconButton(
               icon: Icon(
                 showPassword
@@ -120,7 +121,9 @@ class RegisterBody extends StatelessWidget {
             ),
             validator: (v) {
               if (v == null || v.isEmpty) return RegisterStringsConstants.passwordRequired.tr();
-              if (v.length < 8) return RegisterStringsConstants.passwordTooShort.tr();
+              if (v.length < AppConstants.minPasswordLength.value) {
+                return RegisterStringsConstants.passwordTooShort.tr(args: [AppConstants.minPasswordLength.asText]);
+              }
               final hasUpper = RegExp(r'[A-Z]').hasMatch(v);
               final hasLower = RegExp(r'[a-z]').hasMatch(v);
               final hasDigit = RegExp(r'\d').hasMatch(v);

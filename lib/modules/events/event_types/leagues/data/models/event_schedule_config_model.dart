@@ -1,3 +1,5 @@
+import 'package:sport_platform/core/constants/app_constants.dart';
+
 class EventScheduleConfigModel {
   final String? id;
   final String eventId;
@@ -30,7 +32,7 @@ class EventScheduleConfigModel {
               .toList() ??
           [],
       startTime: json['startTime']?.toString() ?? '09:00',
-      matchDurationMinutes: (json['matchDurationMinutes'] as num?)?.toInt() ?? 90,
+      matchDurationMinutes: (json['matchDurationMinutes'] as num?)?.toInt() ?? AppConstants.defaultMatchDuration.value.inMinutes,
       breakBetweenHalvesMinutes:
           (json['breakBetweenHalvesMinutes'] as num?)?.toInt() ?? 15,
       breakBetweenMatchesMinutes:

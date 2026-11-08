@@ -21,10 +21,10 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController(
-    text: AppConstants.fixedLoginEmail,
+    text: AppConstants.fixedLoginEmail.value,
   );
   final _passwordController = TextEditingController(
-    text: AppConstants.fixedLoginPassword,
+    text: AppConstants.fixedLoginPassword.value,
   );
   bool _obscurePassword = true;
   bool _isLoading = false;

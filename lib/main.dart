@@ -5,7 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/modules/modules_setup.dart';
 import 'package:sport_platform/core/routes/app_navigator.dart';
@@ -52,7 +52,7 @@ class SportsPlatform extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       navigatorKey: AppNavigator.key,
       theme: AppTheme.sportsPlatform,
-      onGenerateTitle: (ctx) => AppStringsConstants.appName.tr(),
+      title: AppConstants.appName.value,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: context.locale,

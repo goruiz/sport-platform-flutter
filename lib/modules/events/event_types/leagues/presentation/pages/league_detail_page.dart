@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_matches_repository.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_teams_repository.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/presentation/pages/team_in_event_page.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/providers/league_detail_notifier.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_players_sheet.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_team_sheet.dart';
@@ -19,6 +21,7 @@ import 'package:sport_platform/modules/events/event_types/leagues/presentation/w
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/championship_tab.dart';
+import 'package:sport_platform/modules/events/shared/presentation/widgets/event_rules_card.dart';
 import 'package:sport_platform/modules/matches/presentation/pages/match_detail_page.dart';
 import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
 
@@ -71,6 +74,19 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
         team: TeamModel(id: teamId, name: teamName),
         isEditMode: true,
       );
+
+  /// El detalle de un equipo del evento: su balance, sus partidos, sus goleadores y, si se ve, su plantilla.
+  void _openTeam(TeamEventModel team) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => TeamInEventPage(
+          event: _event,
+          team: team,
+          teamNames: {for (final t in _notifier.teams) t.teamId: t.teamName},
+        ),
+      ),
+    );
+  }
 
   Future<void> _openAddTeam() async {
     final enrolledIds = _notifier.teams.map((t) => t.teamId).toSet();
@@ -282,18 +298,24 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
   Widget _buildInfoTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: LeagueInfoCard(
-        event: _event,
-        isOwner: widget.isOwner,
-        onSave: (data) async {
-          final notifier = getIt<EventsNotifier>(instanceName: 'leagues');
-          final updated = await notifier.update(_event.id, data);
-          if (mounted) {
-            setState(() => _event = updated);
-            _showSnack('leagues.success_updated'.tr());
-          }
-        },
-        onError: () => _showSnack('leagues.error_update'.tr(), isError: true),
+      child: Column(
+        children: [
+          LeagueInfoCard(
+            event: _event,
+            isOwner: widget.isOwner,
+            onSave: (data) async {
+              final notifier = getIt<EventsNotifier>(instanceName: 'leagues');
+              final updated = await notifier.update(_event.id, data);
+              if (mounted) {
+                setState(() => _event = updated);
+                _showSnack('leagues.success_updated'.tr());
+              }
+            },
+            onError: () => _showSnack('leagues.error_update'.tr(), isError: true),
+          ),
+          const SizedBox(height: 16),
+          EventRulesCard(event: _event),
+        ],
       ),
     );
   }
@@ -305,6 +327,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       error: _notifier.teamsError?.tr(),
       isOwner: widget.isOwner,
       onRetry: _notifier.loadTeams,
+      onOpen: _openTeam,
       onManagePlayers: (team) => _openManagePlayers(team.teamId, team.teamName),
       onRemove: (team) => _confirmRemoveTeam(team.id, team.teamName),
     );

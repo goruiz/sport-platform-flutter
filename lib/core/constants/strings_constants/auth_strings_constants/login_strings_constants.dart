@@ -1,5 +1,4 @@
 class LoginStringsConstants {
-  static const String appName = 'app.name';
   static const String appTagline = 'app.tagline';
 
   static const String welcomeBack = 'login.welcome_back';

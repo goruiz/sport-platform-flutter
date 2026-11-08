@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/matches/data/datasource/match_attendance_service.dart';
 import 'package:sport_platform/core/services/external_launcher.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
@@ -10,13 +12,16 @@ import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/core/utils/external_links.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_events_service.dart';
+import 'package:sport_platform/modules/matches/presentation/providers/match_attendance_notifier.dart';
 import 'package:sport_platform/modules/matches/presentation/providers/match_detail_notifier.dart';
+import 'package:sport_platform/modules/matches/presentation/widgets/match_attendance_card.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_event_tile.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_scoreboard.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
+import 'package:sport_platform/shared/enums/summary_status.dart';
 import 'package:sport_platform/shared/widgets/status_badge.dart';
 
 /// El detalle de un partido: marcador y cronología de goles, asistencias, tarjetas y faltas.
@@ -43,6 +48,7 @@ class MatchDetailPage extends StatefulWidget {
 
 class _MatchDetailPageState extends State<MatchDetailPage> {
   late final MatchDetailNotifier _notifier;
+  late final MatchAttendanceNotifier _attendance;
 
   @override
   void initState() {
@@ -51,12 +57,25 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
       service: getIt<MatchEventsService>(),
       matchId: widget.match.id,
     )..load();
+    _attendance = MatchAttendanceNotifier(
+      playersService: getIt<PlayersService>(),
+      service: getIt<MatchAttendanceService>(),
+      match: widget.match,
+    )..load();
   }
 
   @override
   void dispose() {
     _notifier.dispose();
+    _attendance.dispose();
     super.dispose();
+  }
+
+  /// Guarda lo que el jugador responde (o quita su respuesta) y, si el backend lo rechaza, dice por qué.
+  Future<void> _saveAttendance(Future<String?> Function() save) async {
+    final problemKey = await save();
+    if (!mounted || problemKey == null) return;
+    AppSnackbar.error(context, problemKey.tr());
   }
 
   String _teamNameOf(String teamId) =>
@@ -69,9 +88,9 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
       backgroundColor: AppColors.backgroundEnd,
       appBar: AppBar(title: Text('match_detail.title'.tr())),
       body: ListenableBuilder(
-        listenable: _notifier,
+        listenable: Listenable.merge([_notifier, _attendance]),
         builder: (context, _) => RefreshIndicator(
-          onRefresh: _notifier.load,
+          onRefresh: () => Future.wait([_notifier.load(), _attendance.load()]),
           color: AppColors.primaryLight,
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -80,6 +99,7 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
               _buildHeaderCard(),
               const SizedBox(height: AppSpacing.md),
               _buildActions(),
+              ..._buildAttendance(),
               const SizedBox(height: AppSpacing.xxl),
               _buildTimelineTitle(),
               ..._buildTimeline(),
@@ -164,6 +184,42 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
     );
   }
 
+  /// La asistencia, solo para quien juega en uno de los equipos del partido: nadie más la ve.
+  List<Widget> _buildAttendance() {
+    if (!_attendance.isParticipant) return const [];
+    final attendance = _attendance.attendance;
+    if (_attendance.status == SummaryStatus.failed || attendance == null) {
+      if (_attendance.status == SummaryStatus.loading) return const [];
+      return [
+        const SizedBox(height: AppSpacing.md),
+        AppCard(
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  (_attendance.loadErrorKey ?? 'match_detail.attendance.error_load').tr(),
+                  style: AppTextStyles.bodyMuted,
+                ),
+              ),
+              TextButton(onPressed: _attendance.load, child: Text('common.retry'.tr())),
+            ],
+          ),
+        ),
+      ];
+    }
+    return [
+      const SizedBox(height: AppSpacing.md),
+      MatchAttendanceCard(
+        attendance: attendance,
+        myTeamId: _attendance.myTeamId,
+        canAnswer: _attendance.canAnswer,
+        isSaving: _attendance.isSaving,
+        onAnswer: (status) => _saveAttendance(() => _attendance.answer(status)),
+        onClearAnswer: () => _saveAttendance(_attendance.clearAnswer),
+      ),
+    ];
+  }
+
   /// El resultado si ya hay, y si no, quién juega con quién y cuándo.
   String _shareText() {
     final match = widget.match;
@@ -189,7 +245,7 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
     final uri = ExternalLinks.calendarEvent(
       title: 'match_detail.calendar_title'.tr(args: [widget.homeName, widget.awayName]),
       start: match.matchDate,
-      end: match.endsAt ?? match.matchDate.add(AppConstants.defaultMatchDuration),
+      end: match.endsAt ?? match.matchDate.add(AppConstants.defaultMatchDuration.value),
       location: widget.courtName ?? match.location,
       details: widget.eventName,
     );

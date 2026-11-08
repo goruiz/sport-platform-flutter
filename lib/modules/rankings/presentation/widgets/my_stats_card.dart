@@ -3,17 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 
-/// Lo que hizo el propio jugador en el evento elegido: goles, asistencias, tarjetas y faltas.
+/// Lo que hizo el propio jugador (en un evento o, con [subtitle], sumando varios): partidos jugados, goles, asistencias,
+/// tarjetas y faltas.
 class MyStatsCard extends StatelessWidget {
   final PlayerStatsModel stats;
 
-  const MyStatsCard({super.key, required this.stats});
+  /// Aclara a qué corresponden los números cuando no es un solo evento.
+  final String? subtitle;
+  final EdgeInsetsGeometry margin;
+
+  const MyStatsCard({
+    super.key,
+    required this.stats,
+    this.subtitle,
+    this.margin = const EdgeInsets.fromLTRB(16, 8, 16, 4),
+  });
 
   @override
   Widget build(BuildContext context) {
     context.locale;
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      margin: margin,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: AppColors.primaryLight.withValues(alpha: 0.12),
@@ -33,10 +43,14 @@ class MyStatsCard extends StatelessWidget {
               ),
             ],
           ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 4),
+            Text(subtitle!, style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12)),
+          ],
           const SizedBox(height: 12),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              _Counter(label: 'rankings.my_stats.matches'.tr(), value: stats.matchesPlayed),
               _Counter(label: 'rankings.my_stats.goals'.tr(), value: stats.goals),
               _Counter(label: 'rankings.my_stats.assists'.tr(), value: stats.assists),
               _Counter(label: 'rankings.my_stats.yellow'.tr(), value: stats.yellowCards, color: AppColors.cardYellow),
@@ -59,12 +73,17 @@ class _Counter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text('$value', style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 2),
-        Text(label, style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 11)),
-      ],
+    return Expanded(
+      child: Column(
+        children: [
+          Text('$value', style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 2),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(label, style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 11)),
+          ),
+        ],
+      ),
     );
   }
 }

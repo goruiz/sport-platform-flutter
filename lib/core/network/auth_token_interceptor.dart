@@ -6,6 +6,10 @@ import 'package:sport_platform/core/services/auth_storage.dart';
 class AuthTokenInterceptor extends Interceptor {
   static const String authorizationHeader = 'Authorization';
   static const String _bearerScheme = 'Bearer';
+
+  /// El valor de la cabecera de autorización para [token].
+  static String bearerValue(String token) => '$_bearerScheme $token';
+
   static const Set<String> _publicAuthEndpoints = {
     ApiEndpoints.login,
     ApiEndpoints.register,
@@ -24,7 +28,7 @@ class AuthTokenInterceptor extends Interceptor {
     }
     final token = await AuthStorage.getToken();
     if (token != null) {
-      options.headers[authorizationHeader] = '$_bearerScheme $token';
+      options.headers[authorizationHeader] = bearerValue(token);
     }
     handler.next(options);
   }

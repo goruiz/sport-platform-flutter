@@ -1,4 +1,5 @@
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 
 /// Cómo terminó un partido para un equipo.
 enum MatchResult { win, draw, loss }
@@ -37,6 +38,17 @@ class TeamRecord {
     goalsFor: this.goalsFor + goalsFor,
     goalsAgainst: this.goalsAgainst + goalsAgainst,
   );
+}
+
+/// La disciplina de un equipo: lo que suman sus jugadores en tarjetas y faltas.
+class TeamDiscipline {
+  final int yellowCards;
+  final int redCards;
+  final int fouls;
+
+  const TeamDiscipline({this.yellowCards = 0, this.redCards = 0, this.fouls = 0});
+
+  int get cards => yellowCards + redCards;
 }
 
 /// El resultado de [match] para [teamId]; null si el partido no tiene resultado o el equipo no lo jugó.
@@ -97,4 +109,29 @@ List<MatchResult> buildRecentForm(
       ? played.sublist(played.length - limit)
       : played;
   return lastOnes.map((match) => resultFor(teamId, match)!).toList();
+}
+
+/// Cuántos eventos distintos jugó el equipo: aquellos en los que tiene al menos un partido.
+int countEventsPlayed(Iterable<MatchModel> matches) =>
+    {for (final match in matches) if (match.eventId.isNotEmpty) match.eventId}.length;
+
+/// Suma las tarjetas y faltas de los jugadores de [teamId] en cada evento (cada lista es lo de un evento). El backend
+/// pone en cada línea el equipo con el que el jugador jugó ese evento, así que un jugador que cambió de equipo suma
+/// solo donde estaba con este.
+TeamDiscipline buildTeamDiscipline(
+  String teamId,
+  Iterable<List<PlayerStatsModel>> statsByEvent,
+) {
+  var yellowCards = 0;
+  var redCards = 0;
+  var fouls = 0;
+  for (final stats in statsByEvent) {
+    for (final player in stats) {
+      if (player.teamId != teamId) continue;
+      yellowCards += player.yellowCards;
+      redCards += player.redCards;
+      fouls += player.fouls;
+    }
+  }
+  return TeamDiscipline(yellowCards: yellowCards, redCards: redCards, fouls: fouls);
 }

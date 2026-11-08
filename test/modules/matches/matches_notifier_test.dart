@@ -32,7 +32,7 @@ class _FakeEventsSearchService extends EventsSearchService {
   int searches = 0;
 
   @override
-  Future<EventsPage> search({String? text, EventStatus? status, int page = 0, int size = 20}) async {
+  Future<EventsPage> search({String? text, EventStatus? status, int page = 0, int? size}) async {
     searches++;
     return EventsPage(
       events: [

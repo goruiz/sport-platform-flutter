@@ -1,4 +1,5 @@
-/// Lo que hizo un jugador en todos los partidos de un evento, sumado por el backend.
+/// Lo que hizo un jugador, sumado por el backend: en todos los partidos de un evento o, si viene de sus totales
+/// (`GET /players/me/stats`), en todos los eventos en que jugó.
 class PlayerStatsModel {
   final String playerId;
 
@@ -12,6 +13,9 @@ class PlayerStatsModel {
   final int redCards;
   final int fouls;
 
+  /// Los partidos ya jugados por su equipo (en el evento o en total). 0 si el backend no lo manda.
+  final int matchesPlayed;
+
   const PlayerStatsModel({
     required this.playerId,
     this.playerName,
@@ -22,9 +26,13 @@ class PlayerStatsModel {
     this.yellowCards = 0,
     this.redCards = 0,
     this.fouls = 0,
+    this.matchesPlayed = 0,
   });
 
   int get cards => yellowCards + redCards;
+
+  /// No tiene nada que mostrar: ni partidos jugados ni un solo gol, tarjeta o falta.
+  bool get isEmpty => matchesPlayed + goals + assists + yellowCards + redCards + fouls == 0;
 
   factory PlayerStatsModel.fromJson(Map<String, dynamic> json) {
     return PlayerStatsModel(
@@ -37,6 +45,7 @@ class PlayerStatsModel {
       yellowCards: _asInt(json['yellowCards']),
       redCards: _asInt(json['redCards']),
       fouls: _asInt(json['fouls']),
+      matchesPlayed: _asInt(json['matchesPlayed']),
     );
   }
 

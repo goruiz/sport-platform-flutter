@@ -58,6 +58,45 @@ void main() {
         EventFormatStructure.swiss,
       );
     });
+
+    test('lee las reglas del formato y los límites de jugadores por equipo', () {
+      final json = _eventJson(
+        eventFormat: {
+          'structure': 'ROUND_ROBIN',
+          'pointsForWin': 3,
+          'pointsForDraw': 1,
+          'pointsForLoss': 0,
+          'tiebreakers': ['GOAL_DIFFERENCE'],
+        },
+      )..addAll({'minPlayersPerTeam': 5, 'maxPlayersPerTeam': 12});
+
+      final event = EventModel.fromJson(json);
+
+      expect(event.formatRules?.pointsForWin, 3);
+      expect(event.formatRules?.tiebreakers, hasLength(1));
+      expect(event.minPlayersPerTeam, 5);
+      expect(event.maxPlayersPerTeam, 12);
+    });
+
+    test('un evento que no fija límites de jugadores los deja en null', () {
+      final event = EventModel.fromJson(_eventJson());
+
+      expect(event.minPlayersPerTeam, isNull);
+      expect(event.maxPlayersPerTeam, isNull);
+      expect(event.formatRules, isNull);
+    });
+
+    test('copyWith conserva las reglas y los límites', () {
+      final event = EventModel.fromJson(
+        _eventJson(eventFormat: {'structure': 'KNOCKOUT', 'thirdPlaceMatch': true})
+          ..addAll({'minPlayersPerTeam': 6}),
+      );
+
+      final copy = event.copyWith(name: 'Otro nombre');
+
+      expect(copy.formatRules?.thirdPlaceMatch, isTrue);
+      expect(copy.minPlayersPerTeam, 6);
+    });
   });
 
   group('EventModel.statusType', () {

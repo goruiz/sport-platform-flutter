@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/network/api_endpoints.dart';
+import 'package:sport_platform/core/network/authorized_image.dart';
+import 'package:sport_platform/core/services/auth_storage.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 /// Un círculo con la imagen de un equipo o de una persona (logo, foto) y, si no la hay, sus iniciales sobre un color
 /// que siempre es el mismo para ese nombre. Así un equipo se reconoce de un vistazo en cualquier lista de partidos.
+/// La imagen puede ser una dirección completa (un logo de otro sitio) o relativa al API (la foto de un jugador, que se
+/// pide con la sesión: ver `resolveNetworkImage`).
 class InitialsAvatar extends StatelessWidget {
   final String name;
   final String? logoUrl;
@@ -36,6 +41,13 @@ class InitialsAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = colorOf(name);
     final logo = logoUrl;
+    final image = logo != null && logo.isNotEmpty
+        ? resolveNetworkImage(
+            logo,
+            apiBaseUrl: ApiEndpoints.baseUrl,
+            token: AuthStorage.cachedToken,
+          )
+        : null;
     return Container(
       width: size,
       height: size,
@@ -46,9 +58,10 @@ class InitialsAvatar extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       alignment: Alignment.center,
-      child: logo != null && logo.isNotEmpty
+      child: image != null
           ? Image.network(
-              logo,
+              image.url,
+              headers: image.headers,
               width: size,
               height: size,
               fit: BoxFit.cover,

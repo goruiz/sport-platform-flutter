@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/auth/data/datasource/login_service.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
@@ -264,7 +265,9 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
               if (v == null || v.isEmpty) {
                 return 'invite_register.password_required'.tr();
               }
-              if (v.length < 8) return 'invite_register.password_too_short'.tr();
+              if (v.length < AppConstants.minPasswordLength.value) {
+                return 'invite_register.password_too_short'.tr(args: [AppConstants.minPasswordLength.asText]);
+              }
               final hasUpper = RegExp(r'[A-Z]').hasMatch(v);
               final hasLower = RegExp(r'[a-z]').hasMatch(v);
               final hasDigit = RegExp(r'\d').hasMatch(v);

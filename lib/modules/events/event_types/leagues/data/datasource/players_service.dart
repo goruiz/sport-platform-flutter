@@ -5,7 +5,9 @@ import 'package:sport_platform/core/network/response_parser.dart';
 import '../models/player_model.dart';
 
 class PlayersService {
-  final DioClient _client = DioClient();
+  final DioClient _client;
+
+  PlayersService({DioClient? client}) : _client = client ?? DioClient();
 
   Future<PlayerModel> create({
     required String firstName,

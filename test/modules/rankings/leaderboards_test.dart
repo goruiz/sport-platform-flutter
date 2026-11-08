@@ -83,6 +83,39 @@ void main() {
     });
   });
 
+  group('filterStatsByScope', () {
+    const mine = PlayerStatsModel(playerId: 'ana', teamId: 'mi-equipo', goals: 3);
+    const teammate = PlayerStatsModel(playerId: 'luis', teamId: 'mi-equipo', goals: 1);
+    const rival = PlayerStatsModel(playerId: 'eva', teamId: 'rival', goals: 5);
+    const everyone = [mine, rival, teammate];
+
+    test('todo el evento deja a todos los jugadores', () {
+      expect(filterStatsByScope(everyone, LeaderboardScope.event, 'mi-equipo'), everyone);
+    });
+
+    test('mi equipo deja solo a los compañeros, en el mismo orden', () {
+      final result = filterStatsByScope(everyone, LeaderboardScope.myTeam, 'mi-equipo');
+
+      expect(result, [mine, teammate]);
+    });
+
+    test('el ranking del equipo se arma con lo de sus jugadores, no con el del evento', () {
+      final team = filterStatsByScope(everyone, LeaderboardScope.myTeam, 'mi-equipo');
+
+      expect(buildLeaderboard(team, LeaderboardKind.scorers).map((player) => player.playerId), ['ana', 'luis']);
+      expect(buildLeaderboard(everyone, LeaderboardKind.scorers).first.playerId, 'eva');
+    });
+
+    test('mi equipo sin equipo no tiene a nadie', () {
+      expect(filterStatsByScope(everyone, LeaderboardScope.myTeam, null), isEmpty);
+      expect(filterStatsByScope(everyone, LeaderboardScope.myTeam, ''), isEmpty);
+    });
+
+    test('un equipo sin datos en el evento da un listado vacío', () {
+      expect(filterStatsByScope(everyone, LeaderboardScope.myTeam, 'otro-equipo'), isEmpty);
+    });
+  });
+
   group('pickDefaultEvent', () {
     test('sin eventos es null', () {
       expect(pickDefaultEvent(const []), isNull);

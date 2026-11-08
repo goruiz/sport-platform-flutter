@@ -55,7 +55,7 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> with SnackMixin {
 
   final Set<String> _selectedDays = {};
   TimeOfDay _startTime = const TimeOfDay(hour: 9, minute: 0);
-  final _durationCtrl = TextEditingController(text: '90');
+  final _durationCtrl = TextEditingController(text: '${AppConstants.defaultMatchDuration.value.inMinutes}');
   final _halvesBreakCtrl = TextEditingController(text: '15');
   final _matchBreakCtrl = TextEditingController(text: '30');
   String? _courtId;
@@ -170,7 +170,7 @@ class _AutoScheduleSheetState extends State<AutoScheduleSheet> with SnackMixin {
   Map<String, dynamic> _buildPayload() => {
         'playDays': _selectedDays.toList(),
         'startTime': _startTimeLabel,
-        'matchDurationMinutes': int.tryParse(_durationCtrl.text) ?? 90,
+        'matchDurationMinutes': int.tryParse(_durationCtrl.text) ?? AppConstants.defaultMatchDuration.value.inMinutes,
         'breakBetweenHalvesMinutes': int.tryParse(_halvesBreakCtrl.text) ?? 15,
         'breakBetweenMatchesMinutes': int.tryParse(_matchBreakCtrl.text) ?? 30,
         if (_courtId != null) 'courtId': _courtId,

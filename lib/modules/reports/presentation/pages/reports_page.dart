@@ -7,10 +7,11 @@ import 'package:sport_platform/modules/reports/domain/team_report.dart';
 import 'package:sport_platform/modules/reports/presentation/providers/reports_notifier.dart';
 import 'package:sport_platform/modules/reports/presentation/widgets/recent_form_chips.dart';
 import 'package:sport_platform/modules/reports/presentation/widgets/team_record_card.dart';
+import 'package:sport_platform/modules/reports/presentation/widgets/team_stats_card.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
-/// El reporte del equipo del usuario: su balance, su racha y cómo le fue en cada evento.
+/// El reporte del equipo del usuario: su balance, su participación y disciplina, su racha y cómo le fue en cada evento.
 class ReportsPage extends StatefulWidget {
   final MenuItemModel item;
 
@@ -29,6 +30,7 @@ class _ReportsPageState extends State<ReportsPage> {
     _notifier = ReportsNotifier(
       playersService: getIt(),
       matchesService: getIt(),
+      playerStatsService: getIt(),
     )..load();
   }
 
@@ -92,6 +94,15 @@ class _ReportsPageState extends State<ReportsPage> {
           _title(_notifier.teamName ?? ''),
           const SizedBox(height: 12),
           TeamRecordCard(record: _notifier.record),
+          const SizedBox(height: 24),
+          _title('reports.participation_and_discipline'.tr()),
+          const SizedBox(height: 10),
+          TeamStatsCard(
+            eventsPlayed: _notifier.eventsPlayed,
+            disciplineStatus: _notifier.disciplineStatus,
+            discipline: _notifier.discipline,
+            onRetry: _notifier.load,
+          ),
           const SizedBox(height: 24),
           _title('reports.recent_form'.tr()),
           const SizedBox(height: 10),

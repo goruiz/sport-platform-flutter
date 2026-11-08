@@ -56,8 +56,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   String? _messageOf(PasswordIssue? issue) {
     if (issue == null) return null;
     return switch (issue) {
-      PasswordIssue.tooShort => issue.translationKey.tr(args: ['${AppConstants.minPasswordLength}']),
-      PasswordIssue.tooLong => issue.translationKey.tr(args: ['${AppConstants.maxPasswordLength}']),
+      PasswordIssue.tooShort => issue.translationKey.tr(args: [AppConstants.minPasswordLength.asText]),
+      PasswordIssue.tooLong => issue.translationKey.tr(args: [AppConstants.maxPasswordLength.asText]),
       _ => issue.translationKey.tr(),
     };
   }

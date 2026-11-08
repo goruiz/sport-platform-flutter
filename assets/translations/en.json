@@ -1,6 +1,5 @@
 {
   "app": {
-    "name": "Sports Platform",
     "tagline": "Your Smart Sports Companion"
   },
   "login": {
@@ -16,8 +15,8 @@
     "email_required": "Enter your email",
     "email_invalid": "Enter a valid email",
     "password_required": "Enter your password",
-    "password_too_short": "Minimum 8 characters",
-    "password_too_long": "Maximum 72 characters",
+    "password_too_short": "Minimum {} characters",
+    "password_too_long": "Maximum {} characters",
     "errors": {
       "invalid_credentials": "Incorrect email or password.",
       "administrator_account": "Administrator accounts sign in through the web panel, not the app.",
@@ -62,7 +61,7 @@
     "email_required": "Enter your email",
     "email_invalid": "Enter a valid email",
     "password_required": "Enter your password",
-    "password_too_short": "Minimum 8 characters",
+    "password_too_short": "Minimum {} characters",
     "password_weak": "Must include uppercase, lowercase, number and special character",
     "confirm_password_required": "Confirm your password",
     "passwords_do_not_match": "Passwords do not match",
@@ -71,7 +70,7 @@
     "success": "Registration successful",
     "error": "Error registering. Please try again.",
     "email_already_exists": "This email is already registered. Please sign in.",
-    "password_rules": "At least 8 characters, with an uppercase letter, a lowercase letter, a number and a special character."
+    "password_rules": "At least {} characters, with an uppercase letter, a lowercase letter, a number and a special character."
   },
   "home": {
     "nav_home": "Home",
@@ -152,7 +151,14 @@
       "players_empty": "This team does not have any players yet.",
       "your_team": "Your team",
       "captain": "Captain",
-      "players_count": "{count} players"
+      "players_count": "{count} players",
+      "leave": "Leave team",
+      "leave_title": "Leave {}?",
+      "leave_message": "You will no longer be part of this team: you will stop seeing its matches and its report. You can come back with an invitation or with the team code.",
+      "leave_captain_note": "You will also stop being the captain.",
+      "leave_confirm": "Leave",
+      "leave_success": "You left the team.",
+      "leave_error": "Could not leave the team. Please try again."
     },
     "matches": {
       "upcoming": "Upcoming",
@@ -172,7 +178,17 @@
       "empty_subtitle": "Registered courts will appear here.",
       "search_hint": "Search court, complex or location",
       "filtered_empty_title": "No matches found",
-      "filtered_empty_subtitle": "Try another search term."
+      "filtered_empty_subtitle": "Try another search term.",
+      "view_complex": "View the complex and its map",
+      "schedule_title": "Schedule",
+      "opening_hours": "Open from {} to {}",
+      "slot_free": "Free",
+      "slot_busy": "Taken",
+      "schedule_note": "Taken slots are the matches scheduled on this court.",
+      "schedule_error": "The schedule could not be loaded.",
+      "upcoming_title": "Upcoming matches",
+      "upcoming_empty": "There are no matches scheduled on this court.",
+      "upcoming_error": "The matches could not be loaded."
     },
     "profile": {
       "load_error": "Profile details could not be loaded.",
@@ -187,7 +203,30 @@
       "section_personal": "Personal details",
       "section_preferences": "Preferences",
       "section_account": "Account",
-      "language": "Language"
+      "language": "Language",
+      "section_team": "My team",
+      "team": "Team",
+      "no_team": "You are not on a team yet",
+      "team_role": "Your role",
+      "role_player": "Player",
+      "role_captain": "Captain",
+      "stats_caption": "Total across all your team's events",
+      "stats_empty": "You have no goals, assists, cards or fouls recorded yet.",
+      "stats_error": "Your stats could not be loaded.",
+      "photo": {
+        "change": "Change profile photo",
+        "take": "Take a photo",
+        "choose": "Choose from gallery",
+        "remove": "Remove photo",
+        "updated": "Photo updated.",
+        "removed": "Photo removed.",
+        "error_save": "The photo could not be saved. Please try again.",
+        "error_remove": "The photo could not be removed. Please try again.",
+        "error_empty": "The image is empty.",
+        "error_type": "Use a JPG, PNG or WebP photo.",
+        "error_too_large": "The photo is too large. The maximum is {} MB.",
+        "error_no_player": "You don't have a player profile to save the photo to yet."
+      }
     },
     "complexes": {
       "load_error": "The complexes could not be loaded.",
@@ -397,7 +436,19 @@
     "standings_col_gd": "GD",
     "info_dates": "Dates",
     "info_format": "Format",
-    "info_type": "Type"
+    "info_type": "Type",
+    "team_detail": {
+      "tap_hint": "Tap to see the details",
+      "record_title": "Record in this event",
+      "no_matches": "This team has no matches in the event yet.",
+      "matches_error": "The team's matches could not be loaded.",
+      "upcoming_title": "Upcoming matches",
+      "results_title": "Latest results",
+      "scorers_title": "Team top scorers",
+      "scorers_empty": "No goals have been recorded yet.",
+      "stats_error": "The team's statistics could not be loaded.",
+      "discipline_title": "Cards and fouls"
+    }
   },
   "menu": {
     "home": "Home",
@@ -520,7 +571,7 @@
     "email_required": "Email is required",
     "email_invalid": "Enter a valid email",
     "password_required": "Password is required",
-    "password_too_short": "Minimum 8 characters",
+    "password_too_short": "Minimum {} characters",
     "password_weak": "Must include uppercase, lowercase, number and special character",
     "confirm_password_required": "Please confirm your password",
     "passwords_mismatch": "Passwords do not match"
@@ -598,6 +649,42 @@
       "GRAND_FINAL": "Grand final"
     }
   },
+  "event_rules": {
+    "title": "Tournament rules",
+    "kinds": {
+      "structure": "Game system",
+      "points": "Points",
+      "tiebreakers": "Tiebreakers",
+      "round_trip": "Matches between teams",
+      "knockout_round_trip": "Knockout matches",
+      "swiss_rounds": "Swiss system rounds",
+      "group_count": "Groups",
+      "teams_advancing_per_group": "Teams advancing per group",
+      "playoff_teams": "Teams reaching the playoffs",
+      "third_place_match": "Is there a third-place match?",
+      "grand_final_reset": "Is there a rematch in the grand final?",
+      "players_per_team": "Players per team"
+    },
+    "values": {
+      "number": "{}",
+      "points": "Win {} · Draw {} · Loss {}",
+      "round_trip_yes": "Home and away",
+      "round_trip_no": "One leg only",
+      "single_match": "Single match",
+      "yes": "Yes",
+      "no": "No",
+      "players_between": "From {} to {}",
+      "players_min": "At least {}",
+      "players_max": "At most {}"
+    },
+    "tiebreaker": {
+      "GOAL_DIFFERENCE": "Goal difference",
+      "GOALS_FOR": "Goals scored",
+      "WINS": "Matches won",
+      "HEAD_TO_HEAD": "Head to head",
+      "OPPONENTS_POINTS": "Opponents’ points (Buchholz)"
+    }
+  },
   "match_events": {
     "types": {
       "GOAL": "Goal",
@@ -619,7 +706,21 @@
     "share_result": "⚽ {} {} – {} {}",
     "share_upcoming": "⚽ {} vs {}",
     "calendar_title": "{} vs {}",
-    "action_error": "The action could not be completed."
+    "action_error": "The action could not be completed.",
+    "attendance": {
+      "title": "Will you attend the match?",
+      "confirm": "I'm in",
+      "decline": "I can't go",
+      "clear": "Clear my answer",
+      "summary": "Confirmed: {confirmed} · Not attending: {declined}",
+      "answered_confirmed": "You confirmed you'll attend the match.",
+      "answered_declined": "You said you can't attend.",
+      "closed": "Answers are closed: the match has started or has no firm date.",
+      "error_load": "The attendance could not be loaded.",
+      "error_save": "Your answer could not be saved. Please try again.",
+      "error_closed": "The match no longer accepts answers.",
+      "error_not_participant": "Only players from the match's teams can answer."
+    }
   },
   "invitations": {
     "title": "Invitations",
@@ -661,8 +762,13 @@
       "assists": "Assists",
       "yellow": "Yellow",
       "red": "Red",
-      "fouls": "Fouls"
-    }
+      "fouls": "Fouls",
+      "matches": "Matches"
+    },
+    "scope_event": "Whole event",
+    "scope_team": "My team",
+    "empty_team_subtitle": "Your teammates will appear once goals and cards are recorded.",
+    "you": "You"
   },
   "reports": {
     "load_error": "The report could not be loaded.",
@@ -683,7 +789,13 @@
     "form_draw": "D",
     "form_loss": "L",
     "by_event": "By event",
-    "event_summary": "{won}W {drawn}D {lost}L"
+    "event_summary": "{won}W {drawn}D {lost}L",
+    "participation_and_discipline": "Participation and discipline",
+    "events_played": "Events",
+    "yellow_cards": "Yellow",
+    "red_cards": "Red",
+    "fouls": "Fouls",
+    "team_stats_error": "The team's cards and fouls could not be loaded."
   },
   "account": {
     "change_password": {

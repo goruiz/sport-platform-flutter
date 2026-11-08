@@ -3,6 +3,7 @@ import 'package:sport_platform/core/routes/app_navigator.dart';
 import 'package:sport_platform/core/services/session_expired_listener.dart';
 import 'package:sport_platform/core/services/session_service.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
+import 'package:sport_platform/modules/courts/data/datasource/court_availability_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/courts_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/league_matches_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/league_schedule_service.dart';
@@ -17,12 +18,14 @@ import 'package:sport_platform/modules/events/event_types/leagues/domain/reposit
 import 'package:sport_platform/modules/events/shared/data/datasource/championship_service.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_catalog_service.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
+import 'package:sport_platform/modules/matches/data/datasource/match_attendance_service.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_events_service.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/players/data/datasource/join_team_service.dart';
 import 'package:sport_platform/modules/players/data/datasource/team_invitations_service.dart';
 import 'package:sport_platform/modules/users/data/datasource/account_service.dart';
+import 'package:sport_platform/modules/users/data/datasource/player_photo_service.dart';
 import 'package:sport_platform/modules/users/presentation/providers/email_verification_notifier.dart';
 import 'package:sport_platform/modules/players/presentation/providers/invitations_notifier.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
@@ -60,17 +63,20 @@ void setupServiceLocator() {
   getIt.registerLazySingleton<TeamsService>(() => TeamsService());
   getIt.registerLazySingleton<PlayersService>(() => PlayersService());
   getIt.registerLazySingleton<CourtsService>(() => CourtsService());
+  getIt.registerLazySingleton<CourtAvailabilityService>(() => CourtAvailabilityService());
   getIt.registerLazySingleton<SportComplexesService>(() => SportComplexesService());
   getIt.registerLazySingleton<EventsCatalogService>(() => EventsCatalogService());
   getIt.registerLazySingleton<ChampionshipService>(() => ChampionshipService());
   getIt.registerLazySingleton<MatchesService>(() => MatchesService());
   getIt.registerLazySingleton<MatchEventsService>(() => MatchEventsService());
+  getIt.registerLazySingleton<MatchAttendanceService>(() => MatchAttendanceService());
   getIt.registerLazySingleton<PlayerStatsService>(() => PlayerStatsService());
   getIt.registerLazySingleton<TeamInvitationsService>(() => TeamInvitationsService());
   getIt.registerLazySingleton<InvitationsNotifier>(
     () => InvitationsNotifier(getIt<TeamInvitationsService>(), getIt<SessionService>()),
   );
   getIt.registerLazySingleton<AccountService>(() => AccountService());
+  getIt.registerLazySingleton<PlayerPhotoService>(() => PlayerPhotoService());
   getIt.registerLazySingleton<EmailVerificationNotifier>(
     () => EmailVerificationNotifier(getIt<AccountService>()),
   );

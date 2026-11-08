@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 import 'package:sport_platform/modules/reports/domain/team_report.dart';
 
 import '../../support/builders.dart';
@@ -108,6 +109,40 @@ void main() {
 
     test('con un límite mayor devuelve todos los que hay', () {
       expect(buildRecentForm(myTeam, matches, limit: 10), hasLength(3));
+    });
+  });
+
+  group('countEventsPlayed', () {
+    test('cuenta cada evento una sola vez', () {
+      expect(countEventsPlayed(matches), 2);
+    });
+
+    test('sin partidos no hay eventos', () {
+      expect(countEventsPlayed(const []), 0);
+    });
+  });
+
+  group('buildTeamDiscipline', () {
+    PlayerStatsModel stats(String teamId, {int yellow = 0, int red = 0, int fouls = 0}) =>
+        PlayerStatsModel(playerId: 'p-$teamId-$yellow$red$fouls', teamId: teamId, yellowCards: yellow, redCards: red, fouls: fouls);
+
+    test('suma solo a los jugadores del equipo, en todos los eventos', () {
+      final discipline = buildTeamDiscipline(myTeam, [
+        [stats(myTeam, yellow: 2, fouls: 1), stats('x', yellow: 5, red: 5, fouls: 5)],
+        [stats(myTeam, yellow: 1, red: 1, fouls: 4)],
+      ]);
+
+      expect(discipline.yellowCards, 3);
+      expect(discipline.redCards, 1);
+      expect(discipline.fouls, 5);
+      expect(discipline.cards, 4);
+    });
+
+    test('sin estadísticas todo queda en cero', () {
+      final discipline = buildTeamDiscipline(myTeam, const []);
+
+      expect(discipline.cards, 0);
+      expect(discipline.fouls, 0);
     });
   });
 }

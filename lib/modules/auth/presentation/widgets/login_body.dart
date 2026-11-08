@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
@@ -128,8 +129,8 @@ class LoginBody extends StatelessWidget {
               if (v == null || v.isEmpty) {
                 return LoginStringsConstants.passwordRequired.tr();
               }
-              if (v.length < 8) {
-                return LoginStringsConstants.passwordTooShort.tr();
+              if (v.length < AppConstants.minPasswordLength.value) {
+                return LoginStringsConstants.passwordTooShort.tr(args: [AppConstants.minPasswordLength.asText]);
               }
               return null;
             },

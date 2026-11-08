@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
@@ -80,8 +81,8 @@ class _EventFormSheetState extends State<EventFormSheet> {
     final date = await showDatePicker(
       context: context,
       initialDate: initial,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2035),
+      firstDate: AppConstants.minPickerDate,
+      lastDate: AppConstants.maxPickerDate,
     );
     if (date == null || !mounted) return;
     setState(() {

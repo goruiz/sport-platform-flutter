@@ -9,10 +9,13 @@ void main() {
     });
 
     test('respeta el mínimo y el máximo de la política del backend', () {
-      expect(checkNewPassword('a' * (AppConstants.minPasswordLength - 1)), PasswordIssue.tooShort);
-      expect(checkNewPassword('a' * AppConstants.minPasswordLength), isNull);
-      expect(checkNewPassword('a' * AppConstants.maxPasswordLength), isNull);
-      expect(checkNewPassword('a' * (AppConstants.maxPasswordLength + 1)), PasswordIssue.tooLong);
+      final minLength = AppConstants.minPasswordLength.value;
+      final maxLength = AppConstants.maxPasswordLength.value;
+
+      expect(checkNewPassword('a' * (minLength - 1)), PasswordIssue.tooShort);
+      expect(checkNewPassword('a' * minLength), isNull);
+      expect(checkNewPassword('a' * maxLength), isNull);
+      expect(checkNewPassword('a' * (maxLength + 1)), PasswordIssue.tooLong);
     });
 
     test('no puede ser igual a la actual', () {

@@ -1,3 +1,4 @@
+import 'package:sport_platform/modules/events/shared/data/models/event_format_rules.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_format_structure.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
 
@@ -13,9 +14,13 @@ class EventModel {
   final DateTime? updatedAt;
   final String? eventTypeName;
 
-  /// La estructura de juego de su formato; null si el evento no tiene formato o su formato no
+  /// Las reglas de su formato (estructura, puntos, desempates…); null si el evento no tiene formato o su formato no
   /// tiene reglas (entonces es una liga como siempre y no hay campeonato que mostrar).
-  final EventFormatStructure? formatStructure;
+  final EventFormatRules? formatRules;
+
+  /// Los límites de jugadores por equipo que fijó el organizador; null si no puso alguno.
+  final int? minPlayersPerTeam;
+  final int? maxPlayersPerTeam;
 
   const EventModel({
     required this.id,
@@ -28,8 +33,13 @@ class EventModel {
     required this.createdAt,
     this.updatedAt,
     this.eventTypeName,
-    this.formatStructure,
+    this.formatRules,
+    this.minPlayersPerTeam,
+    this.maxPlayersPerTeam,
   });
+
+  /// La estructura de juego de su formato; null si no tiene reglas.
+  EventFormatStructure? get formatStructure => formatRules?.structure;
 
   /// Su estado como enum; null si el backend trae un texto distinto de los cuatro conocidos.
   EventStatus? get statusType => EventStatus.fromApi(status);
@@ -59,8 +69,9 @@ class EventModel {
           ? DateTime.parse(json['updatedAt'].toString())
           : null,
       eventTypeName: eventType?['name']?.toString(),
-      formatStructure:
-          EventFormatStructure.fromApi(eventFormat?['structure']?.toString()),
+      formatRules: EventFormatRules.fromJson(eventFormat),
+      minPlayersPerTeam: _asInt(json['minPlayersPerTeam']),
+      maxPlayersPerTeam: _asInt(json['maxPlayersPerTeam']),
     );
   }
 
@@ -83,7 +94,9 @@ class EventModel {
     DateTime? createdAt,
     DateTime? updatedAt,
     String? eventTypeName,
-    EventFormatStructure? formatStructure,
+    EventFormatRules? formatRules,
+    int? minPlayersPerTeam,
+    int? maxPlayersPerTeam,
   }) =>
       EventModel(
         id: id ?? this.id,
@@ -96,8 +109,12 @@ class EventModel {
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         eventTypeName: eventTypeName ?? this.eventTypeName,
-        formatStructure: formatStructure ?? this.formatStructure,
+        formatRules: formatRules ?? this.formatRules,
+        minPlayersPerTeam: minPlayersPerTeam ?? this.minPlayersPerTeam,
+        maxPlayersPerTeam: maxPlayersPerTeam ?? this.maxPlayersPerTeam,
       );
+
+  static int? _asInt(dynamic value) => value is num ? value.toInt() : null;
 
   static String _apiDate(DateTime d) =>
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';

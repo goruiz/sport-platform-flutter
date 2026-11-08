@@ -47,14 +47,15 @@ class EventsSearchService {
     String? text,
     EventStatus? status,
     int page = 0,
-    int size = AppConstants.listPageSize,
+    int? size,
   }) async {
     final trimmedText = text?.trim() ?? '';
     final response = await _client.get(
       ApiEndpoints.eventsSearch,
       queryParams: {
         'page': page,
-        'size': size,
+        // Un valor por defecto de parámetro debe ser constante y un enum no lo es: sin tamaño se usa el de AppConstants.
+        'size': size ?? AppConstants.listPageSize.value,
         if (trimmedText.isNotEmpty) 'search': trimmedText,
         if (status != null) 'status': status.apiValue,
       },

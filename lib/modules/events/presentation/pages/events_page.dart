@@ -65,7 +65,7 @@ class _EventsPageState extends State<EventsPage> {
   /// Se busca cuando la persona deja de teclear, no con cada letra: una sola petición por «copa quito».
   void _onSearchChanged(String text) {
     _searchDebounce?.cancel();
-    _searchDebounce = Timer(AppConstants.searchDebounce, () => _explorer.search(text));
+    _searchDebounce = Timer(AppConstants.searchDebounce.value, () => _explorer.search(text));
   }
 
   void _openEvent(EventModel event) {

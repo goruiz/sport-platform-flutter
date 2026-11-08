@@ -12,6 +12,8 @@ import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/players/presentation/pages/join_team_page.dart';
 import 'package:sport_platform/modules/teams/domain/team_members.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
+import 'package:sport_platform/shared/widgets/app_snackbar.dart';
+import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 import 'package:sport_platform/shared/widgets/initials_avatar.dart';
@@ -27,6 +29,7 @@ class TeamsPage extends StatefulWidget {
 
 class _TeamsPageState extends State<TeamsPage> {
   late Future<_TeamData?> _teamData;
+  bool _isLeaving = false;
 
   @override
   void initState() {
@@ -48,18 +51,55 @@ class _TeamsPageState extends State<TeamsPage> {
     if (team == null) return null;
     return _TeamData(
       team: team,
+      player: player,
       members: sortCaptainFirst(results[1] as List<PlayerModel>),
     );
   }
 
   Future<void> _reload() async {
-    setState(() => _teamData = _loadTeamData());
+    // Con llaves: un `setState` cuyo callback devuelve el Future (la forma con flecha) falla en modo debug.
+    setState(() {
+      _teamData = _loadTeamData();
+    });
     await _teamData;
   }
 
   Future<void> _joinWithCode() async {
     final joined = await JoinTeamPage.open(context);
     if (joined && mounted) await _reload();
+  }
+
+  /// Pide confirmación y saca al jugador de su equipo; después la pantalla vuelve a leerse y queda como la de
+  /// quien no tiene equipo (con la opción de entrar con un código).
+  Future<void> _leaveTeam(_TeamData data) async {
+    final confirmed = await showConfirmationDialog(
+      context,
+      title: 'mobile.teams.leave_title'.tr(args: [data.team.name]),
+      content: _leaveMessage(data.player),
+      confirmLabel: 'mobile.teams.leave_confirm'.tr(),
+      cancelLabel: 'common.cancel'.tr(),
+    );
+    if (!confirmed || !mounted) return;
+    setState(() => _isLeaving = true);
+    try {
+      await getIt<PlayersService>().removeFromTeam(data.player.id);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _isLeaving = false);
+        AppSnackbar.error(context, 'mobile.teams.leave_error'.tr());
+      }
+      return;
+    }
+    if (!mounted) return;
+    setState(() => _isLeaving = false);
+    AppSnackbar.success(context, 'mobile.teams.leave_success'.tr());
+    await _reload();
+  }
+
+  /// Quien es capitán además pierde la capitanía al salir, y lo debe saber antes de confirmar.
+  String _leaveMessage(PlayerModel player) {
+    final message = 'mobile.teams.leave_message'.tr();
+    return player.isCaptain ? '$message\n\n${'mobile.teams.leave_captain_note'.tr()}' : message;
   }
 
   @override
@@ -126,6 +166,11 @@ class _TeamsPageState extends State<TeamsPage> {
                   )
                 else
                   ...data.members.map(_PlayerTile.new),
+                const SizedBox(height: AppSpacing.xxl),
+                _LeaveTeamButton(
+                  isBusy: _isLeaving,
+                  onPressed: () => _leaveTeam(data),
+                ),
               ],
             ),
           );
@@ -137,9 +182,12 @@ class _TeamsPageState extends State<TeamsPage> {
 
 class _TeamData {
   final TeamModel team;
+
+  /// El jugador de la cuenta (uno de los `members`): quien puede abandonar el equipo.
+  final PlayerModel player;
   final List<PlayerModel> members;
 
-  const _TeamData({required this.team, required this.members});
+  const _TeamData({required this.team, required this.player, required this.members});
 }
 
 class _TeamHeader extends StatelessWidget {
@@ -216,6 +264,28 @@ class _PlayerTile extends StatelessWidget {
             const _CaptainBadge(),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// La acción de salir del equipo: va al final de la pantalla y en rojo porque se deshace solo con un código o una
+/// invitación.
+class _LeaveTeamButton extends StatelessWidget {
+  final bool isBusy;
+  final VoidCallback onPressed;
+
+  const _LeaveTeamButton({required this.isBusy, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: isBusy ? null : onPressed,
+      icon: const Icon(Icons.logout, size: 18),
+      label: Text('mobile.teams.leave'.tr()),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.error,
+        side: const BorderSide(color: AppColors.error),
       ),
     );
   }

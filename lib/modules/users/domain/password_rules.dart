@@ -18,8 +18,8 @@ enum PasswordIssue {
 /// La contraseña nueva cumple la política del backend y es distinta de la actual; null si sirve.
 PasswordIssue? checkNewPassword(String value, {String? currentPassword}) {
   if (value.isEmpty) return PasswordIssue.empty;
-  if (value.length < AppConstants.minPasswordLength) return PasswordIssue.tooShort;
-  if (value.length > AppConstants.maxPasswordLength) return PasswordIssue.tooLong;
+  if (value.length < AppConstants.minPasswordLength.value) return PasswordIssue.tooShort;
+  if (value.length > AppConstants.maxPasswordLength.value) return PasswordIssue.tooLong;
   if (currentPassword != null && value == currentPassword) return PasswordIssue.sameAsCurrent;
   return null;
 }

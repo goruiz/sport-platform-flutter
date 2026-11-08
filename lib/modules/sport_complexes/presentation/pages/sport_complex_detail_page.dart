@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/services/external_launcher.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/utils/external_links.dart';
+import 'package:sport_platform/modules/courts/presentation/pages/court_detail_page.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
 import 'package:sport_platform/modules/sport_complexes/domain/complex_overview.dart';
 import 'package:sport_platform/modules/sport_complexes/presentation/widgets/complex_map.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
@@ -12,6 +14,13 @@ class SportComplexDetailPage extends StatelessWidget {
   final ComplexOverview overview;
 
   const SportComplexDetailPage({super.key, required this.overview});
+
+  /// El detalle de una cancha del complejo (sin el enlace de vuelta al complejo: ya se viene de él).
+  void _openCourt(BuildContext context, CourtModel court) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => CourtDetailPage(court: court)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +61,7 @@ class SportComplexDetailPage extends StatelessWidget {
                 icon: Icons.sports_soccer,
                 text: court.name,
                 detail: court.description,
+                onTap: () => _openCourt(context, court),
               ),
         ],
       ),
@@ -125,31 +135,38 @@ class _Line extends StatelessWidget {
   final String text;
   final String? detail;
 
-  const _Line({required this.icon, required this.text, this.detail});
+  /// Si se da, la línea se puede tocar y lo indica con una flecha.
+  final VoidCallback? onTap;
+
+  const _Line({required this.icon, required this.text, this.detail, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: AppColors.primaryLight, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(text, style: const TextStyle(color: AppColors.white, fontSize: 14)),
-                if (detail?.isNotEmpty ?? false)
-                  Text(
-                    detail!,
-                    style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
-                  ),
-              ],
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: AppColors.primaryLight, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(text, style: const TextStyle(color: AppColors.white, fontSize: 14)),
+                  if (detail?.isNotEmpty ?? false)
+                    Text(
+                      detail!,
+                      style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+            if (onTap != null) const Icon(Icons.chevron_right, color: AppColors.whiteSubtle),
+          ],
+        ),
       ),
     );
   }

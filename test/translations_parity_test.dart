@@ -44,6 +44,12 @@ void main() {
       'mobile.matches.pick_event',
       'match_detail.share_result',
       'rankings.my_stats.title',
+      'rankings.scope_team',
+      'event_rules.title',
+      'event_rules.tiebreaker.GOAL_DIFFERENCE',
+      'mobile.teams.leave_title',
+      'mobile.profile.section_team',
+      'mobile.profile.stats_caption',
       'common.cancel',
     ];
 

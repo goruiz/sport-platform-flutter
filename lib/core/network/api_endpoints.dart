@@ -30,6 +30,8 @@ class ApiEndpoints {
   static String playerById(String id) => '/players/$id';
   static const String playersSearch = '/players/search';
   static const String playersMe = '/players/me';
+  static const String playersMePhoto = '/players/me/photo';
+  static const String playersMeStats = '/players/me/stats';
   static const String playersInvite = '/players/invite';
   static const String playersInviteRegister = '/players/invite-register';
   static const String playersAuthRegister = '/players/auth/register';
@@ -51,6 +53,8 @@ class ApiEndpoints {
   static String matchById(String id) => '/matches/$id';
   static String matchesByEvent(String eventId) => '/matches/by-event/$eventId';
   static const String matchesMine = '/matches/mine';
+  static String matchesByCourt(String courtId) => '/matches/by-court/$courtId';
+  static String matchAttendance(String matchId) => '/matches/$matchId/attendance';
 
   // Match events (goals, assists, cards and fouls of a match): the app only reads them
   static String matchEventsByMatch(String matchId) =>
@@ -72,6 +76,8 @@ class ApiEndpoints {
 
   // Courts
   static const String courts = '/courts';
+  static String courtAvailability(String courtId) =>
+      '/courts/$courtId/availability';
 
   // Sport Complexes
   static const String sportComplexes = '/sport-complexes';

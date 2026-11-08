@@ -20,6 +20,28 @@ enum LeaderboardKind {
       };
 }
 
+/// A quiénes abarca un ranking: a todos los del evento o solo a los compañeros del propio equipo.
+enum LeaderboardScope {
+  event('rankings.scope_event'),
+  myTeam('rankings.scope_team');
+
+  const LeaderboardScope(this.translationKey);
+
+  final String translationKey;
+}
+
+/// Las estadísticas que entran en el ranking según su alcance. «Mi equipo» sin equipo no tiene a nadie: la pantalla
+/// ni lo ofrece, pero así la regla no depende de eso.
+List<PlayerStatsModel> filterStatsByScope(
+  List<PlayerStatsModel> stats,
+  LeaderboardScope scope,
+  String? teamId,
+) {
+  if (scope == LeaderboardScope.event) return stats;
+  if (teamId == null || teamId.isEmpty) return const [];
+  return stats.where((player) => player.teamId == teamId).toList();
+}
+
 /// Los jugadores que cuentan en el listado, de más a menos. Un jugador con cero no aparece. Ante un
 /// empate gana quien tiene menos expulsiones (y, en las tarjetas, más rojas primero: son más graves).
 List<PlayerStatsModel> buildLeaderboard(

@@ -8,6 +8,13 @@ class PlayerStatsService {
 
   PlayerStatsService({DioClient? client}) : _client = client ?? DioClient();
 
+  /// Lo que suma el jugador de la cuenta en todos los eventos, también los de un equipo anterior, con sus partidos
+  /// jugados. Un 404 es que la cuenta aún no tiene jugador.
+  Future<PlayerStatsModel> getMine() async {
+    final response = await _client.get(ApiEndpoints.playersMeStats);
+    return PlayerStatsModel.fromJson(ResponseParser.toMap(response.data));
+  }
+
   /// Los jugadores de un evento que tienen algo que mostrar (un gol, una tarjeta…).
   Future<List<PlayerStatsModel>> getByEvent(String eventId) async {
     final response = await _client.get(ApiEndpoints.playerStatsByEvent(eventId));

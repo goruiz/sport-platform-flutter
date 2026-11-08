@@ -2,12 +2,28 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/modules/courts/presentation/pages/court_detail_page.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/courts_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/modules/sport_complexes/data/datasource/sport_complexes_service.dart';
+import 'package:sport_platform/modules/sport_complexes/data/models/sport_complex_model.dart';
+import 'package:sport_platform/modules/sport_complexes/domain/complex_overview.dart';
+import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/app_search_field.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
+
+/// Las canchas y, para abrir el mapa desde cada una, los complejos a los que pertenecen.
+class _CourtsData {
+  final List<CourtModel> courts;
+
+  /// Cada complejo con sus canchas, por id del complejo.
+  final Map<String, ComplexOverview> complexesById;
+
+  const _CourtsData({required this.courts, required this.complexesById});
+}
 
 class CourtsPage extends StatefulWidget {
   final MenuItemModel item;
@@ -19,18 +35,44 @@ class CourtsPage extends StatefulWidget {
 }
 
 class _CourtsPageState extends State<CourtsPage> {
-  late Future<List<CourtModel>> _courtsFuture;
+  late Future<_CourtsData> _courtsFuture;
   String _query = '';
 
   @override
   void initState() {
     super.initState();
-    _courtsFuture = getIt<CourtsService>().getAll();
+    _courtsFuture = _loadCourts();
+  }
+
+  Future<_CourtsData> _loadCourts() async {
+    // Las dos lecturas salen a la vez. Los complejos solo sirven para el enlace al mapa: si fallan, las canchas se
+    // ven igual, solo que sin ese enlace.
+    final courtsRead = getIt<CourtsService>().getAll();
+    final complexesRead = getIt<SportComplexesService>().getAll().catchError((_) => const <SportComplexModel>[]);
+    final courts = await courtsRead;
+    final overviews = buildComplexOverviews(await complexesRead, courts);
+    return _CourtsData(
+      courts: courts,
+      complexesById: {for (final overview in overviews) overview.complex.id: overview},
+    );
   }
 
   Future<void> _reload() async {
-    setState(() => _courtsFuture = getIt<CourtsService>().getAll());
+    setState(() {
+      _courtsFuture = _loadCourts();
+    });
     await _courtsFuture;
+  }
+
+  void _openCourt(CourtModel court, _CourtsData data) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CourtDetailPage(
+          court: court,
+          complex: data.complexesById[court.sportComplexId],
+        ),
+      ),
+    );
   }
 
   @override
@@ -47,7 +89,7 @@ class _CourtsPageState extends State<CourtsPage> {
           ),
         ],
       ),
-      body: FutureBuilder<List<CourtModel>>(
+      body: FutureBuilder<_CourtsData>(
         future: _courtsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -61,7 +103,8 @@ class _CourtsPageState extends State<CourtsPage> {
               onRetry: _reload,
             );
           }
-          final courts = snapshot.data ?? const <CourtModel>[];
+          final data = snapshot.data;
+          final courts = data?.courts ?? const <CourtModel>[];
           final filtered = courts.where((court) {
             final query = _query.trim().toLowerCase();
             return query.isEmpty ||
@@ -73,7 +116,7 @@ class _CourtsPageState extends State<CourtsPage> {
                 .toLowerCase()
                 .compareTo(b.displayName.toLowerCase()));
 
-          if (courts.isEmpty) {
+          if (data == null || courts.isEmpty) {
             return EmptyState(
               icon: Icons.location_off_outlined,
               title: 'mobile.courts.empty_title'.tr(),
@@ -108,8 +151,10 @@ class _CourtsPageState extends State<CourtsPage> {
                 else
                   SliverList.builder(
                     itemCount: filtered.length,
-                    itemBuilder: (context, index) =>
-                        _CourtCard(court: filtered[index]),
+                    itemBuilder: (context, index) => _CourtCard(
+                      court: filtered[index],
+                      onTap: () => _openCourt(filtered[index], data),
+                    ),
                   ),
                 const SliverToBoxAdapter(child: SizedBox(height: 24)),
               ],
@@ -123,8 +168,9 @@ class _CourtsPageState extends State<CourtsPage> {
 
 class _CourtCard extends StatelessWidget {
   final CourtModel court;
+  final VoidCallback onTap;
 
-  const _CourtCard({required this.court});
+  const _CourtCard({required this.court, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -132,14 +178,9 @@ class _CourtCard extends StatelessWidget {
       if (court.sportComplexName?.isNotEmpty ?? false) court.sportComplexName,
       if (court.location?.isNotEmpty ?? false) court.location,
     ].join(' · ');
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.inputBorder),
-      ),
+    return AppCard(
+      onTap: onTap,
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.page, vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -181,6 +222,7 @@ class _CourtCard extends StatelessWidget {
               ],
             ),
           ),
+          const Icon(Icons.chevron_right, color: AppColors.whiteSubtle),
         ],
       ),
     );

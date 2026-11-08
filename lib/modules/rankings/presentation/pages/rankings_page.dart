@@ -5,6 +5,7 @@ import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/standings_tab.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/championship_tab.dart';
@@ -37,7 +38,8 @@ class _RankingsPageState extends State<RankingsPage>
   late Future<List<EventModel>> _eventsFuture;
   Future<List<PlayerStatsModel>>? _statsFuture;
   EventModel? _selectedEvent;
-  String? _currentPlayerId;
+  PlayerModel? _currentPlayer;
+  LeaderboardScope _scope = LeaderboardScope.event;
 
   @override
   void initState() {
@@ -55,16 +57,17 @@ class _RankingsPageState extends State<RankingsPage>
   Future<List<EventModel>> _loadEvents() async {
     // La primera página que ordena el backend (lo que está en curso va primero), no todos los eventos de la plataforma.
     final events = (await getIt<EventsSearchService>().search()).events;
-    _currentPlayerId = (await _readCurrentPlayerId());
+    _currentPlayer = await _readCurrentPlayer();
     final defaultEvent = pickDefaultEvent(events);
     if (_selectedEvent == null && defaultEvent != null) _selectEvent(defaultEvent);
     return events;
   }
 
-  /// El jugador de la cuenta, para mostrarle sus propias estadísticas; sin él (o si falla) solo se omite esa tarjeta.
-  Future<String?> _readCurrentPlayerId() async {
+  /// El jugador de la cuenta, para mostrarle sus propias estadísticas y el ranking de su equipo; sin él (o si falla)
+  /// solo se omiten esa tarjeta y el selector de alcance.
+  Future<PlayerModel?> _readCurrentPlayer() async {
     try {
-      return (await getIt<PlayersService>().getCurrent())?.id;
+      return await getIt<PlayersService>().getCurrent();
     } catch (_) {
       return null;
     }
@@ -137,7 +140,7 @@ class _RankingsPageState extends State<RankingsPage>
     return FutureBuilder<List<PlayerStatsModel>>(
       future: _statsFuture,
       builder: (context, snapshot) {
-        final mine = findPlayerStats(snapshot.data ?? const [], _currentPlayerId);
+        final mine = findPlayerStats(snapshot.data ?? const [], _currentPlayer?.id);
         return mine == null ? const SizedBox.shrink() : MyStatsCard(stats: mine);
       },
     );
@@ -195,13 +198,54 @@ class _RankingsPageState extends State<RankingsPage>
           if (snapshot.hasError) {
             return ErrorRetry(message: 'rankings.load_error'.tr(), onRetry: _reloadStats);
           }
-          return LeaderboardList(
-            stats: snapshot.data ?? const [],
-            kind: kind,
-            onRefresh: _reloadStats,
-          );
+          return _buildLeaderboard(kind, snapshot.data ?? const []);
         },
       );
     }).toList();
   }
+
+  /// El listado, con el selector «Todo el evento / Mi equipo» encima para quien tiene equipo.
+  Widget _buildLeaderboard(LeaderboardKind kind, List<PlayerStatsModel> stats) {
+    final teamId = _currentPlayer?.teamId;
+    final hasTeam = teamId != null && teamId.isNotEmpty;
+    final isTeamScope = _scope == LeaderboardScope.myTeam;
+    return Column(
+      children: [
+        if (hasTeam) _buildScopeSelector(),
+        Expanded(
+          child: LeaderboardList(
+            stats: filterStatsByScope(stats, _scope, teamId),
+            kind: kind,
+            onRefresh: _reloadStats,
+            highlightPlayerId: _currentPlayer?.id,
+            emptySubtitleKey: isTeamScope ? 'rankings.empty_team_subtitle' : 'rankings.empty_subtitle',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScopeSelector() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: SegmentedButton<LeaderboardScope>(
+        segments: [
+          for (final scope in LeaderboardScope.values)
+            ButtonSegment(
+              value: scope,
+              icon: Icon(_iconOf(scope)),
+              label: Text(scope.translationKey.tr()),
+            ),
+        ],
+        selected: {_scope},
+        onSelectionChanged: (selection) => setState(() => _scope = selection.first),
+        showSelectedIcon: false,
+      ),
+    );
+  }
+
+  IconData _iconOf(LeaderboardScope scope) => switch (scope) {
+        LeaderboardScope.event => Icons.public,
+        LeaderboardScope.myTeam => Icons.shield_outlined,
+      };
 }

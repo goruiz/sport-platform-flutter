@@ -11,11 +11,19 @@ class LeaderboardList extends StatelessWidget {
   final LeaderboardKind kind;
   final Future<void> Function() onRefresh;
 
+  /// El jugador de la cuenta: su fila se resalta para compararse con los demás de un vistazo.
+  final String? highlightPlayerId;
+
+  /// Qué se le dice cuando el listado está vacío; cambia si se mira solo a su equipo.
+  final String emptySubtitleKey;
+
   const LeaderboardList({
     super.key,
     required this.stats,
     required this.kind,
     required this.onRefresh,
+    this.highlightPlayerId,
+    this.emptySubtitleKey = 'rankings.empty_subtitle',
   });
 
   @override
@@ -33,7 +41,7 @@ class LeaderboardList extends StatelessWidget {
                   child: EmptyState(
                     icon: Icons.leaderboard_outlined,
                     title: 'rankings.empty_title'.tr(),
-                    subtitle: 'rankings.empty_subtitle'.tr(),
+                    subtitle: emptySubtitleKey.tr(),
                   ),
                 ),
               ],
@@ -46,6 +54,7 @@ class LeaderboardList extends StatelessWidget {
                 rank: index + 1,
                 player: leaders[index],
                 kind: kind,
+                isCurrentPlayer: leaders[index].playerId == highlightPlayerId,
               ),
             ),
     );
@@ -56,8 +65,14 @@ class _LeaderTile extends StatelessWidget {
   final int rank;
   final PlayerStatsModel player;
   final LeaderboardKind kind;
+  final bool isCurrentPlayer;
 
-  const _LeaderTile({required this.rank, required this.player, required this.kind});
+  const _LeaderTile({
+    required this.rank,
+    required this.player,
+    required this.kind,
+    required this.isCurrentPlayer,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +80,9 @@ class _LeaderTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.inputFill,
+        color: isCurrentPlayer ? AppColors.primaryLight.withValues(alpha: 0.12) : AppColors.inputFill,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.inputBorder),
+        border: Border.all(color: isCurrentPlayer ? AppColors.primaryLight : AppColors.inputBorder),
       ),
       child: Row(
         children: [
@@ -87,7 +102,7 @@ class _LeaderTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  player.playerName ?? 'match_detail.unknown_player'.tr(),
+                  _displayName,
                   style: const TextStyle(
                     color: AppColors.white,
                     fontWeight: FontWeight.w600,
@@ -105,6 +120,12 @@ class _LeaderTile extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// El nombre del jugador y, si es quien mira, «(Tú)» para encontrarse sin leer toda la lista.
+  String get _displayName {
+    final name = player.playerName ?? 'match_detail.unknown_player'.tr();
+    return isCurrentPlayer ? '$name (${'rankings.you'.tr()})' : name;
   }
 
   Color get _rankColor => switch (rank) {

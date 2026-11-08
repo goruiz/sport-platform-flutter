@@ -10,6 +10,10 @@ class AuthStorage {
     await prefs.setString(_tokenKey, token);
   }
 
+  /// El token que ya está en memoria, sin esperar al disco; null si aún no se leyó. Sirve donde no se puede esperar,
+  /// como las cabeceras de una imagen de la red.
+  static String? get cachedToken => _cache;
+
   static Future<String?> getToken() async {
     if (_cache != null) return _cache;
     final prefs = await SharedPreferences.getInstance();

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
@@ -342,7 +343,11 @@ String? _validatePassword(String? value) {
   if (value == null || value.isEmpty) {
     return LoginStringsConstants.passwordRequired.tr();
   }
-  if (value.length < 8) return LoginStringsConstants.passwordTooShort.tr();
-  if (value.length > 72) return LoginStringsConstants.passwordTooLong.tr();
+  if (value.length < AppConstants.minPasswordLength.value) {
+    return LoginStringsConstants.passwordTooShort.tr(args: [AppConstants.minPasswordLength.asText]);
+  }
+  if (value.length > AppConstants.maxPasswordLength.value) {
+    return LoginStringsConstants.passwordTooLong.tr(args: [AppConstants.maxPasswordLength.asText]);
+  }
   return null;
 }
