@@ -11,6 +11,9 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/models/te
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/players/presentation/pages/join_team_page.dart';
 import 'package:sport_platform/modules/teams/domain/team_members.dart';
+import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/presentation/widgets/team_switcher.dart';
+import 'package:sport_platform/modules/teams/presentation/widgets/team_switcher_card.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
@@ -28,30 +31,50 @@ class TeamsPage extends StatefulWidget {
 }
 
 class _TeamsPageState extends State<TeamsPage> {
-  late Future<_TeamData?> _teamData;
+  /// El equipo que se ve aquí es el activo de TODA la app: elegirlo en el selector cambia también el inicio, los partidos,
+  /// los reportes y los rankings.
+  final _activeTeam = getIt<ActiveTeamNotifier>();
+
+  late Future<_TeamsData?> _teamsData;
   bool _isLeaving = false;
 
   @override
   void initState() {
     super.initState();
-    _teamData = _loadTeamData();
+    _teamsData = _loadTeamsData();
   }
 
-  Future<_TeamData?> _loadTeamData() async {
+  /// Lee al jugador y, de cada uno de sus equipos, el equipo y su plantilla, todos a la vez: cambiar de equipo es
+  /// instantáneo, sin esperar a otra lectura.
+  Future<_TeamsData?> _loadTeamsData() async {
     final player = await getIt<PlayersService>().getCurrent();
-    final teamId = player?.teamId;
-    if (player == null || teamId == null || teamId.isEmpty) return null;
+    // Aun sin equipos se anota: así la app se entera de que el jugador ya no tiene ninguno (acaba de abandonar el último).
+    await _activeTeam.sync(player);
+    final memberships = player?.allTeams ?? const <PlayerTeam>[];
+    if (player == null || memberships.isEmpty) return null;
 
-    // Su equipo por id, no la lista de todos los que la app puede ver.
+    // `allTeams` ya viene del equipo al que entró más recientemente al más antiguo: ese es el orden del selector.
+    final sections = await Future.wait(memberships.map(_loadTeamSection));
+    final shownSections = sections.whereType<_TeamSection>().toList();
+    if (shownSections.isEmpty) return null;
+
+    final data = _TeamsData(player: player, sections: shownSections);
+    // Un equipo que ya no existe no se muestra: si era el activo, pasa a serlo el primero que sí.
+    if (!data.teamIds.contains(_activeTeam.activeTeamId)) _activeTeam.select(data.teamIds.first);
+    return data;
+  }
+
+  /// Su equipo por id, no la lista de todos los que la app puede ver. Null si el equipo ya no existe.
+  Future<_TeamSection?> _loadTeamSection(PlayerTeam membership) async {
     final results = await Future.wait<dynamic>([
-      getIt<TeamsService>().getById(teamId),
-      getIt<PlayersService>().getByTeamId(teamId),
+      getIt<TeamsService>().getById(membership.teamId),
+      getIt<PlayersService>().getByTeamId(membership.teamId),
     ]);
     final team = results[0] as TeamModel?;
     if (team == null) return null;
-    return _TeamData(
+    return _TeamSection(
       team: team,
-      player: player,
+      isCaptain: membership.isCaptain,
       members: sortCaptainFirst(results[1] as List<PlayerModel>),
     );
   }
@@ -59,9 +82,13 @@ class _TeamsPageState extends State<TeamsPage> {
   Future<void> _reload() async {
     // Con llaves: un `setState` cuyo callback devuelve el Future (la forma con flecha) falla en modo debug.
     setState(() {
-      _teamData = _loadTeamData();
+      _teamsData = _loadTeamsData();
     });
-    await _teamData;
+    await _teamsData;
+  }
+
+  void _selectTeam(String teamId) {
+    setState(() => _activeTeam.select(teamId));
   }
 
   Future<void> _joinWithCode() async {
@@ -69,20 +96,21 @@ class _TeamsPageState extends State<TeamsPage> {
     if (joined && mounted) await _reload();
   }
 
-  /// Pide confirmación y saca al jugador de su equipo; después la pantalla vuelve a leerse y queda como la de
-  /// quien no tiene equipo (con la opción de entrar con un código).
-  Future<void> _leaveTeam(_TeamData data) async {
+  /// Pide confirmación y saca al jugador de ese equipo (los demás se quedan); después la pantalla vuelve a leerse: con
+  /// otros equipos muestra los que queden, y sin ninguno queda como la de quien no tiene equipo (con la opción de entrar
+  /// con un código).
+  Future<void> _leaveTeam(PlayerModel player, _TeamSection section) async {
     final confirmed = await showConfirmationDialog(
       context,
-      title: 'mobile.teams.leave_title'.tr(args: [data.team.name]),
-      content: _leaveMessage(data.player),
+      title: 'mobile.teams.leave_title'.tr(args: [section.team.name]),
+      content: _leaveMessage(isCaptain: section.isCaptain),
       confirmLabel: 'mobile.teams.leave_confirm'.tr(),
       cancelLabel: 'common.cancel'.tr(),
     );
     if (!confirmed || !mounted) return;
     setState(() => _isLeaving = true);
     try {
-      await getIt<PlayersService>().removeFromTeam(data.player.id, teamId: data.team.id);
+      await getIt<PlayersService>().removeFromTeam(player.id, teamId: section.team.id);
     } catch (_) {
       if (mounted) {
         setState(() => _isLeaving = false);
@@ -96,10 +124,10 @@ class _TeamsPageState extends State<TeamsPage> {
     await _reload();
   }
 
-  /// Quien es capitán además pierde la capitanía al salir, y lo debe saber antes de confirmar.
-  String _leaveMessage(PlayerModel player) {
+  /// Quien es capitán de ese equipo además pierde la capitanía al salir, y lo debe saber antes de confirmar.
+  String _leaveMessage({required bool isCaptain}) {
     final message = 'mobile.teams.leave_message'.tr();
-    return player.isCaptain ? '$message\n\n${'mobile.teams.leave_captain_note'.tr()}' : message;
+    return isCaptain ? '$message\n\n${'mobile.teams.leave_captain_note'.tr()}' : message;
   }
 
   @override
@@ -116,8 +144,8 @@ class _TeamsPageState extends State<TeamsPage> {
           ),
         ],
       ),
-      body: FutureBuilder<_TeamData?>(
-        future: _teamData,
+      body: FutureBuilder<_TeamsData?>(
+        future: _teamsData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -140,92 +168,168 @@ class _TeamsPageState extends State<TeamsPage> {
               actionIcon: Icons.vpn_key_outlined,
             );
           }
-          return RefreshIndicator(
-            onRefresh: _reload,
-            color: AppColors.primaryLight,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.page,
-                AppSpacing.lg,
-                AppSpacing.page,
-                AppSpacing.listBottom,
-              ),
+          return _buildTeams(data);
+        },
+      ),
+    );
+  }
+
+  /// El selector de equipos y, debajo, el detalle del elegido.
+  Widget _buildTeams(_TeamsData data) {
+    final selected = data.sectionOf(_activeTeam.activeTeamId);
+    return RefreshIndicator(
+      onRefresh: _reload,
+      color: AppColors.primaryLight,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        // Sin margen lateral: el carrusel llega de borde a borde (así se asoma el equipo vecino) y cada bloque pone el suyo.
+        padding: const EdgeInsets.only(top: AppSpacing.lg, bottom: AppSpacing.listBottom),
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.page),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _TeamHeader(team: data.team, playerCount: data.members.length),
-                const SizedBox(height: AppSpacing.xxl),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: Text('mobile.teams.players'.tr(), style: AppTextStyles.sectionTitle),
-                ),
-                if (data.members.isEmpty)
-                  EmptyState(
-                    icon: Icons.person_search_outlined,
-                    title: 'mobile.teams.players_empty'.tr(),
-                    subtitle: '',
-                  )
-                else
-                  ...data.members.map(_PlayerTile.new),
-                const SizedBox(height: AppSpacing.xxl),
-                _LeaveTeamButton(
-                  isBusy: _isLeaving,
-                  onPressed: () => _leaveTeam(data),
-                ),
+                Text(_title(data), style: AppTextStyles.sectionTitle),
+                // Con varios equipos, elegir uno cambia lo que ve toda la app: se dice aquí, donde se elige.
+                if (data.sections.length > 1) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Text('mobile.teams.active_hint'.tr(), style: AppTextStyles.caption),
+                ],
               ],
             ),
-          );
-        },
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          TeamSwitcher(
+            items: data.switcherItems,
+            selectedTeamId: selected.team.id,
+            onSelected: _selectTeam,
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.page),
+            child: _TeamDetailTransition(
+              child: _TeamDetail(
+                key: ValueKey('team-detail-${selected.team.id}'),
+                section: selected,
+                isLeaving: _isLeaving,
+                onLeave: () => _leaveTeam(data.player, selected),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _title(_TeamsData data) => data.sections.length > 1
+      ? 'mobile.teams.your_teams'.tr(namedArgs: {'count': '${data.sections.length}'})
+      : 'mobile.teams.your_team'.tr();
+}
+
+/// Lo que muestra la pantalla: el jugador de la cuenta y cada uno de sus equipos, del último al que entró al más antiguo.
+class _TeamsData {
+  /// El jugador de la cuenta (uno de los jugadores de cada equipo): quien puede abandonarlos.
+  final PlayerModel player;
+  final List<_TeamSection> sections;
+
+  const _TeamsData({required this.player, required this.sections});
+
+  List<String> get teamIds => [for (final section in sections) section.team.id];
+
+  List<TeamSwitcherItem> get switcherItems => [
+        for (final section in sections)
+          TeamSwitcherItem(
+            teamId: section.team.id,
+            name: section.team.name,
+            logoUrl: section.team.logoUrl,
+            playerCount: section.members.length,
+            isCaptain: section.isCaptain,
+          ),
+      ];
+
+  /// El equipo con ese id; si no está (no debería pasar), el primero.
+  _TeamSection sectionOf(String? teamId) =>
+      sections.firstWhere((section) => section.team.id == teamId, orElse: () => sections.first);
+}
+
+/// Un equipo del jugador con su plantilla.
+class _TeamSection {
+  final TeamModel team;
+
+  /// Si el jugador es capitán de ESTE equipo (puede serlo de uno y de otro no).
+  final bool isCaptain;
+  final List<PlayerModel> members;
+
+  const _TeamSection({required this.team, required this.isCaptain, required this.members});
+}
+
+/// Al cambiar de equipo, el detalle anterior se desvanece y el nuevo entra con un leve ascenso; la altura se ajusta
+/// suave si las dos plantillas miden distinto, para que lo de abajo no salte.
+class _TeamDetailTransition extends StatelessWidget {
+  final Widget child;
+
+  const _TeamDetailTransition({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.topCenter,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 280),
+        switchInCurve: Curves.easeOutCubic,
+        transitionBuilder: (child, animation) => FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(begin: const Offset(0, 0.03), end: Offset.zero).animate(animation),
+            child: child,
+          ),
+        ),
+        layoutBuilder: (current, previous) => Stack(
+          alignment: Alignment.topCenter,
+          children: [...previous, ?current],
+        ),
+        child: child,
       ),
     );
   }
 }
 
-class _TeamData {
-  final TeamModel team;
+/// Lo del equipo elegido que no cabe en su tarjeta: sus jugadores y la acción de abandonarlo.
+class _TeamDetail extends StatelessWidget {
+  final _TeamSection section;
+  final bool isLeaving;
+  final VoidCallback onLeave;
 
-  /// El jugador de la cuenta (uno de los `members`): quien puede abandonar el equipo.
-  final PlayerModel player;
-  final List<PlayerModel> members;
-
-  const _TeamData({required this.team, required this.player, required this.members});
-}
-
-class _TeamHeader extends StatelessWidget {
-  final TeamModel team;
-  final int playerCount;
-
-  const _TeamHeader({required this.team, required this.playerCount});
+  const _TeamDetail({
+    super.key,
+    required this.section,
+    required this.isLeaving,
+    required this.onLeave,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final count = 'mobile.teams.players_count'.tr(namedArgs: {'count': '$playerCount'});
-    return AppCard(
-      accent: AppColors.primaryLight,
-      padding: const EdgeInsets.all(AppSpacing.xl),
-      child: Row(
-        children: [
-          InitialsAvatar(name: team.name, logoUrl: team.logoUrl, size: 68),
-          const SizedBox(width: AppSpacing.lg),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  team.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyles.pageTitle,
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  '${'mobile.teams.your_team'.tr()} · $count',
-                  style: AppTextStyles.bodyMuted,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          child: Text('mobile.teams.players'.tr(), style: AppTextStyles.sectionTitle),
+        ),
+        if (section.members.isEmpty)
+          EmptyState(
+            icon: Icons.person_search_outlined,
+            title: 'mobile.teams.players_empty'.tr(),
+            subtitle: '',
+          )
+        else
+          ...section.members.map(_PlayerTile.new),
+        const SizedBox(height: AppSpacing.xxl),
+        _LeaveTeamButton(isBusy: isLeaving, onPressed: onLeave),
+      ],
     );
   }
 }

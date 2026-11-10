@@ -22,6 +22,12 @@ const _keys = <String>[
   'mobile.complexes.no_location_detail',
   'mobile.complexes.courts_title',
   'mobile.complexes.no_courts',
+  'mobile.complexes.scope_mine',
+  'mobile.complexes.scope_all',
+  'mobile.complexes.empty_mine_title',
+  'mobile.complexes.empty_mine_subtitle',
+  'mobile.complexes.see_all',
+  'mobile.complexes.courts_without_complex',
 ];
 
 void main() {

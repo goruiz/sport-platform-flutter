@@ -231,7 +231,7 @@ class _TeamInEventPageState extends State<TeamInEventPage> {
     final teamStats = filterStatsByScope(
       _notifier.eventStats,
       LeaderboardScope.myTeam,
-      widget.team.teamId,
+      [widget.team.teamId],
     );
     final scorers = buildLeaderboard(teamStats, LeaderboardKind.scorers)
         .take(AppConstants.teamMatchesPreviewLimit.value)

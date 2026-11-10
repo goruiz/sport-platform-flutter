@@ -22,6 +22,7 @@
       "administrator_account": "Las cuentas de administrador entran por el panel web, no por la app.",
       "organization_suspended": "La organización de tu cuenta está suspendida. Contacta a tu organizador.",
       "organization_not_found": "La organización de tu cuenta ya no existe. Contacta a tu organizador.",
+      "account_suspended": "Tu cuenta está suspendida. Contacta a tu organizador.",
       "access_denied": "Tu cuenta no tiene acceso a la app.",
       "no_connection": "No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
       "unexpected": "No se pudo iniciar sesión. Inténtalo más tarde."
@@ -141,7 +142,12 @@
       "results_count": "{count} eventos",
       "load_more": "Ver más",
       "no_results_title": "Sin resultados",
-      "no_results_subtitle": "Prueba con otra búsqueda o con otro estado."
+      "no_results_subtitle": "Prueba con otra búsqueda o con otro estado.",
+      "scope_mine": "Mi equipo",
+      "scope_all": "Todos",
+      "empty_mine_title": "Tu equipo aún no juega ningún evento",
+      "empty_mine_subtitle": "Aquí aparecerán los eventos en que tu equipo tenga partidos. Mientras tanto, puedes ver todos los eventos.",
+      "see_all": "Ver todos los eventos"
     },
     "teams": {
       "load_error": "No se pudo cargar tu equipo.",
@@ -150,6 +156,12 @@
       "players": "Jugadores",
       "players_empty": "Este equipo aún no tiene jugadores.",
       "your_team": "Tu equipo",
+      "your_teams": "Tus equipos ({count})",
+      "active_team_label": "Equipo activo",
+      "active_hint": "La app muestra la información del equipo que elijas aquí: tu inicio, partidos, eventos, rankings y reportes.",
+      "switch_title": "Cambiar de equipo",
+      "previous_team": "Equipo anterior",
+      "next_team": "Equipo siguiente",
       "captain": "Capitán",
       "players_count": "{count} jugadores",
       "leave": "Abandonar equipo",
@@ -173,12 +185,6 @@
       "pick_event": "Elige un evento"
     },
     "courts": {
-      "load_error": "No se pudieron cargar las canchas.",
-      "empty_title": "No hay canchas disponibles",
-      "empty_subtitle": "Las canchas registradas aparecerán aquí.",
-      "search_hint": "Buscar cancha, complejo o ubicación",
-      "filtered_empty_title": "No hay coincidencias",
-      "filtered_empty_subtitle": "Prueba con otro término.",
       "view_complex": "Ver el complejo y su mapa",
       "schedule_title": "Horarios",
       "opening_hours": "Abierta de {} a {}",
@@ -205,6 +211,7 @@
       "section_account": "Cuenta",
       "language": "Idioma",
       "section_team": "Mi equipo",
+      "section_teams": "Mis equipos",
       "team": "Equipo",
       "no_team": "Aún no perteneces a un equipo",
       "team_role": "Tu rol",
@@ -232,7 +239,7 @@
       "load_error": "No se pudieron cargar los complejos.",
       "empty_title": "Aún no hay complejos",
       "empty_subtitle": "Los complejos de tu organización aparecerán aquí.",
-      "search_hint": "Buscar complejo o dirección",
+      "search_hint": "Buscar complejo, dirección o cancha",
       "filtered_empty_title": "Sin resultados",
       "filtered_empty_subtitle": "Prueba con otra búsqueda.",
       "courts_count": "Canchas: {count}",
@@ -242,7 +249,13 @@
       "courts_title": "Canchas del complejo",
       "no_courts": "Este complejo aún no tiene canchas.",
       "directions": "Cómo llegar",
-      "directions_error": "No se pudo abrir el mapa."
+      "directions_error": "No se pudo abrir el mapa.",
+      "scope_mine": "Mi equipo",
+      "scope_all": "Todos",
+      "empty_mine_title": "Sin complejos para tu equipo",
+      "empty_mine_subtitle": "Aquí aparecerán los complejos donde se juegan los eventos de tu equipo. Mientras tanto, puedes ver todos los complejos.",
+      "see_all": "Ver todos los complejos",
+      "courts_without_complex": "Canchas sin complejo"
     }
   },
   "session": {
@@ -472,8 +485,8 @@
       "events_description": "Los eventos de la competición y sus fechas",
       "teams_description": "Tu equipo y los demás equipos de la competición",
       "courts_description": "Dónde se juegan los partidos",
-      "sport_complexes": "Complejos deportivos",
-      "sport_complexes_description": "Dónde están los complejos y las canchas de tu competición"
+      "sport_complexes": "Complejos y canchas",
+      "sport_complexes_description": "Dónde se juegan los eventos de tu equipo: sus complejos y canchas"
     },
     "leagues": {
       "title": "Ligas",
@@ -756,6 +769,8 @@
     "load_error": "No se pudieron cargar los rankings.",
     "no_events_title": "No hay eventos",
     "no_events_subtitle": "Los rankings aparecerán cuando haya eventos.",
+    "no_team_events_title": "Tu equipo aún no juega ningún evento",
+    "no_team_events_subtitle": "Los rankings aparecerán cuando tu equipo tenga partidos en un evento.",
     "my_stats": {
       "title": "Mis estadísticas",
       "goals": "Goles",

@@ -30,16 +30,18 @@ enum LeaderboardScope {
   final String translationKey;
 }
 
-/// Las estadísticas que entran en el ranking según su alcance. «Mi equipo» sin equipo no tiene a nadie: la pantalla
-/// ni lo ofrece, pero así la regla no depende de eso.
+/// Las estadísticas que entran en el ranking según su alcance. «Mi equipo» abarca a los compañeros de los equipos
+/// [teamIds] (el equipo activo del jugador, o los que se quiera juntar); sin equipo no tiene a nadie: la pantalla ni lo
+/// ofrece, pero así la regla no depende de eso.
 List<PlayerStatsModel> filterStatsByScope(
   List<PlayerStatsModel> stats,
   LeaderboardScope scope,
-  String? teamId,
+  Iterable<String> teamIds,
 ) {
   if (scope == LeaderboardScope.event) return stats;
-  if (teamId == null || teamId.isEmpty) return const [];
-  return stats.where((player) => player.teamId == teamId).toList();
+  final ids = teamIds.where((id) => id.isNotEmpty).toSet();
+  if (ids.isEmpty) return const [];
+  return stats.where((player) => ids.contains(player.teamId)).toList();
 }
 
 /// Los jugadores que cuentan en el listado, de más a menos. Un jugador con cero no aparece. Ante un
@@ -73,4 +75,13 @@ EventModel? pickDefaultEvent(List<EventModel> events) {
     if (event.statusType == EventStatus.active) return event;
   }
   return newestFirst.first;
+}
+
+/// El evento que queda elegido tras leer la lista de [events]: el que ya estaba ([currentEventId]) si sigue entre ellos
+/// (por ejemplo, al cambiar de equipo y jugar los dos en él) y, si no, el de apertura. Null si no hay eventos.
+EventModel? resolveSelectedEvent(List<EventModel> events, String? currentEventId) {
+  for (final event in events) {
+    if (event.id == currentEventId) return event;
+  }
+  return pickDefaultEvent(events);
 }

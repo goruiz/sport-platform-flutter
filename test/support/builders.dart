@@ -38,6 +38,7 @@ EventModel eventOf({
   String status = 'ACTIVE',
   required DateTime startDate,
   required DateTime endDate,
+  List<String> sportComplexIds = const [],
 }) {
   return EventModel(
     id: id,
@@ -47,5 +48,6 @@ EventModel eventOf({
     startDate: startDate,
     endDate: endDate,
     createdAt: DateTime(2026, 1, 1),
+    sportComplexIds: sportComplexIds,
   );
 }

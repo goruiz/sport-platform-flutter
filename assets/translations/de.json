@@ -22,6 +22,7 @@
       "administrator_account": "Administratorkonten melden sich über das Web-Panel an, nicht über die App.",
       "organization_suspended": "Die Organisation Ihres Kontos ist gesperrt. Wenden Sie sich an Ihren Veranstalter.",
       "organization_not_found": "Die Organisation Ihres Kontos existiert nicht mehr. Wenden Sie sich an Ihren Veranstalter.",
+      "account_suspended": "Ihr Konto ist gesperrt. Wenden Sie sich an Ihren Veranstalter.",
       "access_denied": "Ihr Konto hat keinen Zugriff auf die App.",
       "no_connection": "Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
       "unexpected": "Die Anmeldung ist fehlgeschlagen. Bitte versuchen Sie es später erneut."
@@ -141,7 +142,12 @@
       "results_count": "{count} Events",
       "load_more": "Mehr anzeigen",
       "no_results_title": "Keine Ergebnisse",
-      "no_results_subtitle": "Versuche eine andere Suche oder einen anderen Status."
+      "no_results_subtitle": "Versuche eine andere Suche oder einen anderen Status.",
+      "scope_mine": "Mein Team",
+      "scope_all": "Alle",
+      "empty_mine_title": "Ihr Team spielt noch bei keiner Veranstaltung",
+      "empty_mine_subtitle": "Hier erscheinen die Veranstaltungen, in denen Ihr Team Spiele hat. Bis dahin können Sie alle Veranstaltungen ansehen.",
+      "see_all": "Alle Veranstaltungen ansehen"
     },
     "teams": {
       "load_error": "Ihr Team konnte nicht geladen werden.",
@@ -150,6 +156,12 @@
       "players": "Spieler",
       "players_empty": "Dieses Team hat noch keine Spieler.",
       "your_team": "Ihr Team",
+      "your_teams": "Ihre Teams ({count})",
+      "active_team_label": "Aktives Team",
+      "active_hint": "Die App zeigt die Informationen des Teams, das Sie hier wählen: Startseite, Spiele, Veranstaltungen, Ranglisten und Berichte.",
+      "switch_title": "Team wechseln",
+      "previous_team": "Vorheriges Team",
+      "next_team": "Nächstes Team",
       "captain": "Kapitän",
       "players_count": "{count} Spieler",
       "leave": "Team verlassen",
@@ -173,12 +185,6 @@
       "pick_event": "Event auswählen"
     },
     "courts": {
-      "load_error": "Plätze konnten nicht geladen werden.",
-      "empty_title": "Keine Plätze verfügbar",
-      "empty_subtitle": "Registrierte Plätze werden hier angezeigt.",
-      "search_hint": "Platz, Anlage oder Ort suchen",
-      "filtered_empty_title": "Keine Treffer",
-      "filtered_empty_subtitle": "Versuchen Sie einen anderen Suchbegriff.",
       "view_complex": "Anlage und Karte ansehen",
       "schedule_title": "Zeiten",
       "opening_hours": "Geöffnet von {} bis {}",
@@ -205,6 +211,7 @@
       "section_account": "Konto",
       "language": "Sprache",
       "section_team": "Mein Team",
+      "section_teams": "Meine Teams",
       "team": "Team",
       "no_team": "Sie sind noch in keinem Team",
       "team_role": "Ihre Rolle",
@@ -232,7 +239,7 @@
       "load_error": "Die Anlagen konnten nicht geladen werden.",
       "empty_title": "Noch keine Anlagen",
       "empty_subtitle": "Die Anlagen Ihrer Organisation erscheinen hier.",
-      "search_hint": "Anlage oder Adresse suchen",
+      "search_hint": "Anlage, Adresse oder Platz suchen",
       "filtered_empty_title": "Keine Ergebnisse",
       "filtered_empty_subtitle": "Versuchen Sie eine andere Suche.",
       "courts_count": "Plätze: {count}",
@@ -242,7 +249,13 @@
       "courts_title": "Plätze der Anlage",
       "no_courts": "Diese Anlage hat noch keine Plätze.",
       "directions": "Route anzeigen",
-      "directions_error": "Die Karte konnte nicht geöffnet werden."
+      "directions_error": "Die Karte konnte nicht geöffnet werden.",
+      "scope_mine": "Mein Team",
+      "scope_all": "Alle",
+      "empty_mine_title": "Keine Anlagen für Ihr Team",
+      "empty_mine_subtitle": "Hier erscheinen die Anlagen, in denen die Veranstaltungen Ihres Teams stattfinden. Bis dahin können Sie alle Anlagen ansehen.",
+      "see_all": "Alle Anlagen ansehen",
+      "courts_without_complex": "Plätze ohne Anlage"
     }
   },
   "session": {
@@ -472,8 +485,8 @@
       "events_description": "Die Veranstaltungen des Wettbewerbs und ihre Termine",
       "teams_description": "Dein Team und die anderen Teams des Wettbewerbs",
       "courts_description": "Wo die Spiele stattfinden",
-      "sport_complexes": "Sportanlagen",
-      "sport_complexes_description": "Wo die Anlagen und Plätze Ihres Wettbewerbs liegen"
+      "sport_complexes": "Sportanlagen und Plätze",
+      "sport_complexes_description": "Wo die Veranstaltungen Ihres Teams stattfinden: ihre Anlagen und Plätze"
     },
     "leagues": {
       "title": "Ligen",
@@ -756,6 +769,8 @@
     "load_error": "Die Ranglisten konnten nicht geladen werden.",
     "no_events_title": "Keine Ereignisse",
     "no_events_subtitle": "Ranglisten erscheinen, sobald es Ereignisse gibt.",
+    "no_team_events_title": "Ihr Team spielt noch bei keiner Veranstaltung",
+    "no_team_events_subtitle": "Ranglisten erscheinen, sobald Ihr Team Spiele in einer Veranstaltung hat.",
     "my_stats": {
       "title": "Meine Statistik",
       "goals": "Tore",

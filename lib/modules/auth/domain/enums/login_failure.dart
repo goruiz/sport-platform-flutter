@@ -24,6 +24,12 @@ enum LoginFailure {
     backendCode: 'ORGANIZATION_NOT_FOUND',
   ),
 
+  /// Un administrador suspendió la cuenta: las credenciales son correctas, pero no puede entrar hasta que la reactive.
+  accountSuspended(
+    'login.errors.account_suspended',
+    backendCode: 'ACCOUNT_SUSPENDED',
+  ),
+
   /// Otro 403: el backend rechazó la entrada con un motivo que esta versión de la app no conoce.
   accessDenied('login.errors.access_denied'),
 

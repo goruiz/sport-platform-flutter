@@ -2,7 +2,6 @@
 import 'package:sport_platform/core/modules/module_urls.dart';
 import 'package:sport_platform/modules/events/presentation/pages/events_page.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/pages/leagues_page.dart';
-import 'package:sport_platform/modules/courts/presentation/pages/courts_page.dart';
 import 'package:sport_platform/modules/matches/presentation/pages/matches_page.dart';
 import 'package:sport_platform/modules/rankings/presentation/pages/rankings_page.dart';
 import 'package:sport_platform/modules/reports/presentation/pages/reports_page.dart';
@@ -18,8 +17,10 @@ void registerModules() {
   ModuleRegistry.register(ModuleUrls.events,   (item) => EventsPage(item: item));
   ModuleRegistry.register(ModuleUrls.rankings, (item) => RankingsPage(item: item));
   ModuleRegistry.register(ModuleUrls.matches,  (item) => MatchesPage(item: item));
-  ModuleRegistry.register(ModuleUrls.courts,   (item) => CourtsPage(item: item));
   ModuleRegistry.register(ModuleUrls.sportComplexes, (item) => SportComplexesPage(item: item));
+  // Las canchas ya no son una pantalla aparte: se ven dentro de su complejo. La URL sigue registrada por si el menú de la
+  // cuenta aún trae «Canchas» (antes de aplicar la migración que la oculta).
+  ModuleRegistry.register(ModuleUrls.courts,   (item) => SportComplexesPage(item: item));
   ModuleRegistry.register(ModuleUrls.reports,  (item) => ReportsPage(item: item));
   ModuleRegistry.register(ModuleUrls.profile,  (item) => ProfilePage(item: item));
   ModuleRegistry.register(ModuleUrls.leagues,  (item) => LeaguesPage(item: item));

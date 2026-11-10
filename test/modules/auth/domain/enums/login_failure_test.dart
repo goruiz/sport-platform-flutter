@@ -30,6 +30,7 @@ void main() {
         'ADMIN_CANNOT_USE_MOBILE_APP': LoginFailure.administratorAccount,
         'ORGANIZATION_SUSPENDED': LoginFailure.organizationSuspended,
         'ORGANIZATION_NOT_FOUND': LoginFailure.organizationNotFound,
+        'ACCOUNT_SUSPENDED': LoginFailure.accountSuspended,
       };
 
       for (final entry in codes.entries) {

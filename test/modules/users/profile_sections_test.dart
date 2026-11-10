@@ -38,6 +38,29 @@ void main() {
       expect(find.text('Capitán'), findsNothing);
     });
 
+    testWidgets('quien juega en varios equipos los ve todos, cada uno con su rol', (tester) async {
+      const player = PlayerModel(
+        id: 'ana',
+        firstName: 'Ana',
+        lastName: 'Pérez',
+        email: 'ana@email.com',
+        teamId: 't2',
+        teamName: 'Los Pumas',
+        teams: [
+          PlayerTeam(teamId: 't2', teamName: 'Los Pumas'),
+          PlayerTeam(teamId: 't1', teamName: 'Los Tigres', isCaptain: true),
+        ],
+      );
+      await pumpWithRealTranslations(tester, home: (_) => _teamSection(SummaryStatus.ready, player));
+
+      expect(find.text('MIS EQUIPOS'), findsOneWidget);
+      expect(find.text('Los Pumas'), findsOneWidget);
+      expect(find.text('Los Tigres'), findsOneWidget);
+      // Capitán de uno y jugador en el otro.
+      expect(find.text('Capitán'), findsOneWidget);
+      expect(find.text('Jugador'), findsOneWidget);
+    });
+
     testWidgets('al capitán lo dice como su rol', (tester) async {
       await pumpWithRealTranslations(tester, home: (_) => _teamSection(SummaryStatus.ready, _player(isCaptain: true)));
 

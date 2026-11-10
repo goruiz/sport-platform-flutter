@@ -38,4 +38,24 @@ void main() {
       expect(members.map((member) => member.id), ['ana', 'beto']);
     });
   });
+
+  group('pickSelectedTeamId', () {
+    const teamIds = ['tigres', 'pumas', 'osos'];
+
+    test('al abrir la pantalla ve el primero, el último al que entró', () {
+      expect(pickSelectedTeamId(teamIds), 'tigres');
+    });
+
+    test('al volver a leer conserva el equipo que ya veía, aunque haya cambiado de lugar', () {
+      expect(pickSelectedTeamId(teamIds, previousId: 'pumas', previousIndex: 0), 'pumas');
+    });
+
+    test('si abandonó el que veía, sigue en el que ocupa ahora su lugar', () {
+      expect(pickSelectedTeamId(['tigres', 'osos'], previousId: 'pumas', previousIndex: 1), 'osos');
+    });
+
+    test('si abandonó el último de la lista, queda en el nuevo último', () {
+      expect(pickSelectedTeamId(['tigres', 'pumas'], previousId: 'osos', previousIndex: 2), 'pumas');
+    });
+  });
 }

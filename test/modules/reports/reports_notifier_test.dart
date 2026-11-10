@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
@@ -6,17 +7,22 @@ import 'package:sport_platform/modules/matches/data/datasource/matches_service.d
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 import 'package:sport_platform/modules/reports/presentation/providers/reports_notifier.dart';
+import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
 import 'package:sport_platform/shared/enums/summary_status.dart';
 
 import '../../support/builders.dart';
 
 class _FakePlayersService extends PlayersService {
   final PlayerModel? player;
+  int reads = 0;
 
   _FakePlayersService(this.player);
 
   @override
-  Future<PlayerModel?> getCurrent() async => player;
+  Future<PlayerModel?> getCurrent() async {
+    reads++;
+    return player;
+  }
 }
 
 class _FakeMatchesService extends MatchesService {
@@ -58,9 +64,12 @@ ReportsNotifier _notifier({
   List<MatchModel>? matches,
   Future<List<PlayerStatsModel>> Function(String eventId)? stats,
   _FakePlayerStatsService? statsService,
+  _FakePlayersService? playersService,
+  ActiveTeamNotifier? activeTeam,
 }) {
   return ReportsNotifier(
-    playersService: _FakePlayersService(player),
+    playersService: playersService ?? _FakePlayersService(player),
+    activeTeam: activeTeam ?? ActiveTeamNotifier(),
     matchesService: _FakeMatchesService(
       matches ??
           [
@@ -73,7 +82,36 @@ ReportsNotifier _notifier({
   );
 }
 
+const _anaInThreeTeams = PlayerModel(
+  id: 'ana',
+  firstName: 'Ana',
+  lastName: 'Pérez',
+  email: 'ana@email.com',
+  teamId: 'mine',
+  teamName: 'Tigres',
+  teams: [
+    PlayerTeam(teamId: 'mine', teamName: 'Tigres'),
+    PlayerTeam(teamId: 'other', teamName: 'Pumas'),
+    PlayerTeam(teamId: 'third', teamName: 'Osos'),
+  ],
+);
+
+const _anaInTwoTeams = PlayerModel(
+  id: 'ana',
+  firstName: 'Ana',
+  lastName: 'Pérez',
+  email: 'ana@email.com',
+  teamId: 'mine',
+  teamName: 'Tigres',
+  teams: [
+    PlayerTeam(teamId: 'mine', teamName: 'Tigres'),
+    PlayerTeam(teamId: 'other', teamName: 'Pumas'),
+  ],
+);
+
 void main() {
+  setUp(() => SharedPreferences.setMockInitialValues({}));
+
   test('cuenta en cuántos eventos juega el equipo, aunque algún partido aún no tenga resultado', () async {
     final notifier = _notifier();
 
@@ -81,6 +119,73 @@ void main() {
 
     expect(notifier.eventsPlayed, 2);
     expect(notifier.record.played, 2);
+  });
+
+  group('un jugador de varios equipos (uno por organización)', () {
+    // `getMine` trae los partidos de todos sus equipos.
+    final bothTeamsMatches = [
+      matchOf(id: 'a', homeTeamId: 'mine', date: DateTime(2026, 10, 1), homeScore: 2, awayScore: 0, eventId: 'e1'),
+      matchOf(id: 'b', homeTeamId: 'other', date: DateTime(2026, 10, 2), homeScore: 0, awayScore: 3, eventId: 'e9'),
+    ];
+
+    test('el reporte es del primer equipo (el último al que entró) y no mezcla los partidos del otro', () async {
+      final activeTeam = ActiveTeamNotifier();
+      final notifier = _notifier(player: _anaInTwoTeams, matches: bothTeamsMatches, activeTeam: activeTeam);
+
+      await notifier.load();
+
+      expect(activeTeam.teams.map((team) => team.teamId), ['mine', 'other']);
+      expect(notifier.selectedTeamId, 'mine');
+      expect(notifier.teamName, 'Tigres');
+      expect(notifier.record.won, 1);
+      expect(notifier.record.played, 1);
+      // El evento del otro equipo no cuenta como evento en que juega este.
+      expect(notifier.eventsPlayed, 1);
+    });
+
+    test('al elegir el otro equipo en la app el reporte pasa a ser el suyo', () async {
+      final activeTeam = ActiveTeamNotifier();
+      final notifier = _notifier(player: _anaInTwoTeams, matches: bothTeamsMatches, activeTeam: activeTeam);
+      await notifier.load();
+
+      activeTeam.select('other');
+      await pumpEventQueue();
+
+      expect(notifier.selectedTeamId, 'other');
+      expect(notifier.teamName, 'Pumas');
+      expect(notifier.record.lost, 1);
+      expect(notifier.record.won, 0);
+      expect(notifier.eventsPlayed, 1);
+    });
+
+    test('refrescar conserva el equipo elegido', () async {
+      final activeTeam = ActiveTeamNotifier();
+      final notifier = _notifier(player: _anaInTwoTeams, matches: bothTeamsMatches, activeTeam: activeTeam);
+      await notifier.load();
+      activeTeam.select('other');
+      await pumpEventQueue();
+
+      await notifier.load();
+
+      expect(notifier.selectedTeamId, 'other');
+    });
+
+    test('solo se vuelve a leer cuando cambia el equipo activo, no por otros avisos', () async {
+      final activeTeam = ActiveTeamNotifier();
+      final players = _FakePlayersService(_anaInTwoTeams);
+      final notifier = _notifier(playersService: players, matches: bothTeamsMatches, activeTeam: activeTeam);
+      await notifier.load();
+      expect(players.reads, 1);
+
+      // Un tercer equipo aparece en la lista, pero el activo sigue siendo el mismo: nada se recarga.
+      await activeTeam.sync(_anaInThreeTeams);
+      await pumpEventQueue();
+      expect(players.reads, 1);
+
+      activeTeam.select('other');
+      await pumpEventQueue();
+      expect(players.reads, 2);
+    });
   });
 
   test('suma las tarjetas y faltas de los jugadores del equipo en cada evento', () async {
@@ -149,6 +254,7 @@ void main() {
       playersService: _FakePlayersService(_ana),
       matchesService: _ThrowingMatchesService(),
       playerStatsService: statsService,
+      activeTeam: ActiveTeamNotifier(),
     );
 
     await notifier.load();

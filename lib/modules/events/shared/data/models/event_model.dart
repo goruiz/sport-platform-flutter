@@ -22,6 +22,10 @@ class EventModel {
   final int? minPlayersPerTeam;
   final int? maxPlayersPerTeam;
 
+  /// Los ids de los complejos deportivos donde se juega el evento (los que el organizador le asignó); vacío si no
+  /// eligió ninguno.
+  final List<String> sportComplexIds;
+
   const EventModel({
     required this.id,
     required this.name,
@@ -36,6 +40,7 @@ class EventModel {
     this.formatRules,
     this.minPlayersPerTeam,
     this.maxPlayersPerTeam,
+    this.sportComplexIds = const [],
   });
 
   /// La estructura de juego de su formato; null si no tiene reglas.
@@ -72,6 +77,9 @@ class EventModel {
       formatRules: EventFormatRules.fromJson(eventFormat),
       minPlayersPerTeam: _asInt(json['minPlayersPerTeam']),
       maxPlayersPerTeam: _asInt(json['maxPlayersPerTeam']),
+      sportComplexIds: [
+        for (final id in json['sportComplexIds'] as List<dynamic>? ?? const []) id.toString(),
+      ],
     );
   }
 
@@ -97,6 +105,7 @@ class EventModel {
     EventFormatRules? formatRules,
     int? minPlayersPerTeam,
     int? maxPlayersPerTeam,
+    List<String>? sportComplexIds,
   }) =>
       EventModel(
         id: id ?? this.id,
@@ -112,6 +121,7 @@ class EventModel {
         formatRules: formatRules ?? this.formatRules,
         minPlayersPerTeam: minPlayersPerTeam ?? this.minPlayersPerTeam,
         maxPlayersPerTeam: maxPlayersPerTeam ?? this.maxPlayersPerTeam,
+        sportComplexIds: sportComplexIds ?? this.sportComplexIds,
       );
 
   static int? _asInt(dynamic value) => value is num ? value.toInt() : null;

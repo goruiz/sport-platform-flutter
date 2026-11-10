@@ -90,29 +90,35 @@ void main() {
     const everyone = [mine, rival, teammate];
 
     test('todo el evento deja a todos los jugadores', () {
-      expect(filterStatsByScope(everyone, LeaderboardScope.event, 'mi-equipo'), everyone);
+      expect(filterStatsByScope(everyone, LeaderboardScope.event, const ['mi-equipo']), everyone);
     });
 
     test('mi equipo deja solo a los compañeros, en el mismo orden', () {
-      final result = filterStatsByScope(everyone, LeaderboardScope.myTeam, 'mi-equipo');
+      final result = filterStatsByScope(everyone, LeaderboardScope.myTeam, const ['mi-equipo']);
 
       expect(result, [mine, teammate]);
     });
 
     test('el ranking del equipo se arma con lo de sus jugadores, no con el del evento', () {
-      final team = filterStatsByScope(everyone, LeaderboardScope.myTeam, 'mi-equipo');
+      final team = filterStatsByScope(everyone, LeaderboardScope.myTeam, const ['mi-equipo']);
 
       expect(buildLeaderboard(team, LeaderboardKind.scorers).map((player) => player.playerId), ['ana', 'luis']);
       expect(buildLeaderboard(everyone, LeaderboardKind.scorers).first.playerId, 'eva');
     });
 
     test('mi equipo sin equipo no tiene a nadie', () {
-      expect(filterStatsByScope(everyone, LeaderboardScope.myTeam, null), isEmpty);
-      expect(filterStatsByScope(everyone, LeaderboardScope.myTeam, ''), isEmpty);
+      expect(filterStatsByScope(everyone, LeaderboardScope.myTeam, const []), isEmpty);
+      expect(filterStatsByScope(everyone, LeaderboardScope.myTeam, const ['']), isEmpty);
     });
 
     test('un equipo sin datos en el evento da un listado vacío', () {
-      expect(filterStatsByScope(everyone, LeaderboardScope.myTeam, 'otro-equipo'), isEmpty);
+      expect(filterStatsByScope(everyone, LeaderboardScope.myTeam, const ['otro-equipo']), isEmpty);
+    });
+
+    test('quien juega en varios equipos ve a los compañeros de todos', () {
+      final result = filterStatsByScope(everyone, LeaderboardScope.myTeam, const ['mi-equipo', 'rival']);
+
+      expect(result, [mine, rival, teammate]);
     });
   });
 
@@ -157,6 +163,27 @@ void main() {
       );
 
       expect(pickDefaultEvent([first, last])?.id, 'last');
+    });
+  });
+
+  group('resolveSelectedEvent', () {
+    final older = eventOf(id: 'older', startDate: DateTime(2026, 1, 1), endDate: DateTime(2026, 12, 1));
+    final newer = eventOf(id: 'newer', startDate: DateTime(2026, 6, 1), endDate: DateTime(2026, 12, 1));
+
+    test('conserva el evento elegido si sigue entre los de la lista', () {
+      expect(resolveSelectedEvent([older, newer], 'older')?.id, 'older');
+    });
+
+    test('si el elegido ya no está (otro equipo, otros eventos) abre con el de apertura', () {
+      expect(resolveSelectedEvent([older, newer], 'de-otro-equipo')?.id, 'newer');
+    });
+
+    test('sin elegir ninguno abre con el de apertura', () {
+      expect(resolveSelectedEvent([older, newer], null)?.id, 'newer');
+    });
+
+    test('sin eventos no queda ninguno elegido', () {
+      expect(resolveSelectedEvent(const [], 'older'), isNull);
     });
   });
 }

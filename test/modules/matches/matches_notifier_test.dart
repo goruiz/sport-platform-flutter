@@ -1,11 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/courts_service.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
 import 'package:sport_platform/modules/matches/presentation/providers/matches_notifier.dart';
+import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
 
 import '../../support/builders.dart';
 
@@ -51,18 +55,40 @@ class _FakeCourtsService extends CourtsService {
   Future<List<CourtModel>> getAll() async => const [];
 }
 
+/// Ana juega en dos equipos: «home» (el último al que entró) y «other».
+class _FakePlayersService extends PlayersService {
+  @override
+  Future<PlayerModel?> getCurrent() async => const PlayerModel(
+        id: 'ana',
+        firstName: 'Ana',
+        lastName: 'Pérez',
+        email: 'ana@email.com',
+        teamId: 'home',
+        teamName: 'Tigres',
+        teams: [
+          PlayerTeam(teamId: 'home', teamName: 'Tigres'),
+          PlayerTeam(teamId: 'other', teamName: 'Pumas'),
+        ],
+      );
+}
+
 void main() {
   late _FakeMatchesService matchesService;
   late _FakeEventsSearchService eventsSearchService;
+  late ActiveTeamNotifier activeTeam;
   late MatchesNotifier notifier;
 
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
     matchesService = _FakeMatchesService();
     eventsSearchService = _FakeEventsSearchService();
+    activeTeam = ActiveTeamNotifier();
     notifier = MatchesNotifier(
       matchesService: matchesService,
       eventsSearchService: eventsSearchService,
       courtsService: _FakeCourtsService(),
+      playersService: _FakePlayersService(),
+      activeTeam: activeTeam,
     );
   });
 
@@ -77,6 +103,30 @@ void main() {
     expect(notifier.visibleMatches.map((match) => match.id), ['mine-1']);
     expect(matchesService.eventCalls, isEmpty);
     expect(eventsSearchService.searches, 0);
+  });
+
+  test('«Mi equipo» muestra solo los partidos del equipo activo, no los de sus otros equipos', () async {
+    matchesService.mine = [
+      matchOf(id: 'tigres', date: DateTime(2026, 11, 1)),
+      matchOf(id: 'pumas', homeTeamId: 'other', date: DateTime(2026, 11, 2)),
+    ];
+
+    await notifier.load();
+
+    expect(notifier.visibleMatches.map((match) => match.id), ['tigres']);
+  });
+
+  test('al elegir otro equipo en la app se vuelven a leer los partidos de ese equipo', () async {
+    matchesService.mine = [
+      matchOf(id: 'tigres', date: DateTime(2026, 11, 1)),
+      matchOf(id: 'pumas', homeTeamId: 'other', date: DateTime(2026, 11, 2)),
+    ];
+    await notifier.load();
+
+    activeTeam.select('other');
+    await pumpEventQueue();
+
+    expect(notifier.visibleMatches.map((match) => match.id), ['pumas']);
   });
 
   test('sin partidos de su equipo abre con los del primer evento que ofrece el backend', () async {

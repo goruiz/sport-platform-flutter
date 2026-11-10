@@ -33,6 +33,14 @@ List<ComplexOverview> buildComplexOverviews(
   return overviews;
 }
 
+/// Los complejos de [overviews] cuyo id está en [complexIds] (los de los eventos del equipo), en el mismo orden.
+List<ComplexOverview> filterComplexOverviewsByIds(List<ComplexOverview> overviews, Set<String> complexIds) =>
+    overviews.where((overview) => complexIds.contains(overview.complex.id)).toList();
+
+/// Las canchas que no pertenecen a ningún complejo (las registradas cuando el complejo era opcional), por nombre.
+List<CourtModel> listCourtsWithoutComplex(List<CourtModel> courts) =>
+    courts.where((court) => (court.sportComplexId ?? '').isEmpty).toList()..sort(_compareCourtsByName);
+
 /// Los que coinciden con [query] en el nombre, la dirección, la descripción o el nombre de alguna cancha, sin
 /// distinguir mayúsculas ni tildes.
 List<ComplexOverview> filterComplexOverviews(
@@ -52,6 +60,18 @@ List<ComplexOverview> filterComplexOverviews(
             matches(overview.complex.description) ||
             overview.courts.any((court) => matches(court.name)),
       )
+      .toList();
+}
+
+/// Las canchas que coinciden con [query] en el nombre, la descripción o la ubicación, sin distinguir mayúsculas ni tildes.
+List<CourtModel> filterCourtsByQuery(List<CourtModel> courts, String query) {
+  final normalizedQuery = foldForComparison(query.trim());
+  if (normalizedQuery.isEmpty) return courts;
+
+  bool matches(String? text) => text != null && foldForComparison(text).contains(normalizedQuery);
+
+  return courts
+      .where((court) => matches(court.name) || matches(court.description) || matches(court.location))
       .toList();
 }
 

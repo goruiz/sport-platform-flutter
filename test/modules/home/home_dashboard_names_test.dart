@@ -17,7 +17,7 @@ void main() {
   ];
 
   test('toma el nombre de un equipo del propio partido', () {
-    final data = HomeDashboardData(events: const [], matches: matches, teams: const [], currentPlayer: null);
+    final data = HomeDashboardData(events: const [], matches: matches, teams: const []);
 
     expect(data.teamName('home'), 'Tigres');
     expect(data.teamName('away'), 'Leones');
@@ -29,14 +29,13 @@ void main() {
       events: const [],
       matches: matches,
       teams: const [TeamModel(id: 'home', name: 'Tigres FC')],
-      currentPlayer: null,
     );
 
     expect(data.teamName('home'), 'Tigres FC');
   });
 
   test('un equipo o evento que no ve queda con un guion o vacío', () {
-    final data = HomeDashboardData(events: const [], matches: matches, teams: const [], currentPlayer: null);
+    final data = HomeDashboardData(events: const [], matches: matches, teams: const []);
 
     expect(data.teamName('desconocido'), '—');
     expect(data.eventName('otro'), '');
@@ -44,7 +43,7 @@ void main() {
 
   test('un partido sin nombres no inventa ninguno', () {
     final unnamed = [matchOf(date: DateTime(2026, 11, 5))];
-    final data = HomeDashboardData(events: const [], matches: unnamed, teams: const [], currentPlayer: null);
+    final data = HomeDashboardData(events: const [], matches: unnamed, teams: const []);
 
     expect(data.teamName('home'), '—');
   });

@@ -7,18 +7,19 @@ import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/pages/league_detail_page.dart';
-import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_explorer_notifier.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/event_card.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/modules/teams/presentation/widgets/active_team_pill.dart';
 import 'package:sport_platform/shared/widgets/app_search_field.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
-/// Explorar los eventos que el jugador ve (los de su organización y los públicos): se busca por texto, se filtra por estado
-/// y se descargan de a poco, porque la lista puede crecer con todos los eventos públicos de la plataforma.
+/// Explorar los eventos: por defecto los del equipo activo del jugador (el que eligió en «Equipo»; con varios equipos se
+/// cambia desde aquí) o, a elección, todos los que ve (los de su organización y los públicos). Se busca por texto, se filtra
+/// por estado y se descargan de a poco, porque la lista puede crecer con todos los eventos públicos de la plataforma.
 class EventsPage extends StatefulWidget {
   final MenuItemModel item;
 
@@ -43,7 +44,12 @@ class _EventsPageState extends State<EventsPage> {
   @override
   void initState() {
     super.initState();
-    _explorer = EventsExplorerNotifier(getIt<EventsSearchService>());
+    _explorer = EventsExplorerNotifier(
+      searchService: getIt(),
+      teamEventsService: getIt(),
+      playersService: getIt(),
+      activeTeam: getIt(),
+    );
     _scrollController.addListener(_loadMoreNearTheEnd);
     _explorer.load();
   }
@@ -99,6 +105,7 @@ class _EventsPageState extends State<EventsPage> {
       ),
       body: Column(
         children: [
+          _buildTeamHeader(),
           _buildSearchField(),
           _buildStatusChips(),
           Expanded(
@@ -108,6 +115,49 @@ class _EventsPageState extends State<EventsPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Quien tiene equipo elige entre los eventos de su equipo y todos; en «Mi equipo» se dice de cuál equipo son (con varios
+  /// equipos) y se puede cambiar desde aquí.
+  Widget _buildTeamHeader() {
+    return ListenableBuilder(
+      listenable: _explorer,
+      builder: (context, _) {
+        if (!_explorer.hasTeam) return const SizedBox.shrink();
+        return Column(
+          children: [
+            _buildScopeSelector(),
+            if (_explorer.scope == EventsScope.myTeam)
+              const ActiveTeamPill(
+                margin: EdgeInsets.fromLTRB(AppSpacing.page, AppSpacing.md, AppSpacing.page, 0),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildScopeSelector() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.page, AppSpacing.md, AppSpacing.page, 0),
+      child: SegmentedButton<EventsScope>(
+        segments: [
+          ButtonSegment(
+            value: EventsScope.myTeam,
+            icon: const Icon(Icons.shield_outlined),
+            label: Text('mobile.events.scope_mine'.tr()),
+          ),
+          ButtonSegment(
+            value: EventsScope.all,
+            icon: const Icon(Icons.public),
+            label: Text('mobile.events.scope_all'.tr()),
+          ),
+        ],
+        selected: {_explorer.scope},
+        onSelectionChanged: (selection) => _explorer.selectScope(selection.first),
+        showSelectedIcon: false,
       ),
     );
   }
@@ -206,24 +256,40 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
+  /// Sin eventos que mostrar: «sin resultados» si hay una búsqueda o un estado puestos; si no, que el equipo aún no juega
+  /// ninguno (con el atajo a todos los eventos) o que no hay eventos.
   Widget _buildEmpty() {
     final isFiltering = _explorer.isFiltering;
+    final isTeamWithoutEvents = !isFiltering && _explorer.scope == EventsScope.myTeam;
+    final String titleKey;
+    final String subtitleKey;
+    if (isFiltering) {
+      titleKey = 'mobile.events.no_results_title';
+      subtitleKey = 'mobile.events.no_results_subtitle';
+    } else if (isTeamWithoutEvents) {
+      titleKey = 'mobile.events.empty_mine_title';
+      subtitleKey = 'mobile.events.empty_mine_subtitle';
+    } else {
+      titleKey = 'mobile.events.empty_title';
+      subtitleKey = 'mobile.events.empty_subtitle';
+    }
     return RefreshIndicator(
       onRefresh: _explorer.load,
       color: AppColors.primaryLight,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
-          SizedBox(
-            height: MediaQuery.sizeOf(context).height * 0.5,
+          // Alto mínimo y no fijo: con el botón «Ver todos los eventos» el contenido puede ser más alto que la mitad de la
+          // pantalla y entonces debe crecer (la lista se desplaza) en vez de desbordarse.
+          ConstrainedBox(
+            constraints: BoxConstraints(minHeight: MediaQuery.sizeOf(context).height * 0.5),
             child: EmptyState(
               icon: isFiltering ? Icons.filter_list_off : Icons.emoji_events_outlined,
-              title: isFiltering
-                  ? 'mobile.events.no_results_title'.tr()
-                  : 'mobile.events.empty_title'.tr(),
-              subtitle: isFiltering
-                  ? 'mobile.events.no_results_subtitle'.tr()
-                  : 'mobile.events.empty_subtitle'.tr(),
+              title: titleKey.tr(),
+              subtitle: subtitleKey.tr(),
+              onAdd: isTeamWithoutEvents ? () => _explorer.selectScope(EventsScope.all) : null,
+              actionLabel: 'mobile.events.see_all'.tr(),
+              actionIcon: Icons.public,
             ),
           ),
         ],

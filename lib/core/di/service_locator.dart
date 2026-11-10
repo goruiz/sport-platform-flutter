@@ -17,6 +17,7 @@ import 'package:sport_platform/modules/events/event_types/leagues/domain/reposit
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_teams_repository.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/championship_service.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_catalog_service.dart';
+import 'package:sport_platform/modules/events/shared/data/datasource/team_events_service.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_attendance_service.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_events_service.dart';
@@ -30,6 +31,7 @@ import 'package:sport_platform/modules/users/presentation/providers/email_verifi
 import 'package:sport_platform/modules/players/presentation/providers/invitations_notifier.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/sport_complexes/data/datasource/sport_complexes_service.dart';
+import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
 import 'package:sport_platform/modules/users/data/datasource/user_profile_service.dart';
 import 'package:sport_platform/modules/users/domain/repositories/i_user_profile_repository.dart';
 import 'package:sport_platform/shared/services/session_expired_handler.dart';
@@ -75,6 +77,7 @@ void setupServiceLocator() {
   getIt.registerLazySingleton<InvitationsNotifier>(
     () => InvitationsNotifier(getIt<TeamInvitationsService>(), getIt<SessionService>()),
   );
+  getIt.registerLazySingleton<ActiveTeamNotifier>(() => ActiveTeamNotifier());
   getIt.registerLazySingleton<AccountService>(() => AccountService());
   getIt.registerLazySingleton<PlayerPhotoService>(() => PlayerPhotoService());
   getIt.registerLazySingleton<EmailVerificationNotifier>(
@@ -82,6 +85,9 @@ void setupServiceLocator() {
   );
   getIt.registerLazySingleton<JoinTeamService>(() => JoinTeamService());
   getIt.registerLazySingleton<EventsSearchService>(() => EventsSearchService());
+  getIt.registerLazySingleton<TeamEventsService>(
+    () => TeamEventsService(matchesService: getIt<MatchesService>()),
+  );
   getIt.registerLazySingleton<EventsNotifier>(
     () => EventsNotifier(LeagueService()),
     instanceName: _leaguesNotifierName,
@@ -101,6 +107,11 @@ void _resetSessionScopedServices() {
   _resetOrganizationScopedServices();
   if (getIt.isRegistered<InvitationsNotifier>()) {
     getIt.resetLazySingleton<InvitationsNotifier>();
+  }
+  // El equipo que veía el usuario que sale no le queda elegido al siguiente (tampoco lo guardado en el dispositivo).
+  if (getIt.isRegistered<ActiveTeamNotifier>()) {
+    getIt<ActiveTeamNotifier>().clear();
+    getIt.resetLazySingleton<ActiveTeamNotifier>();
   }
   if (getIt.isRegistered<EmailVerificationNotifier>()) {
     getIt.resetLazySingleton<EmailVerificationNotifier>();

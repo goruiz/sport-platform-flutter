@@ -30,6 +30,20 @@ void main() {
       expect(event.hasChampionship, isTrue);
     });
 
+    test('lee los complejos donde se juega el evento', () {
+      final json = {
+        ..._eventJson(),
+        'sportComplexIds': ['c1', 'c2'],
+      };
+
+      expect(EventModel.fromJson(json).sportComplexIds, ['c1', 'c2']);
+    });
+
+    test('un evento sin complejos asignados (o de un backend anterior) tiene la lista vacía', () {
+      expect(EventModel.fromJson(_eventJson()).sportComplexIds, isEmpty);
+      expect(EventModel.fromJson({..._eventJson(), 'sportComplexIds': null}).sportComplexIds, isEmpty);
+    });
+
     test('un evento sin formato no tiene campeonato', () {
       final event = EventModel.fromJson(_eventJson());
 

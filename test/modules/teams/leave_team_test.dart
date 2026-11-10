@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/teams_service.dart';
@@ -7,6 +8,7 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/models/pl
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/teams/presentation/pages/teams_page.dart';
+import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
 
 import '../../support/real_translations.dart';
 
@@ -56,7 +58,19 @@ const _menuItem = MenuItemModel(id: 'menu-teams', name: 'Equipo');
 Future<void> _openTeamsPage(WidgetTester tester, _FakePlayersService players) async {
   getIt.registerSingleton<PlayersService>(players);
   getIt.registerSingleton<TeamsService>(_FakeTeamsService());
+  getIt.registerSingleton<ActiveTeamNotifier>(ActiveTeamNotifier());
   await pumpWithRealTranslations(tester, home: (_) => const TeamsPage(item: _menuItem));
+  await tester.pumpAndSettle();
+}
+
+/// Avanza la pantalla alternando fotogramas con turnos del bucle real. La primera lectura de la pantalla nace en
+/// `initState`, que `pumpWithRealTranslations` ejecuta en la zona de tiempo real: una segunda lectura (tras abandonar el
+/// equipo) espera lo que esa zona dejó pendiente, y `pumpAndSettle` no le da el turno.
+Future<void> _settleAfterReload(WidgetTester tester) async {
+  for (var i = 0; i < 6; i++) {
+    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+    await tester.pump(const Duration(milliseconds: 300));
+  }
   await tester.pumpAndSettle();
 }
 
@@ -67,6 +81,7 @@ Future<void> _tapLeaveButton(WidgetTester tester) async {
 
 void main() {
   setUpAll(initRealTranslations);
+  setUp(() => SharedPreferences.setMockInitialValues({}));
   tearDown(getIt.reset);
 
   testWidgets('el jugador con equipo ve la acción de abandonarlo al final de la pantalla', (tester) async {
@@ -98,7 +113,7 @@ void main() {
 
     await _tapLeaveButton(tester);
     await tester.tap(find.widgetWithText(FilledButton, 'Abandonar'));
-    await tester.pumpAndSettle();
+    await _settleAfterReload(tester);
 
     expect(players.leftPlayerIds, ['ana']);
     expect(find.text('Saliste del equipo.'), findsOneWidget);
@@ -128,7 +143,7 @@ void main() {
 
     await _tapLeaveButton(tester);
     await tester.tap(find.widgetWithText(FilledButton, 'Abandonar'));
-    await tester.pumpAndSettle();
+    await _settleAfterReload(tester);
 
     expect(find.text('No se pudo abandonar el equipo. Inténtalo de nuevo.'), findsOneWidget);
     expect(find.widgetWithText(OutlinedButton, 'Abandonar equipo'), findsOneWidget);

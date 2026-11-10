@@ -88,6 +88,20 @@ void main() {
     });
   });
 
+  group('teamOfPlayerInMatch', () {
+    final match = matchOf(homeTeamId: 'home', awayTeamId: 'away', date: DateTime(2026, 11, 10));
+
+    test('de los equipos del jugador, el que juega el partido', () {
+      expect(teamOfPlayerInMatch(match, ['tigres', 'away']), 'away');
+      expect(teamOfPlayerInMatch(match, ['home']), 'home');
+    });
+
+    test('si ninguno de sus equipos lo juega, ninguno', () {
+      expect(teamOfPlayerInMatch(match, ['tigres', 'pumas']), isNull);
+      expect(teamOfPlayerInMatch(match, const []), isNull);
+    });
+  });
+
   group('canAnswerAttendance', () {
     test('un partido por jugar admite respuesta', () {
       final match = matchOf(date: DateTime(2026, 11, 10));
@@ -212,6 +226,20 @@ void main() {
       expect(subject.isParticipant, isTrue);
       expect(subject.myTeamId, 'home');
       expect(subject.canAnswer, isTrue);
+    });
+
+    test('quien juega en varios equipos participa con el que juega este partido, no con el último al que entró', () async {
+      final subject = notifier(
+        player: _ana.copyWith(
+          teamId: 'tigres',
+          teams: const [PlayerTeam(teamId: 'tigres', teamName: 'Tigres'), PlayerTeam(teamId: 'home', teamName: 'Local')],
+        ),
+      );
+
+      await subject.load();
+
+      expect(subject.isParticipant, isTrue);
+      expect(subject.myTeamId, 'home');
     });
 
     test('quien no juega en el partido no ve nada y ni se lee la asistencia', () async {

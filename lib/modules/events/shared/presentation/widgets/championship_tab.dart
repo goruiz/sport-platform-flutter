@@ -38,7 +38,9 @@ class _ChampionshipTabState extends State<ChampionshipTab>
   }
 
   Future<void> _reload() async {
-    setState(() => _championship = _service.getByEvent(widget.eventId));
+    setState(() {
+      _championship = _service.getByEvent(widget.eventId);
+    });
     await _championship;
   }
 

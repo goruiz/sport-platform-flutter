@@ -24,6 +24,15 @@ bool playsInMatch(MatchModel match, String? myTeamId) {
   return match.homeTeamId == myTeamId || match.awayTeamId == myTeamId;
 }
 
+/// De los equipos del jugador ([teamIds]: puede jugar en varios), el que juega este partido; null si ninguno. Un partido
+/// enfrenta a equipos de una misma organización y el jugador tiene uno por organización, así que como mucho es uno.
+String? teamOfPlayerInMatch(MatchModel match, Iterable<String> teamIds) {
+  for (final teamId in teamIds) {
+    if (playsInMatch(match, teamId)) return teamId;
+  }
+  return null;
+}
+
 /// Todavía se puede responder si va a asistir: el partido aún no empieza y no está aplazado, suspendido ni cancelado
 /// (de un partido aplazado no se sabe cuándo se juega). El backend decide al recibir la respuesta; esto solo evita
 /// ofrecer botones que se van a rechazar.

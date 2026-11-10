@@ -22,6 +22,7 @@
       "administrator_account": "Administrator accounts sign in through the web panel, not the app.",
       "organization_suspended": "Your account’s organization is suspended. Contact your organizer.",
       "organization_not_found": "Your account’s organization no longer exists. Contact your organizer.",
+      "account_suspended": "Your account is suspended. Contact your organizer.",
       "access_denied": "Your account does not have access to the app.",
       "no_connection": "We could not reach the server. Check your connection and try again.",
       "unexpected": "We could not sign you in. Please try again later."
@@ -141,7 +142,12 @@
       "results_count": "{count} events",
       "load_more": "Show more",
       "no_results_title": "No results",
-      "no_results_subtitle": "Try another search or another status."
+      "no_results_subtitle": "Try another search or another status.",
+      "scope_mine": "My team",
+      "scope_all": "All",
+      "empty_mine_title": "Your team isn't in any event yet",
+      "empty_mine_subtitle": "Events in which your team has matches will appear here. In the meantime, you can browse all events.",
+      "see_all": "See all events"
     },
     "teams": {
       "load_error": "Your team could not be loaded.",
@@ -150,6 +156,12 @@
       "players": "Players",
       "players_empty": "This team does not have any players yet.",
       "your_team": "Your team",
+      "your_teams": "Your teams ({count})",
+      "active_team_label": "Active team",
+      "active_hint": "The app shows the information of the team you choose here: your home, matches, events, rankings and reports.",
+      "switch_title": "Switch team",
+      "previous_team": "Previous team",
+      "next_team": "Next team",
       "captain": "Captain",
       "players_count": "{count} players",
       "leave": "Leave team",
@@ -173,12 +185,6 @@
       "pick_event": "Pick an event"
     },
     "courts": {
-      "load_error": "Courts could not be loaded.",
-      "empty_title": "No courts available",
-      "empty_subtitle": "Registered courts will appear here.",
-      "search_hint": "Search court, complex or location",
-      "filtered_empty_title": "No matches found",
-      "filtered_empty_subtitle": "Try another search term.",
       "view_complex": "View the complex and its map",
       "schedule_title": "Schedule",
       "opening_hours": "Open from {} to {}",
@@ -205,6 +211,7 @@
       "section_account": "Account",
       "language": "Language",
       "section_team": "My team",
+      "section_teams": "My teams",
       "team": "Team",
       "no_team": "You are not on a team yet",
       "team_role": "Your role",
@@ -232,7 +239,7 @@
       "load_error": "The complexes could not be loaded.",
       "empty_title": "No complexes yet",
       "empty_subtitle": "Your organization’s complexes will appear here.",
-      "search_hint": "Search complex or address",
+      "search_hint": "Search complex, address or court",
       "filtered_empty_title": "No results",
       "filtered_empty_subtitle": "Try another search.",
       "courts_count": "Courts: {count}",
@@ -242,7 +249,13 @@
       "courts_title": "Courts of the complex",
       "no_courts": "This complex has no courts yet.",
       "directions": "Get directions",
-      "directions_error": "Could not open the map."
+      "directions_error": "Could not open the map.",
+      "scope_mine": "My team",
+      "scope_all": "All",
+      "empty_mine_title": "No complexes for your team",
+      "empty_mine_subtitle": "The complexes where your team’s events are played will appear here. In the meantime, you can see all the complexes.",
+      "see_all": "See all complexes",
+      "courts_without_complex": "Courts without a complex"
     }
   },
   "session": {
@@ -472,8 +485,8 @@
       "events_description": "The competition’s events and their dates",
       "teams_description": "Your team and the competition’s other teams",
       "courts_description": "Where the matches are played",
-      "sport_complexes": "Sports complexes",
-      "sport_complexes_description": "Where your competition’s complexes and courts are"
+      "sport_complexes": "Complexes and courts",
+      "sport_complexes_description": "Where your team’s events are played: their complexes and courts"
     },
     "leagues": {
       "title": "Leagues",
@@ -756,6 +769,8 @@
     "load_error": "The rankings could not be loaded.",
     "no_events_title": "No events",
     "no_events_subtitle": "Rankings will appear when there are events.",
+    "no_team_events_title": "Your team isn't in any event yet",
+    "no_team_events_subtitle": "Rankings will appear once your team has matches in an event.",
     "my_stats": {
       "title": "My stats",
       "goals": "Goals",

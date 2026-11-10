@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
+import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/modules/module_urls.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
@@ -23,6 +24,8 @@ import 'package:sport_platform/modules/home/presentation/widgets/summary_tile.da
 import 'package:sport_platform/modules/matches/presentation/pages/match_detail_page.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_summary_card.dart';
 import 'package:sport_platform/modules/players/presentation/pages/join_team_page.dart';
+import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/presentation/widgets/active_team_pill.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/skeleton_box.dart';
 import 'package:sport_platform/shared/widgets/initials_avatar.dart';
@@ -55,12 +58,40 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> {
   final _dashboardService = HomeDashboardService();
+  final _activeTeam = getIt<ActiveTeamNotifier>();
   late Future<HomeDashboardData> _dashboardFuture;
+
+  /// El equipo activo cuya lectura está en curso o terminó por última vez: lo que se compara para saber si cambió. Null
+  /// mientras llega la primera lectura o si no tiene equipo.
+  String? _watchedTeamId;
 
   @override
   void initState() {
     super.initState();
-    _dashboardFuture = _dashboardService.load();
+    _activeTeam.addListener(_onActiveTeamChanged);
+    _dashboardFuture = _loadDashboard();
+  }
+
+  @override
+  void dispose() {
+    _activeTeam.removeListener(_onActiveTeamChanged);
+    super.dispose();
+  }
+
+  Future<HomeDashboardData> _loadDashboard() async {
+    final data = await _dashboardService.load();
+    _watchedTeamId = data.activeTeamId;
+    return data;
+  }
+
+  /// El jugador eligió ver otro de sus equipos (desde la pantalla «Equipo» o desde el indicador de aquí): el inicio se
+  /// vuelve a leer con los partidos de ese equipo. Los avisos que no cambian el equipo activo no recargan nada.
+  void _onActiveTeamChanged() {
+    final activeTeamId = _activeTeam.activeTeamId;
+    final watchedTeamId = _watchedTeamId;
+    if (watchedTeamId == null || activeTeamId == watchedTeamId || !mounted) return;
+    _watchedTeamId = activeTeamId;
+    _refreshDashboard();
   }
 
   Future<void> _joinWithCode() async {
@@ -69,7 +100,11 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   Future<void> _refreshDashboard() async {
-    setState(() => _dashboardFuture = _dashboardService.load());
+    // Con llaves y no con flecha: una flecha devuelve el Future y, en modo debug, `setState` lo rechaza antes de
+    // reconstruir, así que el inicio se quedaba con los datos del equipo anterior.
+    setState(() {
+      _dashboardFuture = _loadDashboard();
+    });
     await _dashboardFuture;
   }
 
@@ -104,6 +139,8 @@ class _HomeTabState extends State<HomeTab> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const GreetingBanner(),
+            // Con varios equipos, de cuál es lo que se ve aquí, y cómo cambiarlo.
+            const ActiveTeamPill(margin: EdgeInsets.only(top: AppSpacing.lg)),
             const SizedBox(height: AppSpacing.xl),
             // Solo se dibujan cuando hay algo que atender: el correo sin confirmar y las invitaciones pendientes.
             const EmailVerificationBanner(),

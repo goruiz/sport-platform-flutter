@@ -2,13 +2,18 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
+import 'package:sport_platform/modules/events/shared/data/datasource/team_events_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_explorer_notifier.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
+import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
 
 import '../../support/builders.dart';
 
@@ -37,6 +42,61 @@ class _FakeSearchService extends EventsSearchService {
   }
 }
 
+/// Los eventos de cada equipo y qué equipos se pidieron.
+class _FakeTeamEventsService extends TeamEventsService {
+  final Map<String, List<EventModel>> eventsByTeam;
+  final List<String> requests = [];
+  bool fail = false;
+
+  _FakeTeamEventsService([this.eventsByTeam = const {}]);
+
+  @override
+  Future<List<EventModel>> getOfTeam(String teamId) async {
+    requests.add(teamId);
+    if (fail) throw Exception('sin red');
+    return eventsByTeam[teamId] ?? const [];
+  }
+}
+
+/// El jugador de la cuenta; sin jugador (`null`) no tiene equipo.
+class _FakePlayersService extends PlayersService {
+  PlayerModel? player;
+  bool fail = false;
+
+  @override
+  Future<PlayerModel?> getCurrent() async {
+    if (fail) throw Exception('sin red');
+    return player;
+  }
+}
+
+/// Ana juega en dos equipos: «home» (el último al que entró, el activo al abrir) y «other».
+const _inTwoTeams = PlayerModel(
+  id: 'ana',
+  firstName: 'Ana',
+  lastName: 'Pérez',
+  email: 'ana@email.com',
+  teamId: 'home',
+  teamName: 'Tigres',
+  teams: [
+    PlayerTeam(teamId: 'home', teamName: 'Tigres'),
+    PlayerTeam(teamId: 'other', teamName: 'Pumas'),
+  ],
+);
+
+EventsExplorerNotifier _notifierOf({
+  required EventsSearchService search,
+  required TeamEventsService teamEvents,
+  required PlayersService players,
+  required ActiveTeamNotifier activeTeam,
+}) =>
+    EventsExplorerNotifier(
+      searchService: search,
+      teamEventsService: teamEvents,
+      playersService: players,
+      activeTeam: activeTeam,
+    );
+
 void main() {
   _registerSearchServiceTests();
 
@@ -44,11 +104,157 @@ void main() {
   late EventsExplorerNotifier notifier;
 
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
     service = _FakeSearchService();
-    notifier = EventsExplorerNotifier(service);
+    // Sin jugador no hay equipo: la lista es la de todos los eventos que ve.
+    notifier = _notifierOf(
+      search: service,
+      teamEvents: _FakeTeamEventsService(),
+      players: _FakePlayersService(),
+      activeTeam: ActiveTeamNotifier(),
+    );
   });
 
   tearDown(() => notifier.dispose());
+
+  group('con un equipo activo', () {
+    late _FakeTeamEventsService teamEvents;
+    late _FakePlayersService players;
+    late ActiveTeamNotifier activeTeam;
+    late EventsExplorerNotifier teamNotifier;
+
+    EventModel teamEvent(String id, String name, {String status = 'ACTIVE'}) =>
+        eventOf(id: id, name: name, status: status, startDate: DateTime(2026, 1, 1), endDate: DateTime(2026, 2, 1));
+
+    setUp(() {
+      teamEvents = _FakeTeamEventsService({
+        'home': [teamEvent('liga', 'Liga de barrio'), teamEvent('copa', 'Copa Quito', status: 'FINISHED')],
+        'other': [teamEvent('torneo', 'Torneo relámpago')],
+      });
+      players = _FakePlayersService()..player = _inTwoTeams;
+      activeTeam = ActiveTeamNotifier();
+      teamNotifier = _notifierOf(search: service, teamEvents: teamEvents, players: players, activeTeam: activeTeam);
+    });
+
+    tearDown(() => teamNotifier.dispose());
+
+    test('abre con los eventos del equipo activo, sin pedirle nada a la búsqueda general', () async {
+      await teamNotifier.load();
+
+      expect(teamNotifier.scope, EventsScope.myTeam);
+      expect(teamNotifier.hasTeam, isTrue);
+      expect(teamNotifier.events.map((event) => event.id), ['liga', 'copa']);
+      expect(teamNotifier.totalElements, 2);
+      expect(teamNotifier.hasMore, isFalse);
+      expect(teamEvents.requests, ['home']);
+      expect(service.requests, isEmpty);
+    });
+
+    test('buscar y filtrar por estado trabaja sobre los eventos del equipo sin volver a leerlos', () async {
+      await teamNotifier.load();
+
+      await teamNotifier.search('quito');
+      expect(teamNotifier.events.map((event) => event.id), ['copa']);
+
+      await teamNotifier.selectStatus(EventStatus.active);
+      expect(teamNotifier.events, isEmpty);
+      expect(teamNotifier.isFiltering, isTrue);
+
+      await teamNotifier.search('');
+      expect(teamNotifier.events.map((event) => event.id), ['liga']);
+      expect(teamEvents.requests, ['home']);
+      expect(service.requests, isEmpty);
+    });
+
+    test('«Todos» pide la primera página al backend y volver a «Mi equipo» no vuelve a leer los del equipo', () async {
+      await teamNotifier.load();
+
+      await teamNotifier.selectScope(EventsScope.all);
+      expect(teamNotifier.events.map((event) => event.id), ['p0-a', 'p0-b']);
+      expect(teamNotifier.hasMore, isTrue);
+
+      await teamNotifier.selectScope(EventsScope.myTeam);
+      expect(teamNotifier.events.map((event) => event.id), ['liga', 'copa']);
+      expect(teamEvents.requests, ['home']);
+      expect(service.requests, hasLength(1));
+    });
+
+    test('al elegir otro equipo en la app se leen los eventos de ese equipo', () async {
+      await teamNotifier.load();
+
+      activeTeam.select('other');
+      await pumpEventQueue();
+
+      expect(teamNotifier.scope, EventsScope.myTeam);
+      expect(teamNotifier.events.map((event) => event.id), ['torneo']);
+      expect(teamEvents.requests, ['home', 'other']);
+    });
+
+    test('en «Todos» cambiar de equipo no recarga nada: la lista no depende del equipo', () async {
+      await teamNotifier.load();
+      await teamNotifier.selectScope(EventsScope.all);
+
+      activeTeam.select('other');
+      await pumpEventQueue();
+
+      expect(teamNotifier.scope, EventsScope.all);
+      expect(service.requests, hasLength(1));
+      expect(teamEvents.requests, ['home']);
+    });
+
+    test('actualizar conserva el alcance elegido y vuelve a leer los eventos del equipo', () async {
+      await teamNotifier.load();
+      await teamNotifier.selectScope(EventsScope.all);
+
+      await teamNotifier.load();
+      expect(teamNotifier.scope, EventsScope.all);
+
+      await teamNotifier.selectScope(EventsScope.myTeam);
+      expect(teamEvents.requests, ['home', 'home']);
+    });
+
+    test('si falla la lectura de los eventos del equipo guarda la clave del error y deja la lista vacía', () async {
+      teamEvents.fail = true;
+
+      await teamNotifier.load();
+
+      expect(teamNotifier.error, 'mobile.events.load_error');
+      expect(teamNotifier.events, isEmpty);
+      expect(teamNotifier.loading, isFalse);
+    });
+
+    test('un equipo sin eventos deja la lista vacía y sigue en «Mi equipo»', () async {
+      teamEvents.eventsByTeam.clear();
+
+      await teamNotifier.load();
+
+      expect(teamNotifier.scope, EventsScope.myTeam);
+      expect(teamNotifier.events, isEmpty);
+      expect(teamNotifier.error, isNull);
+    });
+
+    test('si no se puede leer al jugador abre con todos los eventos en vez de quedar en blanco', () async {
+      players.fail = true;
+
+      await teamNotifier.load();
+
+      expect(teamNotifier.hasTeam, isFalse);
+      expect(teamNotifier.scope, EventsScope.all);
+      expect(teamNotifier.events.map((event) => event.id), ['p0-a', 'p0-b']);
+    });
+  });
+
+  test('quien aún no tiene equipo abre con todos los eventos y no puede elegir «Mi equipo»', () async {
+    await notifier.load();
+
+    expect(notifier.hasTeam, isFalse);
+    expect(notifier.scope, EventsScope.all);
+
+    await notifier.selectScope(EventsScope.myTeam);
+
+    expect(notifier.scope, EventsScope.all);
+    expect(service.requests, hasLength(1));
+  });
 
   test('abre con la primera página y dice que quedan más', () async {
     await notifier.load();

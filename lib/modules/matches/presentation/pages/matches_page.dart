@@ -12,6 +12,7 @@ import 'package:sport_platform/modules/matches/domain/match_rules.dart';
 import 'package:sport_platform/modules/matches/presentation/pages/match_detail_page.dart';
 import 'package:sport_platform/modules/matches/presentation/providers/matches_notifier.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_summary_card.dart';
+import 'package:sport_platform/modules/teams/presentation/widgets/active_team_pill.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
@@ -38,6 +39,8 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
       matchesService: getIt(),
       eventsSearchService: getIt(),
       courtsService: getIt(),
+      playersService: getIt(),
+      activeTeam: getIt(),
     )..load();
   }
 
@@ -99,6 +102,9 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
     return Column(
       children: [
         _buildScopeSelector(),
+        // «Mi equipo» es el equipo activo: se dice cuál es (con varios equipos) y se puede cambiar desde aquí.
+        if (_notifier.scope == MatchesScope.mine)
+          const ActiveTeamPill(margin: EdgeInsets.fromLTRB(16, 12, 16, 0)),
         if (_notifier.scope == MatchesScope.all) _buildEventPicker(),
         Expanded(
           child: _notifier.loadingAll

@@ -8,6 +8,7 @@ import 'package:sport_platform/modules/reports/presentation/providers/reports_no
 import 'package:sport_platform/modules/reports/presentation/widgets/recent_form_chips.dart';
 import 'package:sport_platform/modules/reports/presentation/widgets/team_record_card.dart';
 import 'package:sport_platform/modules/reports/presentation/widgets/team_stats_card.dart';
+import 'package:sport_platform/modules/teams/presentation/widgets/active_team_pill.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
@@ -31,6 +32,7 @@ class _ReportsPageState extends State<ReportsPage> {
       playersService: getIt(),
       matchesService: getIt(),
       playerStatsService: getIt(),
+      activeTeam: getIt(),
     )..load();
   }
 
@@ -78,10 +80,17 @@ class _ReportsPageState extends State<ReportsPage> {
       );
     }
     if (_notifier.record.isEmpty) {
-      return EmptyState(
-        icon: Icons.bar_chart_outlined,
-        title: 'reports.no_results_title'.tr(),
-        subtitle: 'reports.no_results_subtitle'.tr(),
+      return Column(
+        children: [
+          const ActiveTeamPill(margin: EdgeInsets.fromLTRB(16, 16, 16, 0)),
+          Expanded(
+            child: EmptyState(
+              icon: Icons.bar_chart_outlined,
+              title: 'reports.no_results_title'.tr(),
+              subtitle: 'reports.no_results_subtitle'.tr(),
+            ),
+          ),
+        ],
       );
     }
     return RefreshIndicator(
@@ -91,6 +100,7 @@ class _ReportsPageState extends State<ReportsPage> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         children: [
+          const ActiveTeamPill(margin: EdgeInsets.only(bottom: 20)),
           _title(_notifier.teamName ?? ''),
           const SizedBox(height: 12),
           TeamRecordCard(record: _notifier.record),

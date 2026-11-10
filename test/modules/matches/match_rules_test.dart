@@ -7,6 +7,47 @@ import '../../support/builders.dart';
 void main() {
   final now = DateTime(2026, 10, 27, 12);
 
+  group('matchesOfTeam', () {
+    final asHome = matchOf(id: 'home-game', homeTeamId: 'tigres', awayTeamId: 'x', date: DateTime(2026, 11, 1));
+    final asAway = matchOf(id: 'away-game', homeTeamId: 'y', awayTeamId: 'tigres', date: DateTime(2026, 11, 2));
+    final other = matchOf(id: 'other', homeTeamId: 'pumas', awayTeamId: 'z', date: DateTime(2026, 11, 3));
+
+    test('deja los partidos en que juega el equipo, de local o de visitante', () {
+      expect(matchesOfTeam([asHome, other, asAway], 'tigres').map((match) => match.id), ['home-game', 'away-game']);
+    });
+
+    test('sin equipo no hay ninguno', () {
+      expect(matchesOfTeam([asHome, asAway], null), isEmpty);
+      expect(matchesOfTeam([asHome, asAway], ''), isEmpty);
+    });
+  });
+
+  group('eventIdsOfTeam', () {
+    test('junta los eventos de los partidos del equipo, sin repetir y sin los de otros equipos', () {
+      final matches = [
+        matchOf(id: 'a', homeTeamId: 'tigres', awayTeamId: 'x', date: DateTime(2026, 11, 1), eventId: 'liga'),
+        matchOf(id: 'b', homeTeamId: 'y', awayTeamId: 'tigres', date: DateTime(2026, 11, 2), eventId: 'liga'),
+        matchOf(id: 'c', homeTeamId: 'tigres', awayTeamId: 'z', date: DateTime(2026, 11, 3), eventId: 'copa'),
+        matchOf(id: 'd', homeTeamId: 'pumas', awayTeamId: 'z', date: DateTime(2026, 11, 4), eventId: 'otro'),
+      ];
+
+      expect(eventIdsOfTeam(matches, 'tigres'), {'liga', 'copa'});
+    });
+
+    test('sin equipo, o si el equipo no tiene partidos, no hay ninguno', () {
+      final matches = [matchOf(homeTeamId: 'tigres', awayTeamId: 'x', date: DateTime(2026, 11, 1))];
+
+      expect(eventIdsOfTeam(matches, null), isEmpty);
+      expect(eventIdsOfTeam(matches, 'pumas'), isEmpty);
+    });
+
+    test('un partido sin evento no cuenta', () {
+      final matches = [matchOf(homeTeamId: 'tigres', awayTeamId: 'x', date: DateTime(2026, 11, 1), eventId: '')];
+
+      expect(eventIdsOfTeam(matches, 'tigres'), isEmpty);
+    });
+  });
+
   group('upcomingMatches', () {
     test('deja los partidos futuros, el más cercano primero', () {
       final later = matchOf(

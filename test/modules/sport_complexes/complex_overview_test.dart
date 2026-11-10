@@ -76,6 +76,60 @@ void main() {
     });
   });
 
+  group('filterComplexOverviewsByIds', () {
+    final overviews = buildComplexOverviews(
+      [_complex('c1', 'Norte'), _complex('c2', 'Sur'), _complex('c3', 'Este')],
+      [_court('k1', 'Cancha 1', complexId: 'c2')],
+    );
+
+    test('deja solo los complejos pedidos, en el mismo orden, con sus canchas', () {
+      final result = filterComplexOverviewsByIds(overviews, {'c3', 'c2'});
+
+      expect(result.map((overview) => overview.complex.name), ['Este', 'Sur']);
+      expect(result.last.courts.single.name, 'Cancha 1');
+    });
+
+    test('sin ids (un equipo cuyos eventos no tienen complejos) no deja ninguno', () {
+      expect(filterComplexOverviewsByIds(overviews, const {}), isEmpty);
+    });
+
+    test('un id que no es de ningún complejo visible se ignora', () {
+      expect(filterComplexOverviewsByIds(overviews, {'otro'}), isEmpty);
+    });
+  });
+
+  group('listCourtsWithoutComplex', () {
+    test('deja solo las canchas sin complejo, por nombre', () {
+      final result = listCourtsWithoutComplex([
+        _court('k1', 'Zeta'),
+        _court('k2', 'De un complejo', complexId: 'c1'),
+        _court('k3', 'alfa'),
+      ]);
+
+      expect(result.map((court) => court.name), ['alfa', 'Zeta']);
+    });
+  });
+
+  group('filterCourtsByQuery', () {
+    final courts = [
+      const CourtModel(id: 'k1', name: 'Cancha Bombonera', location: 'Av. Principal'),
+      const CourtModel(id: 'k2', name: 'Cancha 2', description: 'Césped sintético'),
+    ];
+
+    List<String> idsFor(String query) => filterCourtsByQuery(courts, query).map((court) => court.id).toList();
+
+    test('sin búsqueda deja todas', () {
+      expect(idsFor('  '), ['k1', 'k2']);
+    });
+
+    test('busca en el nombre, la descripción y la ubicación sin distinguir mayúsculas ni tildes', () {
+      expect(idsFor('BOMBONERA'), ['k1']);
+      expect(idsFor('cesped'), ['k2']);
+      expect(idsFor('principal'), ['k1']);
+      expect(idsFor('nada'), isEmpty);
+    });
+  });
+
   group('filterComplexOverviews', () {
     final overviews = buildComplexOverviews(
       [

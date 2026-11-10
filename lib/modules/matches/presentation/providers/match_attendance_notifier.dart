@@ -62,8 +62,9 @@ class MatchAttendanceNotifier extends ChangeNotifier {
     String? teamId;
     try {
       final player = await _playersService.getCurrent();
-      teamId = player?.teamId;
-      isParticipantNow = playsInMatch(match, teamId);
+      // De sus equipos (puede jugar en varios), el que juega este partido: no el activo ni el último al que entró.
+      teamId = player == null ? null : teamOfPlayerInMatch(match, player.teamIds);
+      isParticipantNow = teamId != null;
       if (isParticipantNow) attendance = await _service.get(match.id);
     } catch (_) {
       status = SummaryStatus.failed;

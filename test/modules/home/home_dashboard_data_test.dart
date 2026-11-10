@@ -13,6 +13,7 @@ void main() {
   HomeDashboardData dataOf({
     List<EventModel> events = const [],
     List<MatchModel> matches = const [],
+    String? activeTeamId,
   }) => HomeDashboardData(
     events: events,
     matches: matches,
@@ -20,8 +21,29 @@ void main() {
       TeamModel(id: 'home', name: 'Tigres'),
       TeamModel(id: 'away', name: 'Leones'),
     ],
-    currentPlayer: null,
+    activeTeamId: activeTeamId,
   );
+
+  group('currentTeam', () {
+    test('es el equipo activo del jugador', () {
+      final data = HomeDashboardData(
+        events: const [],
+        matches: const [],
+        teams: const [TeamModel(id: 'home', name: 'Tigres')],
+        activeTeamId: 'home',
+      );
+
+      expect(data.currentTeam?.name, 'Tigres');
+    });
+
+    test('sin equipo activo, o con uno que no se pudo leer, no hay ninguno', () {
+      expect(dataOf().currentTeam, isNull);
+      expect(
+        HomeDashboardData(events: const [], matches: const [], teams: const [], activeTeamId: 'home').currentTeam,
+        isNull,
+      );
+    });
+  });
 
   group('nextEvent', () {
     final early = eventOf(
@@ -53,6 +75,30 @@ void main() {
         );
       },
     );
+
+    test('con un equipo activo solo cuentan los eventos en que juega ese equipo', () {
+      final mine = matchOf(eventId: 'late', date: now.add(const Duration(days: 2)));
+
+      final data = dataOf(events: [early, late], matches: [mine], activeTeamId: 'home');
+
+      // «early» empieza antes, pero no es del equipo.
+      expect(data.nextEvent(now)?.id, 'late');
+    });
+
+    test('con un equipo activo que no juega en ningún evento no hay próximo evento, aunque haya otros', () {
+      final data = dataOf(events: [early, late], activeTeamId: 'home');
+
+      expect(data.nextEvent(now), isNull);
+    });
+
+    test('con un equipo activo, un evento del equipo ya terminado no cuenta y no lo reemplaza uno de otro equipo', () {
+      final over = eventOf(id: 'mine-over', startDate: DateTime(2026, 1, 1), endDate: DateTime(2026, 10, 26));
+      final mine = matchOf(eventId: 'mine-over', date: DateTime(2026, 9, 1));
+
+      final data = dataOf(events: [over, early], matches: [mine], activeTeamId: 'home');
+
+      expect(data.nextEvent(now), isNull);
+    });
 
     test('no cuenta un evento cancelado ni uno que ya terminó', () {
       final cancelled = eventOf(
