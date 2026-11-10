@@ -82,7 +82,7 @@ class _TeamsPageState extends State<TeamsPage> {
     if (!confirmed || !mounted) return;
     setState(() => _isLeaving = true);
     try {
-      await getIt<PlayersService>().removeFromTeam(data.player.id);
+      await getIt<PlayersService>().removeFromTeam(data.player.id, teamId: data.team.id);
     } catch (_) {
       if (mounted) {
         setState(() => _isLeaving = false);

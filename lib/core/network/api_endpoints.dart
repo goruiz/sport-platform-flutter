@@ -37,8 +37,9 @@ class ApiEndpoints {
   static const String playersAuthRegister = '/players/auth/register';
   static const String playersJoinByCode = '/players/join-by-code';
   static String playersByTeam(String teamId) => '/players/by-team/$teamId';
-  static String playerRemoveFromTeam(String id) =>
-      '/players/$id/remove-from-team';
+  // Un jugador puede jugar en varios equipos (uno por organización): [teamId] dice de cuál sale.
+  static String playerRemoveFromTeam(String id, {String? teamId}) =>
+      '/players/$id/remove-from-team${teamId == null ? '' : '?teamId=$teamId'}';
 
   // Events
   static const String events = '/events';

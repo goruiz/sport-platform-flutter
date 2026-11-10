@@ -136,7 +136,7 @@ class AddPlayersNotifier extends ChangeNotifier {
   /// Returns true on success.
   Future<bool> removePlayer(String playerId) async {
     try {
-      await _service.removeFromTeam(playerId);
+      await _service.removeFromTeam(playerId, teamId: teamId);
       _existingPlayers =
           _existingPlayers.where((p) => p.id != playerId).toList();
       notifyListeners();

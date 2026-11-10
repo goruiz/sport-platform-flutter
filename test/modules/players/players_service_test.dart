@@ -32,4 +32,17 @@ void main() {
     expect(player.teamId, isNull);
     expect(player.isCaptain, isFalse);
   });
+
+  test('abandonar un equipo dice de cuál sale: un jugador puede jugar en varios, uno por organización', () async {
+    final client = _RecordingDioClient({
+      'success': true,
+      'data': {'id': 'p1', 'firstName': 'Ana', 'lastName': 'Pérez', 'email': 'ana@email.com', 'teamId': 'team-b', 'isCaptain': false},
+    });
+
+    final player = await PlayersService(client: client).removeFromTeam('p1', teamId: 'team-a');
+
+    expect(client.calls, ['PATCH /players/p1/remove-from-team?teamId=team-a']);
+    // Le queda el otro equipo: el jugador que devuelve el backend sigue jugando allí.
+    expect(player.teamId, 'team-b');
+  });
 }

@@ -105,9 +105,11 @@ class PlayersService {
     return PlayerModel.fromJson(data);
   }
 
-  Future<PlayerModel> removeFromTeam(String playerId) async {
+  /// Saca al jugador de un equipo; los demás en los que juega (de otras organizaciones) se quedan. [teamId] dice
+  /// de cuál: el backend lo exige solo si el jugador tiene varios que quien llama puede ver.
+  Future<PlayerModel> removeFromTeam(String playerId, {String? teamId}) async {
     final response = await _client.patch(
-      ApiEndpoints.playerRemoveFromTeam(playerId),
+      ApiEndpoints.playerRemoveFromTeam(playerId, teamId: teamId),
     );
     final dynamic raw = response.data;
     final Map<String, dynamic> data =

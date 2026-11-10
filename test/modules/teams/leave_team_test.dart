@@ -39,7 +39,7 @@ class _FakePlayersService extends PlayersService {
   Future<List<PlayerModel>> getByTeamId(String teamId) async => [_player(isCaptain: isCaptain)];
 
   @override
-  Future<PlayerModel> removeFromTeam(String playerId) async {
+  Future<PlayerModel> removeFromTeam(String playerId, {String? teamId}) async {
     if (failsToLeave) throw Exception('sin red');
     leftPlayerIds.add(playerId);
     return _player(teamId: null);
