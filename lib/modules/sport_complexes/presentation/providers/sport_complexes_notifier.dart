@@ -3,17 +3,19 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/datasourc
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/team_events_service.dart';
+import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/domain/event_rules.dart';
 import 'package:sport_platform/modules/sport_complexes/data/datasource/sport_complexes_service.dart';
 import 'package:sport_platform/modules/sport_complexes/domain/complex_overview.dart';
+import 'package:sport_platform/modules/sport_complexes/domain/event_complexes.dart';
 import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
 
 /// De qué complejos se habla: los de los eventos del equipo activo del jugador o todos los que ve.
 enum ComplexesScope { myTeam, all }
 
-/// El estado de la pantalla «Complejos y canchas»: cada complejo con sus canchas. Abre con los complejos donde se juegan
-/// los eventos del equipo activo (el que el jugador eligió en «Equipo»; sin equipo, con todos los que ve) y se vuelve a
-/// armar al cambiarlo ([ActiveTeamNotifier]).
+/// El estado de la pantalla «Complejos y canchas»: cada complejo con sus canchas. Abre con los eventos del equipo activo (el
+/// que el jugador eligió en «Equipo»), cada uno con los complejos donde se juega; sin equipo, con todos los complejos que
+/// ve. Se vuelve a armar al cambiar de equipo ([ActiveTeamNotifier]).
 ///
 /// Los complejos y las canchas se leen una vez por carga; los eventos de cada equipo, una vez por equipo: cambiar de equipo
 /// o de alcance no vuelve a pedir lo que ya se leyó. Descarta la respuesta de una lectura que ya no es la actual, para que
@@ -54,8 +56,8 @@ class SportComplexesNotifier extends ChangeNotifier {
   List<ComplexOverview>? _allOverviews;
   List<CourtModel> _courtsWithoutComplex = const [];
 
-  /// Los complejos donde se juegan los eventos de cada equipo ya leídos, por id de equipo.
-  final Map<String, Set<String>> _complexIdsByTeam = {};
+  /// Los eventos de cada equipo ya leídos, por id de equipo.
+  final Map<String, List<EventModel>> _eventsByTeam = {};
 
   bool _loading = false;
   String? _error;
@@ -77,12 +79,20 @@ class SportComplexesNotifier extends ChangeNotifier {
   /// Todavía no hay nada que enseñar (se está leyendo por primera vez o falló).
   bool get hasNothingYet => _allOverviews == null;
 
-  /// Los complejos de este alcance con sus canchas, por nombre: los de los eventos del equipo activo o todos.
+  /// Los complejos de este alcance con sus canchas, por nombre: los de los eventos del equipo activo (sin repetir) o todos.
   List<ComplexOverview> get overviews {
     final all = _allOverviews ?? const <ComplexOverview>[];
-    final teamId = _scopedTeamId;
-    if (teamId == null) return all;
-    return filterComplexOverviewsByIds(all, _complexIdsByTeam[teamId] ?? const {});
+    final teamEvents = _scopedTeamEvents;
+    if (teamEvents == null) return all;
+    return filterComplexOverviewsByIds(all, sportComplexIdsOfEvents(teamEvents));
+  }
+
+  /// En «Mi equipo», cada evento del equipo con los complejos donde se juega (los más relevantes primero: lo que está en
+  /// curso, lo que viene y lo que ya terminó); los eventos sin complejos no salen. En «Todos» no se agrupa: vacío.
+  List<EventComplexes> get eventGroups {
+    final teamEvents = _scopedTeamEvents;
+    if (teamEvents == null) return const [];
+    return groupComplexesByEvent(teamEvents, _allOverviews ?? const []);
   }
 
   /// Las canchas que no son de ningún complejo; solo se ofrecen en «Todos»: ningún evento las tiene asignadas.
@@ -91,6 +101,12 @@ class SportComplexesNotifier extends ChangeNotifier {
 
   /// El equipo cuyos eventos mandan: el activo en «Mi equipo»; en «Todos» (o sin equipo) ninguno.
   String? get _scopedTeamId => _scope == ComplexesScope.myTeam ? _activeTeam.activeTeamId : null;
+
+  /// Los eventos del equipo que manda, o null si no manda ninguno (o aún no se leyeron: queda vacío hasta entonces).
+  List<EventModel>? get _scopedTeamEvents {
+    final teamId = _scopedTeamId;
+    return teamId == null ? null : _eventsByTeam[teamId] ?? const [];
+  }
 
   /// Lee al jugador (para saber cuál es su equipo activo) y arma la lista desde el principio. Al abrir muestra los
   /// complejos de los eventos de ese equipo (o todos, si no tiene); al actualizar conserva lo que el jugador eligió.
@@ -101,7 +117,7 @@ class SportComplexesNotifier extends ChangeNotifier {
     await _syncActiveTeam();
     _allOverviews = null;
     _courtsWithoutComplex = const [];
-    _complexIdsByTeam.clear();
+    _eventsByTeam.clear();
     if (_isFirstLoad) _scope = hasTeam ? ComplexesScope.myTeam : ComplexesScope.all;
     if (!hasTeam) _scope = ComplexesScope.all;
     _isFirstLoad = false;
@@ -146,15 +162,15 @@ class SportComplexesNotifier extends ChangeNotifier {
     try {
       final catalog = _allOverviews == null ? await _readCatalog() : null;
       final teamId = _scopedTeamId;
-      final teamComplexIds = teamId == null || _complexIdsByTeam.containsKey(teamId)
+      final teamEvents = teamId == null || _eventsByTeam.containsKey(teamId)
           ? null
-          : await _readComplexIdsOfTeam(teamId);
+          : await _teamEventsService.getOfTeam(teamId);
       if (generation != _readGeneration) return;
       if (catalog != null) {
         _allOverviews = catalog.overviews;
         _courtsWithoutComplex = catalog.courtsWithoutComplex;
       }
-      if (teamComplexIds != null) _complexIdsByTeam[teamId!] = teamComplexIds;
+      if (teamEvents != null) _eventsByTeam[teamId!] = teamEvents;
     } catch (_) {
       if (generation != _readGeneration) return;
       _error = _loadErrorKey;
@@ -177,9 +193,6 @@ class SportComplexesNotifier extends ChangeNotifier {
       courtsWithoutComplex: listCourtsWithoutComplex(courts),
     );
   }
-
-  Future<Set<String>> _readComplexIdsOfTeam(String teamId) async =>
-      sportComplexIdsOfEvents(await _teamEventsService.getOfTeam(teamId));
 
   /// Una lectura que termina después de cerrar la pantalla no debe avisar a nadie.
   void _notify() {

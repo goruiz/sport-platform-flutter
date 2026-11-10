@@ -56,8 +56,13 @@ class _FakePlayersService extends PlayersService {
   Future<PlayerModel?> getCurrent() async => player;
 }
 
-EventModel _event(String id, List<String> complexIds) =>
-    eventOf(id: id, startDate: DateTime(2026, 1, 1), endDate: DateTime(2026, 12, 1), sportComplexIds: complexIds);
+EventModel _event(String id, String name, List<String> complexIds) => eventOf(
+      id: id,
+      name: name,
+      startDate: DateTime(2026, 1, 1),
+      endDate: DateTime(2026, 12, 1),
+      sportComplexIds: complexIds,
+    );
 
 const _menuItem = MenuItemModel(id: 'menu-complexes', name: 'Complejos');
 
@@ -74,10 +79,10 @@ PlayerModel _playerIn(List<PlayerTeam> teams) => PlayerModel(
       teams: teams,
     );
 
-/// Tigres juega en el Norte y el Sur; Pumas, en el Este.
+/// Tigres juega la Liga en el Norte y la Copa en el Norte y el Sur; Pumas, un Torneo en el Este.
 final _eventsByTeam = {
-  'tigres': [_event('liga', ['norte']), _event('copa', ['sur'])],
-  'pumas': [_event('torneo', ['este'])],
+  'tigres': [_event('liga', 'Liga de Barrio', ['norte']), _event('copa', 'Copa Quito', ['norte', 'sur'])],
+  'pumas': [_event('torneo', 'Torneo Relámpago', ['este'])],
 };
 
 /// `flutter_test` dibuja el texto con la fuente Ahem (casi el doble de ancha que Roboto): una fila puede «desbordarse» solo
@@ -127,16 +132,20 @@ void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
   tearDown(getIt.reset);
 
-  testWidgets('abre en «Mi equipo»: los complejos de los eventos del equipo, cada uno con sus canchas dentro', (tester) async {
+  testWidgets('abre en «Mi equipo» organizado por evento: cada evento del equipo con sus complejos y canchas', (tester) async {
     await _openComplexes(tester, player: _playerIn([_tigres, _pumas]));
 
     expect(find.byType(SegmentedButton<ComplexesScope>), findsOneWidget);
     expect(find.byType(ActiveTeamPill), findsOneWidget);
-    expect(find.text('Complejo Norte'), findsOneWidget);
+    expect(find.text('Liga de Barrio'), findsOneWidget);
+    expect(find.text('Copa Quito'), findsOneWidget);
     expect(find.text('Complejo Sur'), findsOneWidget);
-    expect(find.text('Cancha Uno'), findsOneWidget);
-    expect(find.text('Cancha Dos'), findsOneWidget);
+    // El Norte es sede de los dos eventos: sale bajo cada uno, con sus canchas.
+    expect(find.text('Complejo Norte'), findsNWidgets(2));
+    expect(find.text('Cancha Uno'), findsNWidgets(2));
+    expect(find.text('Cancha Dos'), findsNWidgets(2));
     expect(find.text('Cancha Alfa'), findsOneWidget);
+    expect(find.text('Torneo Relámpago'), findsNothing);
     // Lo de otros equipos o sin evento no aparece.
     expect(find.text('Complejo Este'), findsNothing);
     expect(find.text('Cancha suelta'), findsNothing);
@@ -147,6 +156,7 @@ void main() {
 
     await _openComplexes(tester, player: _playerIn([_tigres, _pumas]));
 
+    expect(find.text('Torneo Relámpago'), findsOneWidget);
     expect(find.text('Complejo Este'), findsOneWidget);
     expect(find.text('Complejo Norte'), findsNothing);
   });
@@ -159,17 +169,20 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('team-option-pumas')));
     await _pumpFrames(tester);
 
+    expect(find.text('Torneo Relámpago'), findsOneWidget);
     expect(find.text('Complejo Este'), findsOneWidget);
+    expect(find.text('Liga de Barrio'), findsNothing);
     expect(find.text('Complejo Norte'), findsNothing);
     expect(find.text('Complejo Sur'), findsNothing);
   });
 
-  testWidgets('«Todos» muestra todos los complejos y las canchas sin complejo, y deja de mostrar el equipo', (tester) async {
+  testWidgets('«Todos» muestra todos los complejos (sin repetir ni eventos) y las canchas sin complejo, y deja de mostrar el equipo', (tester) async {
     await _openComplexes(tester, player: _playerIn([_tigres, _pumas]));
 
     await tester.tap(_scopeSegment('Todos'));
     await _pumpFrames(tester);
 
+    expect(find.text('Liga de Barrio'), findsNothing);
     expect(find.text('Complejo Este'), findsOneWidget);
     expect(find.text('Complejo Norte'), findsOneWidget);
     expect(find.text('Canchas sin complejo'), findsOneWidget);
@@ -178,7 +191,7 @@ void main() {
   });
 
   testWidgets('si los eventos del equipo no tienen complejos lo dice y ofrece ver todos', (tester) async {
-    await _openComplexes(tester, player: _playerIn([_tigres, _pumas]), eventsByTeam: {'tigres': [_event('liga', const [])]});
+    await _openComplexes(tester, player: _playerIn([_tigres, _pumas]), eventsByTeam: {'tigres': [_event('liga', 'Liga de Barrio', const [])]});
 
     expect(find.text('Sin complejos para tu equipo'), findsOneWidget);
     expect(find.text('Complejo Norte'), findsNothing);
@@ -196,8 +209,19 @@ void main() {
     await tester.enterText(find.byType(TextField), 'alfa');
     await _pumpFrames(tester);
 
+    // Solo el Sur tiene la Cancha Alfa, y solo se queda el evento que se juega en él.
     expect(find.text('Complejo Sur'), findsOneWidget);
+    expect(find.text('Copa Quito'), findsOneWidget);
+    expect(find.text('Liga de Barrio'), findsNothing);
     expect(find.text('Complejo Norte'), findsNothing);
+
+    // Si coincide el nombre de un evento, sale con todos sus complejos.
+    await tester.enterText(find.byType(TextField), 'liga');
+    await _pumpFrames(tester);
+
+    expect(find.text('Liga de Barrio'), findsOneWidget);
+    expect(find.text('Complejo Norte'), findsOneWidget);
+    expect(find.text('Copa Quito'), findsNothing);
 
     await tester.enterText(find.byType(TextField), 'inexistente');
     await _pumpFrames(tester);

@@ -125,6 +125,35 @@ void main() {
     expect(notifier.loading, isFalse);
   });
 
+  test('en «Mi equipo» organiza los complejos por evento: cada evento del equipo con los suyos', () async {
+    await notifier.load();
+
+    final groups = notifier.eventGroups;
+
+    expect(groups.map((group) => group.event.id), ['liga', 'copa']);
+    expect(groups[0].overviews.map((overview) => overview.complex.name), ['Complejo Norte']);
+    // Un complejo donde se juegan dos eventos sale en cada uno (aquí, el Norte), pero `overviews` no lo repite.
+    expect(groups[1].overviews.map((overview) => overview.complex.name), ['Complejo Norte', 'Complejo Sur']);
+    expect(complexNames(), ['Complejo Norte', 'Complejo Sur']);
+  });
+
+  test('en «Todos» no se agrupa por evento', () async {
+    await notifier.load();
+
+    await notifier.selectScope(ComplexesScope.all);
+
+    expect(notifier.eventGroups, isEmpty);
+  });
+
+  test('al elegir otro equipo los eventos agrupados son los del nuevo', () async {
+    await notifier.load();
+
+    activeTeam.select('other');
+    await pumpEventQueue();
+
+    expect(notifier.eventGroups.map((group) => group.event.id), ['torneo']);
+  });
+
   test('en «Mi equipo» no hay canchas sin complejo: ningún evento las tiene asignadas', () async {
     await notifier.load();
 
@@ -188,6 +217,7 @@ void main() {
 
     expect(notifier.scope, ComplexesScope.myTeam);
     expect(notifier.overviews, isEmpty);
+    expect(notifier.eventGroups, isEmpty);
     expect(notifier.error, isNull);
   });
 
