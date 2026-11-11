@@ -9,7 +9,10 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/datasourc
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
 import 'package:sport_platform/modules/players/presentation/pages/join_team_page.dart';
+import 'package:sport_platform/modules/players/presentation/utils/category_refusal.dart';
+import 'package:sport_platform/modules/players/presentation/widgets/category_eligibility_notice.dart';
 import 'package:sport_platform/modules/teams/domain/team_members.dart';
 import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
 import 'package:sport_platform/modules/teams/presentation/widgets/team_switcher.dart';
@@ -75,6 +78,8 @@ class _TeamsPageState extends State<TeamsPage> {
     return _TeamSection(
       team: team,
       isCaptain: membership.isCaptain,
+      cannotPlay: membership.cannotPlay,
+      categoryIssue: membership.categoryIneligibility,
       members: sortCaptainFirst(results[1] as List<PlayerModel>),
     );
   }
@@ -89,6 +94,13 @@ class _TeamsPageState extends State<TeamsPage> {
 
   void _selectTeam(String teamId) {
     setState(() => _activeTeam.select(teamId));
+  }
+
+  /// El aviso de «no puedes jugar» solo pide datos del perfil: se abre el formulario y, si guardó, se vuelve a leer todo (el
+  /// backend juzga de nuevo con los datos nuevos).
+  Future<void> _completeProfile() async {
+    final saved = await openProfileEditor(context);
+    if (saved && mounted) await _reload();
   }
 
   Future<void> _joinWithCode() async {
@@ -214,6 +226,7 @@ class _TeamsPageState extends State<TeamsPage> {
                 section: selected,
                 isLeaving: _isLeaving,
                 onLeave: () => _leaveTeam(data.player, selected),
+                onCompleteProfile: _completeProfile,
               ),
             ),
           ),
@@ -259,9 +272,19 @@ class _TeamSection {
 
   /// Si el jugador es capitán de ESTE equipo (puede serlo de uno y de otro no).
   final bool isCaptain;
+
+  /// El jugador está en este equipo pero la categoría no lo deja jugar (género, edad o perfil incompleto), y por qué.
+  final bool cannotPlay;
+  final CategoryEligibilityIssue? categoryIssue;
   final List<PlayerModel> members;
 
-  const _TeamSection({required this.team, required this.isCaptain, required this.members});
+  const _TeamSection({
+    required this.team,
+    required this.isCaptain,
+    required this.members,
+    this.cannotPlay = false,
+    this.categoryIssue,
+  });
 }
 
 /// Al cambiar de equipo, el detalle anterior se desvanece y el nuevo entra con un leve ascenso; la altura se ajusta
@@ -302,12 +325,14 @@ class _TeamDetail extends StatelessWidget {
   final _TeamSection section;
   final bool isLeaving;
   final VoidCallback onLeave;
+  final VoidCallback onCompleteProfile;
 
   const _TeamDetail({
     super.key,
     required this.section,
     required this.isLeaving,
     required this.onLeave,
+    required this.onCompleteProfile,
   });
 
   @override
@@ -315,6 +340,11 @@ class _TeamDetail extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // Sigue en la plantilla pero la categoría no lo deja jugar: se le dice por qué y qué puede hacer.
+        if (section.cannotPlay) ...[
+          CategoryEligibilityNotice(issue: section.categoryIssue, onCompleteProfile: onCompleteProfile),
+          const SizedBox(height: AppSpacing.xl),
+        ],
         Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.md),
           child: Text('mobile.teams.players'.tr(), style: AppTextStyles.sectionTitle),

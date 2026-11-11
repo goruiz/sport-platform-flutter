@@ -8,7 +8,9 @@ import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/modules/players/data/datasource/join_team_service.dart';
+import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
 import 'package:sport_platform/modules/players/domain/enums/join_team_error.dart';
+import 'package:sport_platform/modules/players/presentation/utils/category_refusal.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
 
@@ -54,9 +56,15 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
       Navigator.of(context).pop(true);
     } catch (error) {
       if (!mounted) return;
+      setState(() => _joining = false);
+      // La categoría del equipo puede no admitir a quien lo intenta (género, edad): se le explica por qué.
+      final categoryIssue = CategoryEligibilityIssue.fromException(error);
+      if (categoryIssue != null) {
+        await showCategoryRefusal(context, categoryIssue);
+        return;
+      }
       final reason = JoinTeamError.fromException(error);
       AppSnackbar.error(context, (reason?.translationKey ?? 'join_team.errors.generic').tr());
-      setState(() => _joining = false);
     }
   }
 

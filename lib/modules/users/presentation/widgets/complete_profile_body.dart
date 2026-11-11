@@ -2,8 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/profile_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/modules/users/domain/enums/gender.dart';
 import 'package:sport_platform/modules/users/domain/name_rules.dart';
 import 'package:sport_platform/modules/users/presentation/utils/person_name_input.dart';
+import 'package:sport_platform/modules/users/presentation/widgets/birth_date_field.dart';
+import 'package:sport_platform/modules/users/presentation/widgets/gender_field.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
 
 class CompleteProfileBody extends StatelessWidget {
@@ -13,6 +16,16 @@ class CompleteProfileBody extends StatelessWidget {
   final TextEditingController lastNameController;
   final TextEditingController secondLastNameController;
   final TextEditingController usernameController;
+
+  /// El género y la fecha de nacimiento no son de texto: la pantalla guarda su valor y este formulario solo los dibuja.
+  final Gender? gender;
+  final ValueChanged<Gender> onGenderChanged;
+  final DateTime? birthDate;
+  final ValueChanged<DateTime> onBirthDateChanged;
+
+  /// Lo que el backend dijo de cada uno, ya traducido (null si no dijo nada).
+  final String? genderServerError;
+  final String? birthDateServerError;
   final bool isLoading;
   final VoidCallback onSubmit;
   final VoidCallback? onSkip;
@@ -26,6 +39,12 @@ class CompleteProfileBody extends StatelessWidget {
     required this.lastNameController,
     required this.secondLastNameController,
     required this.usernameController,
+    required this.gender,
+    required this.onGenderChanged,
+    required this.birthDate,
+    required this.onBirthDateChanged,
+    this.genderServerError,
+    this.birthDateServerError,
     required this.isLoading,
     required this.onSubmit,
     this.onSkip,
@@ -217,6 +236,10 @@ class CompleteProfileBody extends StatelessWidget {
               return null;
             },
           ),
+          const SizedBox(height: 16),
+          GenderField(value: gender, onChanged: onGenderChanged, serverError: genderServerError),
+          const SizedBox(height: 16),
+          BirthDateField(value: birthDate, onChanged: onBirthDateChanged, serverError: birthDateServerError),
         ],
       ),
     );

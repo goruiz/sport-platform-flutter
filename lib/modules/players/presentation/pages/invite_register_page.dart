@@ -7,9 +7,14 @@ import 'package:sport_platform/modules/auth/data/datasource/login_service.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
 import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/modules/players/data/datasource/players_auth_service.dart';
+import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
 import 'package:sport_platform/modules/players/domain/enums/team_invitation_error.dart';
+import 'package:sport_platform/modules/users/domain/enums/gender.dart';
 import 'package:sport_platform/modules/users/domain/name_rules.dart';
+import 'package:sport_platform/modules/users/domain/profile_field_errors.dart';
 import 'package:sport_platform/modules/users/presentation/utils/person_name_input.dart';
+import 'package:sport_platform/modules/users/presentation/widgets/birth_date_field.dart';
+import 'package:sport_platform/modules/users/presentation/widgets/gender_field.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
@@ -31,6 +36,10 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
   final _passwordCtrl = TextEditingController();
   final _confirmPasswordCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
+
+  // El género y la fecha de nacimiento no son de texto: la categoría del equipo que invita puede pedirlos.
+  Gender? _gender;
+  DateTime? _birthDate;
 
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
@@ -62,6 +71,8 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
         password: _passwordCtrl.text,
         inviteToken: widget.inviteToken,
         phone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
+        gender: _gender,
+        birthDate: _birthDate,
       );
       final isSignedIn = await _signInWithNewAccount();
       if (!mounted) return;
@@ -78,9 +89,16 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
   }
 
   // El backend explica por qué rechaza el enlace con un código; sin código, un 409 es que el correo ya tiene cuenta.
+  // La categoría del equipo puede no admitir a quien se registra (género, edad): se juzga antes de crear la cuenta, así que
+  // no queda nada creado y puede corregir lo que dijo.
   String _registerErrorKey(DioException error) {
     final invitationError = TeamInvitationError.fromException(error);
     if (invitationError != null) return invitationError.registrationTranslationKey;
+    final categoryIssue = CategoryEligibilityIssue.fromException(error);
+    if (categoryIssue != null) return categoryIssue.refusalKey;
+    final fieldErrors = ProfileFieldErrors.fromException(error);
+    final dataError = fieldErrors.gender ?? fieldErrors.birthDate;
+    if (dataError != null) return dataError.translationKey;
     if (error.response?.statusCode == 409) return 'invite_register.error_email_taken';
     return 'invite_register.error_generic';
   }
@@ -228,6 +246,10 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
               ),
             ],
           ),
+          const SizedBox(height: 16),
+          GenderField(value: _gender, onChanged: (gender) => setState(() => _gender = gender)),
+          const SizedBox(height: 16),
+          BirthDateField(value: _birthDate, onChanged: (date) => setState(() => _birthDate = date)),
           const SizedBox(height: 16),
           SportTextField(
             controller: _emailCtrl,

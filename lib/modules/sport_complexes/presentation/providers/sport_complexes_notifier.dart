@@ -14,8 +14,8 @@ import 'package:sport_platform/modules/teams/presentation/providers/active_team_
 enum ComplexesScope { myTeam, all }
 
 /// El estado de la pantalla «Complejos y canchas»: cada complejo con sus canchas. Abre con los eventos del equipo activo (el
-/// que el jugador eligió en «Equipo»), cada uno con los complejos donde se juega; sin equipo, con todos los complejos que
-/// ve. Se vuelve a armar al cambiar de equipo ([ActiveTeamNotifier]).
+/// que el jugador eligió en «Equipo»): un selector de esos eventos y, del elegido, los complejos donde se juega; sin
+/// equipo, con todos los complejos que ve. Se vuelve a armar al cambiar de equipo ([ActiveTeamNotifier]).
 ///
 /// Los complejos y las canchas se leen una vez por carga; los eventos de cada equipo, una vez por equipo: cambiar de equipo
 /// o de alcance no vuelve a pedir lo que ya se leyó. Descarta la respuesta de una lectura que ya no es la actual, para que
@@ -59,6 +59,9 @@ class SportComplexesNotifier extends ChangeNotifier {
   /// Los eventos de cada equipo ya leídos, por id de equipo.
   final Map<String, List<EventModel>> _eventsByTeam = {};
 
+  /// El evento que el jugador eligió en el selector; null mientras no haya elegido (se muestra el primero).
+  String? _selectedEventId;
+
   bool _loading = false;
   String? _error;
 
@@ -93,6 +96,22 @@ class SportComplexesNotifier extends ChangeNotifier {
     final teamEvents = _scopedTeamEvents;
     if (teamEvents == null) return const [];
     return groupComplexesByEvent(teamEvents, _allOverviews ?? const []);
+  }
+
+  /// El evento elegido en el selector con sus complejos y canchas: el que el jugador eligió si sigue entre los del equipo
+  /// (también al cambiar de equipo, si el otro juega en él) y, si no, el primero (el más relevante). Null sin eventos.
+  EventComplexes? get selectedEventGroup {
+    final groups = eventGroups;
+    for (final group in groups) {
+      if (group.event.id == _selectedEventId) return group;
+    }
+    return groups.isEmpty ? null : groups.first;
+  }
+
+  void selectEvent(String eventId) {
+    if (eventId == selectedEventGroup?.event.id) return;
+    _selectedEventId = eventId;
+    _notify();
   }
 
   /// Las canchas que no son de ningún complejo; solo se ofrecen en «Todos»: ningún evento las tiene asignadas.

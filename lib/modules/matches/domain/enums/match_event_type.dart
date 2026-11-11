@@ -7,7 +7,10 @@ enum MatchEventType {
   assist('ASSIST', Icons.compare_arrows, AppColors.info),
   yellowCard('YELLOW_CARD', Icons.square_rounded, AppColors.cardYellow),
   redCard('RED_CARD', Icons.square_rounded, AppColors.cardRed),
-  foul('FOUL', Icons.front_hand_outlined, AppColors.warning);
+  foul('FOUL', Icons.front_hand_outlined, AppColors.warning),
+
+  /// Un cambio: entra el jugador de la línea y sale [MatchEventModel.replacedPlayerName]. No suma a las estadísticas de nadie.
+  substitution('SUBSTITUTION', Icons.swap_vert, AppColors.rescheduled);
 
   const MatchEventType(this.apiValue, this.icon, this.color);
 

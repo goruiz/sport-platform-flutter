@@ -233,7 +233,9 @@
         "error_type": "Use a JPG, PNG or WebP photo.",
         "error_too_large": "The photo is too large. The maximum is {} MB.",
         "error_no_player": "You don't have a player profile to save the photo to yet."
-      }
+      },
+      "gender": "Gender",
+      "birth_date": "Date of birth"
     },
     "complexes": {
       "load_error": "The complexes could not be loaded.",
@@ -255,7 +257,8 @@
       "empty_mine_title": "No complexes for your team",
       "empty_mine_subtitle": "The complexes where your team’s events are played will appear here. In the meantime, you can see all the complexes.",
       "see_all": "See all complexes",
-      "courts_without_complex": "Courts without a complex"
+      "courts_without_complex": "Courts without a complex",
+      "pick_event": "Event"
     }
   },
   "session": {
@@ -290,7 +293,19 @@
     "skip_info": "You can complete your profile later from settings.",
     "save_success": "Profile completed successfully",
     "save_error": "Could not save your profile. Please try again.",
-    "name_invalid": "Letters only. Spaces, hyphens and apostrophes are allowed; no numbers or symbols."
+    "name_invalid": "Letters only. Spaces, hyphens and apostrophes are allowed; no numbers or symbols.",
+    "gender": "Gender *",
+    "birth_date": "Date of birth *",
+    "birth_date_future": "The date cannot be in the future.",
+    "birth_date_too_old": "Check the date: it is too far back.",
+    "gender_options": {
+      "MALE": "Male",
+      "FEMALE": "Female"
+    },
+    "errors": {
+      "INVALID_GENDER": "Choose one of the available genders.",
+      "INVALID_BIRTH_DATE": "The date of birth is not valid."
+    }
   },
   "settings": {
     "select_language": "Select language",
@@ -704,8 +719,10 @@
       "ASSIST": "Assist",
       "YELLOW_CARD": "Yellow card",
       "RED_CARD": "Red card",
-      "FOUL": "Foul"
-    }
+      "FOUL": "Foul",
+      "SUBSTITUTION": "Substitution"
+    },
+    "substitution_line": "In: {player_in} · Out: {player_out}"
   },
   "match_detail": {
     "title": "Match details",
@@ -872,5 +889,26 @@
       "EMAIL_NOT_VERIFIED": "Confirm your email before joining a team.",
       "TOO_MANY_REQUESTS": "Too many attempts. Wait a minute."
     }
+  },
+  "category_eligibility": {
+    "notice_title": "You cannot play for this team for now",
+    "notice": {
+      "CATEGORY_GENDER_NOT_ALLOWED": "This team's category is for another gender. You stay on the roster, but no goals or cards will be recorded for you.",
+      "CATEGORY_GENDER_REQUIRED": "This team's category asks for your gender and you have not given it yet. Complete it in your profile to be able to play.",
+      "CATEGORY_BIRTH_DATE_REQUIRED": "This team's category asks for an age and you have not given your date of birth yet. Complete it in your profile to be able to play.",
+      "CATEGORY_TOO_YOUNG": "You are younger than the minimum age of this team's category. You stay on the roster, but no goals or cards will be recorded for you.",
+      "CATEGORY_TOO_OLD": "You are older than the maximum age of this team's category. You stay on the roster, but no goals or cards will be recorded for you.",
+      "UNKNOWN": "You do not meet what this team's category asks for, so you cannot play for it."
+    },
+    "refused_title": "Your profile is missing information",
+    "refused": {
+      "CATEGORY_GENDER_NOT_ALLOWED": "You cannot join this team: its category is for another gender.",
+      "CATEGORY_GENDER_REQUIRED": "This team's category asks for your gender and you have not given it yet. Complete your profile and try again.",
+      "CATEGORY_BIRTH_DATE_REQUIRED": "This team's category asks for an age and you have not given your date of birth yet. Complete your profile and try again.",
+      "CATEGORY_TOO_YOUNG": "You cannot join this team: you are younger than the minimum age of its category.",
+      "CATEGORY_TOO_OLD": "You cannot join this team: you are older than the maximum age of its category."
+    },
+    "complete_profile": "Complete my profile",
+    "not_now": "Not now"
   }
 }

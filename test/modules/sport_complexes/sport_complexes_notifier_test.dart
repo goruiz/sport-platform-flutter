@@ -154,6 +154,77 @@ void main() {
     expect(notifier.eventGroups.map((group) => group.event.id), ['torneo']);
   });
 
+  group('el evento elegido en el selector', () {
+    List<String> selectedComplexNames() =>
+        notifier.selectedEventGroup!.overviews.map((overview) => overview.complex.name).toList();
+
+    test('por defecto es el primero (el más relevante) y sus complejos son los de ese evento', () async {
+      await notifier.load();
+
+      expect(notifier.selectedEventGroup?.event.id, 'liga');
+      expect(selectedComplexNames(), ['Complejo Norte']);
+    });
+
+    test('elegir otro evento muestra sus complejos con sus canchas', () async {
+      await notifier.load();
+
+      notifier.selectEvent('copa');
+
+      expect(notifier.selectedEventGroup?.event.id, 'copa');
+      expect(selectedComplexNames(), ['Complejo Norte', 'Complejo Sur']);
+      expect(notifier.selectedEventGroup!.overviews.first.courts.map((court) => court.name), ['Cancha 1', 'Cancha 2']);
+    });
+
+    test('elegir el que ya está elegido no avisa a nadie', () async {
+      await notifier.load();
+      var notifications = 0;
+      notifier.addListener(() => notifications++);
+
+      notifier.selectEvent('liga');
+
+      expect(notifications, 0);
+    });
+
+    test('un evento que no es del equipo no se puede elegir: queda el primero', () async {
+      await notifier.load();
+
+      notifier.selectEvent('torneo');
+
+      expect(notifier.selectedEventGroup?.event.id, 'liga');
+    });
+
+    test('al cambiar de equipo pasa al primer evento del nuevo si el otro equipo no juega en el elegido', () async {
+      await notifier.load();
+      notifier.selectEvent('copa');
+
+      activeTeam.select('other');
+      await pumpEventQueue();
+
+      expect(notifier.selectedEventGroup?.event.id, 'torneo');
+    });
+
+    test('al cambiar de equipo sigue elegido el mismo evento si el otro equipo también juega en él', () async {
+      teamEvents.eventsByTeam['other'] = [_event('torneo', ['este']), _event('copa', ['norte', 'sur'])];
+      await notifier.load();
+      notifier.selectEvent('copa');
+
+      activeTeam.select('other');
+      await pumpEventQueue();
+
+      expect(notifier.selectedEventGroup?.event.id, 'copa');
+    });
+
+    test('sin eventos con complejos no hay evento elegido, ni en «Todos»', () async {
+      teamEvents.eventsByTeam['home']!.clear();
+
+      await notifier.load();
+      expect(notifier.selectedEventGroup, isNull);
+
+      await notifier.selectScope(ComplexesScope.all);
+      expect(notifier.selectedEventGroup, isNull);
+    });
+  });
+
   test('en «Mi equipo» no hay canchas sin complejo: ningún evento las tiene asignadas', () async {
     await notifier.load();
 

@@ -30,7 +30,7 @@ void main() {
   List<String> complexNames(EventComplexes group) => group.overviews.map((overview) => overview.complex.name).toList();
 
   group('groupComplexesByEvent', () {
-    test('organiza los complejos por evento, en el orden de los eventos', () {
+    test('agrupa los complejos por evento, en el orden de los eventos', () {
       final groups = groupComplexesByEvent(
         [_event('copa', 'Copa', ['sur']), _event('liga', 'Liga', ['norte', 'este'])],
         overviews,
@@ -74,37 +74,6 @@ void main() {
 
     test('sin eventos no hay nada', () {
       expect(groupComplexesByEvent(const [], overviews), isEmpty);
-    });
-  });
-
-  group('filterEventComplexes', () {
-    final groups = groupComplexesByEvent(
-      [_event('liga', 'Liga de Barrio', ['norte', 'sur']), _event('copa', 'Copa Quito', ['este'])],
-      overviews,
-    );
-
-    List<String> eventIdsFor(String query) => filterEventComplexes(groups, query).map((group) => group.event.id).toList();
-
-    test('sin búsqueda deja todo', () {
-      expect(filterEventComplexes(groups, '  '), same(groups));
-    });
-
-    test('si coincide el nombre del evento sale con todos sus complejos, sin distinguir mayúsculas ni tildes', () {
-      final result = filterEventComplexes(groups, 'BARRIÓ');
-
-      expect(result.map((group) => group.event.id), ['liga']);
-      expect(complexNames(result.single), ['Complejo Norte', 'Complejo Sur']);
-    });
-
-    test('si no, deja solo los complejos que coinciden (por nombre, dirección o cancha) y los eventos que se quedan con alguno', () {
-      expect(eventIdsFor('principal'), ['liga']);
-      expect(complexNames(filterEventComplexes(groups, 'principal').single), ['Complejo Norte']);
-      expect(complexNames(filterEventComplexes(groups, 'bombonera').single), ['Complejo Sur']);
-      expect(eventIdsFor('este'), ['copa']);
-    });
-
-    test('sin coincidencias no deja ningún evento', () {
-      expect(eventIdsFor('inexistente'), isEmpty);
     });
   });
 }

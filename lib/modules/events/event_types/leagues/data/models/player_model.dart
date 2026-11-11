@@ -1,3 +1,7 @@
+import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
+import 'package:sport_platform/modules/users/domain/birth_date_rules.dart';
+import 'package:sport_platform/modules/users/domain/enums/gender.dart';
+
 /// Un equipo en el que juega el jugador. Un jugador puede jugar en varios, pero solo en uno por organización.
 class PlayerTeam {
   final String teamId;
@@ -9,12 +13,24 @@ class PlayerTeam {
   /// Si es el capitán de ESTE equipo (lo designa el administrador; hay uno por equipo).
   final bool isCaptain;
 
+  /// Falso cuando el jugador no cumple lo que pide la categoría del equipo (género, edad): sigue en la plantilla pero no
+  /// puede jugar. Lo calcula el backend (la edad cambia cada día), la app solo lo muestra.
+  final bool eligibleForCategory;
+
+  /// Por qué no cumple; null cuando cumple (o cuando el backend dice un motivo que esta versión no conoce).
+  final CategoryEligibilityIssue? categoryIneligibility;
+
   const PlayerTeam({
     required this.teamId,
     required this.teamName,
     this.organizationId,
     this.isCaptain = false,
+    this.eligibleForCategory = true,
+    this.categoryIneligibility,
   });
+
+  /// El jugador está en el equipo pero la categoría no lo deja jugar.
+  bool get cannotPlay => !eligibleForCategory;
 
   factory PlayerTeam.fromJson(Map<String, dynamic> json) {
     return PlayerTeam(
@@ -22,6 +38,9 @@ class PlayerTeam {
       teamName: json['teamName']?.toString() ?? '',
       organizationId: json['organizationId']?.toString(),
       isCaptain: json['isCaptain'] == true,
+      // Un backend anterior no lo manda: sin dato, el jugador puede jugar.
+      eligibleForCategory: json['eligibleForCategory'] != false,
+      categoryIneligibility: CategoryEligibilityIssue.fromCode(json['categoryIneligibility']?.toString()),
     );
   }
 
@@ -30,6 +49,8 @@ class PlayerTeam {
         'teamName': teamName,
         if (organizationId != null) 'organizationId': organizationId,
         if (isCaptain) 'isCaptain': isCaptain,
+        if (!eligibleForCategory) 'eligibleForCategory': false,
+        if (categoryIneligibility != null) 'categoryIneligibility': categoryIneligibility!.code,
       };
 }
 
@@ -41,6 +62,10 @@ class PlayerModel {
   final String? phone;
   final String? profilePhotoUrl;
   final String? status;
+
+  /// Lo que las categorías pueden pedir. Null mientras el jugador no los diga.
+  final Gender? gender;
+  final DateTime? birthDate;
 
   /// El equipo que el backend da por «el suyo»: el último al que entró el jugador. Quien juega en varios los tiene todos en
   /// [teams] (úsese [allTeams], que además cubre un backend que aún no los manda).
@@ -61,6 +86,8 @@ class PlayerModel {
     this.phone,
     this.profilePhotoUrl,
     this.status,
+    this.gender,
+    this.birthDate,
     this.teamId,
     this.teamName,
     this.isCaptain = false,
@@ -90,6 +117,8 @@ class PlayerModel {
       phone: json['phone']?.toString(),
       profilePhotoUrl: json['profilePhotoUrl']?.toString(),
       status: json['status']?.toString(),
+      gender: Gender.fromApi(json['gender']?.toString()),
+      birthDate: parseBirthDate(json['birthDate']),
       teamId: json['teamId']?.toString(),
       teamName: json['teamName']?.toString(),
       isCaptain: json['isCaptain'] == true,
@@ -107,6 +136,8 @@ class PlayerModel {
         if (phone != null) 'phone': phone,
         if (profilePhotoUrl != null) 'profilePhotoUrl': profilePhotoUrl,
         if (status != null) 'status': status,
+        if (gender != null) 'gender': gender!.apiValue,
+        if (birthDate != null) 'birthDate': formatBirthDateForApi(birthDate!),
         if (teamId != null) 'teamId': teamId,
         if (teamName != null) 'teamName': teamName,
         if (isCaptain) 'isCaptain': isCaptain,
@@ -121,6 +152,8 @@ class PlayerModel {
     String? phone,
     String? profilePhotoUrl,
     String? status,
+    Gender? gender,
+    DateTime? birthDate,
     String? teamId,
     String? teamName,
     bool? isCaptain,
@@ -134,6 +167,8 @@ class PlayerModel {
         phone: phone ?? this.phone,
         profilePhotoUrl: profilePhotoUrl ?? this.profilePhotoUrl,
         status: status ?? this.status,
+        gender: gender ?? this.gender,
+        birthDate: birthDate ?? this.birthDate,
         teamId: teamId ?? this.teamId,
         teamName: teamName ?? this.teamName,
         isCaptain: isCaptain ?? this.isCaptain,

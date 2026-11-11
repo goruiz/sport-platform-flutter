@@ -2,6 +2,7 @@ import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/network/response_parser.dart';
 import 'package:sport_platform/modules/users/data/models/user_model.dart';
+import 'package:sport_platform/modules/users/domain/birth_date_rules.dart';
 import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
 import 'package:sport_platform/modules/users/domain/entities/user_profile_update.dart';
 import 'package:sport_platform/modules/users/domain/repositories/i_user_profile_repository.dart';
@@ -20,6 +21,12 @@ class UserProfileService implements IUserProfileRepository {
     return UserModel.fromJson(ResponseParser.toMap(response.data));
   }
 
+  @override
+  Future<UserEntity> getCurrentAccount() async {
+    final response = await _client.get(ApiEndpoints.currentAccount);
+    return UserModel.fromJson(ResponseParser.toMap(response.data));
+  }
+
   // El backend ignora los campos nulos al actualizar: los opcionales vacíos se omiten
   // en vez de enviarse como "", que sí sobrescribirían el valor guardado.
   Map<String, dynamic> _toRequestBody(UserProfileUpdate update) => {
@@ -29,6 +36,8 @@ class UserProfileService implements IUserProfileRepository {
         if (_hasText(update.secondLastName))
           'secondLastName': update.secondLastName,
         'username': update.username,
+        if (update.gender != null) 'gender': update.gender!.apiValue,
+        if (update.birthDate != null) 'birthDate': formatBirthDateForApi(update.birthDate!),
       };
 
   bool _hasText(String? value) => value != null && value.isNotEmpty;

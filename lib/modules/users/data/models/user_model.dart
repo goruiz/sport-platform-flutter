@@ -1,4 +1,6 @@
+import 'package:sport_platform/modules/users/domain/birth_date_rules.dart';
 import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
+import 'package:sport_platform/modules/users/domain/enums/gender.dart';
 
 class UserModel extends UserEntity {
   const UserModel({
@@ -9,6 +11,8 @@ class UserModel extends UserEntity {
     super.secondLastName,
     super.username,
     super.email,
+    super.gender,
+    super.birthDate,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
@@ -19,5 +23,7 @@ class UserModel extends UserEntity {
         secondLastName: json['secondLastName'] as String?,
         username: json['username'] as String?,
         email: json['email'] as String?,
+        gender: Gender.fromApi(json['gender'] as String?),
+        birthDate: parseBirthDate(json['birthDate']),
       );
 }

@@ -3,24 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/courts/presentation/pages/court_detail_page.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/sport_complexes/domain/complex_overview.dart';
-import 'package:sport_platform/modules/sport_complexes/domain/event_complexes.dart';
 import 'package:sport_platform/modules/sport_complexes/presentation/pages/sport_complex_detail_page.dart';
 import 'package:sport_platform/modules/sport_complexes/presentation/providers/sport_complexes_notifier.dart';
 import 'package:sport_platform/modules/sport_complexes/presentation/widgets/complex_section_card.dart';
-import 'package:sport_platform/modules/sport_complexes/presentation/widgets/event_section_header.dart';
+import 'package:sport_platform/modules/sport_complexes/presentation/widgets/selected_event_info.dart';
 import 'package:sport_platform/modules/teams/presentation/widgets/active_team_pill.dart';
 import 'package:sport_platform/shared/widgets/app_search_field.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
-/// Los complejos deportivos con sus canchas dentro, en una sola pantalla: por defecto **organizados por evento**, cada
-/// evento del equipo activo del jugador (el que eligió en «Equipo»; con varios equipos se cambia desde aquí) con los
-/// complejos donde se juega, o, a elección, todos los de su organización. Un complejo se abre para ver su mapa y una
-/// cancha, para ver sus horarios.
+/// Los complejos deportivos con sus canchas dentro, en una sola pantalla: por defecto **según el evento elegido**, entre
+/// los eventos en que compite el equipo activo del jugador (el que eligió en «Equipo»; con varios equipos se cambia desde
+/// aquí), o, a elección, todos los de su organización. Un complejo se abre para ver su mapa y una cancha, para ver sus
+/// horarios.
 class SportComplexesPage extends StatefulWidget {
   final MenuItemModel item;
 
@@ -126,13 +126,54 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
                 showSelectedIcon: false,
               ),
             ),
-            if (_notifier.scope == ComplexesScope.myTeam)
+            if (_notifier.scope == ComplexesScope.myTeam) ...[
               const ActiveTeamPill(
                 margin: EdgeInsets.fromLTRB(AppSpacing.page, AppSpacing.md, AppSpacing.page, 0),
               ),
+              _buildEventSelector(),
+            ],
           ],
         );
       },
+    );
+  }
+
+  /// Los eventos en que compite el equipo (los que tienen complejos asignados), para elegir de cuál se ven los complejos y
+  /// las canchas, con cuándo se juega y en qué estado está el elegido. Sin eventos no se dibuja.
+  Widget _buildEventSelector() {
+    final selected = _notifier.selectedEventGroup;
+    if (selected == null) return const SizedBox.shrink();
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(AppSpacing.page, AppSpacing.md, AppSpacing.page, 0),
+          child: DropdownButtonFormField<String>(
+            // La clave recrea el campo cuando cambia el evento elegido (al cambiar de equipo, por ejemplo): `initialValue`
+            // solo vale al crearlo.
+            key: ValueKey(selected.event.id),
+            initialValue: selected.event.id,
+            isExpanded: true,
+            dropdownColor: AppColors.sheetBackground,
+            style: const TextStyle(color: AppColors.white),
+            decoration: AppInputDecoration.standard('mobile.complexes.pick_event'.tr()),
+            items: [
+              for (final group in _notifier.eventGroups)
+                DropdownMenuItem(
+                  value: group.event.id,
+                  child: Text(
+                    group.event.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: AppColors.white),
+                  ),
+                ),
+            ],
+            onChanged: (eventId) {
+              if (eventId != null) _notifier.selectEvent(eventId);
+            },
+          ),
+        ),
+        SelectedEventInfo(event: selected.event),
+      ],
     );
   }
 
@@ -143,16 +184,16 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
     final error = _notifier.error;
     if (error != null) return ErrorRetry(message: error.tr(), onRetry: _notifier.load);
 
-    final overviews = _notifier.overviews;
+    // «Mi equipo» muestra los complejos del evento elegido; «Todos», todos los complejos, sin repetir ninguno.
+    final overviews = _notifier.scope == ComplexesScope.myTeam
+        ? _notifier.selectedEventGroup?.overviews ?? const <ComplexOverview>[]
+        : _notifier.overviews;
     final looseCourts = _notifier.courtsWithoutComplex;
     if (overviews.isEmpty && looseCourts.isEmpty) return _buildNothingToShow();
 
-    // «Mi equipo» se organiza por evento (cada uno con sus complejos); «Todos», por complejo, sin repetir ninguno.
-    final isTeamScope = _notifier.scope == ComplexesScope.myTeam;
-    final visibleGroups = isTeamScope ? filterEventComplexes(_notifier.eventGroups, _query) : const <EventComplexes>[];
-    final visibleOverviews = isTeamScope ? const <ComplexOverview>[] : filterComplexOverviews(overviews, _query);
+    final visibleOverviews = filterComplexOverviews(overviews, _query);
     final visibleLooseCourts = filterCourtsByQuery(looseCourts, _query);
-    if (visibleGroups.isEmpty && visibleOverviews.isEmpty && visibleLooseCourts.isEmpty) {
+    if (visibleOverviews.isEmpty && visibleLooseCourts.isEmpty) {
       return _scrollableEmptyState(
         EmptyState(
           icon: Icons.search_off,
@@ -168,7 +209,6 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.only(bottom: AppSpacing.listBottom),
         children: [
-          for (final group in visibleGroups) ..._buildEventSection(group),
           for (final overview in visibleOverviews) _buildComplexCard(overview),
           if (visibleLooseCourts.isNotEmpty)
             ComplexSectionCard(
@@ -181,12 +221,6 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
       ),
     );
   }
-
-  /// Un evento del equipo con los complejos donde se juega. Un complejo donde se juegan varios eventos sale en cada uno.
-  List<Widget> _buildEventSection(EventComplexes group) => [
-        EventSectionHeader(event: group.event),
-        for (final overview in group.overviews) _buildComplexCard(overview),
-      ];
 
   Widget _buildComplexCard(ComplexOverview overview) {
     final complex = overview.complex;

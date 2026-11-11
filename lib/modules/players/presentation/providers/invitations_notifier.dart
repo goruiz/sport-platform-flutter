@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sport_platform/core/services/session_service.dart';
 import 'package:sport_platform/modules/players/data/datasource/team_invitations_service.dart';
 import 'package:sport_platform/modules/players/data/models/team_invitation_model.dart';
+import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
 import 'package:sport_platform/modules/players/domain/enums/team_invitation_error.dart';
 
 /// Las invitaciones pendientes del usuario. Lo comparten el inicio (tarjeta y campana con su
@@ -62,8 +63,10 @@ class InvitationsNotifier extends ChangeNotifier {
       return null;
     } catch (error) {
       final reason = TeamInvitationError.fromException(error);
+      // Aceptar también puede rechazarlo la categoría del equipo (género, edad): su texto sale de otro grupo.
+      final categoryReason = CategoryEligibilityIssue.fromException(error);
       await load();
-      return reason?.translationKey ?? _genericErrorKey;
+      return reason?.translationKey ?? categoryReason?.refusalKey ?? _genericErrorKey;
     }
   }
 

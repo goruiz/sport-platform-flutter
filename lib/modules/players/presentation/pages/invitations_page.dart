@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/players/data/models/team_invitation_model.dart';
+import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
+import 'package:sport_platform/modules/players/presentation/utils/category_refusal.dart';
 import 'package:sport_platform/modules/players/presentation/providers/invitations_notifier.dart';
 import 'package:sport_platform/modules/players/presentation/widgets/invitation_tile.dart';
 import 'package:sport_platform/shared/mixins/snack_mixin.dart';
@@ -38,12 +40,23 @@ class _InvitationsPageState extends State<InvitationsPage> with SnackMixin {
     if (!mounted) return;
     setState(() => _busyIds.remove(invitation.id));
     if (failureKey != null) {
-      showSnack(failureKey.tr(), isError: true);
+      await _explainFailure(failureKey);
       return;
     }
     showSnack(accept
         ? 'invitations.accepted'.tr(args: [invitation.teamName ?? ''])
         : 'invitations.declined'.tr());
+  }
+
+  /// Un «no» de la categoría del equipo se explica con su propio aviso (y, si solo faltan datos del perfil, con el camino
+  /// para completarlos); cualquier otro fallo, con su texto.
+  Future<void> _explainFailure(String failureKey) async {
+    final categoryIssue = CategoryEligibilityIssue.fromRefusalKey(failureKey);
+    if (categoryIssue == null) {
+      showSnack(failureKey.tr(), isError: true);
+      return;
+    }
+    await showCategoryRefusal(context, categoryIssue);
   }
 
   @override

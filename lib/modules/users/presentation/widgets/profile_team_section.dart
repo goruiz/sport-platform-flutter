@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/presentation/widgets/category_eligibility_notice.dart';
 import 'package:sport_platform/modules/users/presentation/providers/profile_summary_notifier.dart';
 import 'package:sport_platform/modules/users/presentation/widgets/profile_section.dart';
 import 'package:sport_platform/shared/widgets/skeleton_box.dart';
@@ -13,11 +14,15 @@ class ProfileTeamSection extends StatelessWidget {
   final PlayerModel? player;
   final VoidCallback onRetry;
 
+  /// Abre el formulario del perfil: lo ofrece el aviso de un equipo donde el jugador no puede jugar por faltarle datos.
+  final VoidCallback? onCompleteProfile;
+
   const ProfileTeamSection({
     super.key,
     required this.status,
     required this.player,
     required this.onRetry,
+    this.onCompleteProfile,
   });
 
   @override
@@ -40,15 +45,27 @@ class ProfileTeamSection extends StatelessWidget {
       return [ProfileMessageRow(message: 'mobile.profile.no_team'.tr())];
     }
     if (teams.length > 1) {
-      // Una fila por equipo: el nombre y, a su lado, el rol que tiene en ESE equipo.
-      return [for (final team in teams) ProfileInfoRow(label: team.teamName, value: _roleLabelOf(team))];
+      // Una fila por equipo: el nombre y, a su lado, el rol que tiene en ESE equipo (y, si no puede jugar, por qué).
+      return [
+        for (final team in teams) ...[
+          ProfileInfoRow(label: team.teamName, value: _roleLabelOf(team)),
+          if (team.cannotPlay) _cannotPlayNotice(team),
+        ],
+      ];
     }
     final team = teams.first;
     return [
       ProfileInfoRow(label: 'mobile.profile.team'.tr(), value: team.teamName),
       ProfileInfoRow(label: 'mobile.profile.team_role'.tr(), value: _roleLabelOf(team)),
+      if (team.cannotPlay) _cannotPlayNotice(team),
     ];
   }
+
+  /// El jugador sigue en el equipo pero la categoría no lo deja jugar: aviso dentro de la tarjeta, bajo ese equipo.
+  Widget _cannotPlayNotice(PlayerTeam team) => Padding(
+    padding: const EdgeInsets.all(AppSpacing.md),
+    child: CategoryEligibilityNotice(issue: team.categoryIneligibility, onCompleteProfile: onCompleteProfile),
+  );
 }
 
 /// El rol que el jugador tiene en un equipo: capitán o jugador.

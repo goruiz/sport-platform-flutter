@@ -38,6 +38,11 @@ enum AppConstants<T extends Object> {
   profilePhotoMaxSide<double>(1024),
   profilePhotoQuality<int>(85),
 
+  // La edad más alta que puede tener una persona (`app.people.max-age-years` del backend: una fecha de nacimiento más
+  // antigua se rechaza) y la edad con la que abre el selector de la fecha de nacimiento.
+  maxPersonAgeYears<int>(120),
+  birthDatePickerInitialAgeYears<int>(18),
+
   // Años entre los que se elige una fecha (ver `minPickerDate` y `maxPickerDate`).
   minPickerYear<int>(2020),
   maxPickerYear<int>(2035);

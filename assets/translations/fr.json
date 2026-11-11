@@ -233,7 +233,9 @@
         "error_type": "Utilisez une photo JPG, PNG ou WebP.",
         "error_too_large": "La photo est trop lourde. Le maximum est de {} Mo.",
         "error_no_player": "Vous n'avez pas encore de profil de joueur où enregistrer la photo."
-      }
+      },
+      "gender": "Genre",
+      "birth_date": "Date de naissance"
     },
     "complexes": {
       "load_error": "Impossible de charger les complexes.",
@@ -255,7 +257,8 @@
       "empty_mine_title": "Aucun complexe pour votre équipe",
       "empty_mine_subtitle": "Les complexes où se jouent les événements de votre équipe apparaîtront ici. En attendant, vous pouvez voir tous les complexes.",
       "see_all": "Voir tous les complexes",
-      "courts_without_complex": "Terrains sans complexe"
+      "courts_without_complex": "Terrains sans complexe",
+      "pick_event": "Événement"
     }
   },
   "session": {
@@ -290,7 +293,19 @@
     "skip_info": "Vous pourrez compléter votre profil plus tard dans les paramètres.",
     "save_success": "Profil complété avec succès",
     "save_error": "Impossible d'enregistrer le profil. Veuillez réessayer.",
-    "name_invalid": "Lettres uniquement. Espaces, tirets et apostrophes autorisés ; ni chiffres ni symboles."
+    "name_invalid": "Lettres uniquement. Espaces, tirets et apostrophes autorisés ; ni chiffres ni symboles.",
+    "gender": "Genre *",
+    "birth_date": "Date de naissance *",
+    "birth_date_future": "La date ne peut pas être dans le futur.",
+    "birth_date_too_old": "Vérifiez la date : elle est trop ancienne.",
+    "gender_options": {
+      "MALE": "Masculin",
+      "FEMALE": "Féminin"
+    },
+    "errors": {
+      "INVALID_GENDER": "Choisissez l'un des genres proposés.",
+      "INVALID_BIRTH_DATE": "La date de naissance n'est pas valide."
+    }
   },
   "settings": {
     "select_language": "Choisir la langue",
@@ -704,8 +719,10 @@
       "ASSIST": "Passe décisive",
       "YELLOW_CARD": "Carton jaune",
       "RED_CARD": "Carton rouge",
-      "FOUL": "Faute"
-    }
+      "FOUL": "Faute",
+      "SUBSTITUTION": "Remplacement"
+    },
+    "substitution_line": "Entre {player_in} · Sort {player_out}"
   },
   "match_detail": {
     "title": "Détail du match",
@@ -872,5 +889,26 @@
       "EMAIL_NOT_VERIFIED": "Confirmez votre e-mail avant de rejoindre une équipe.",
       "TOO_MANY_REQUESTS": "Trop de tentatives. Patientez une minute."
     }
+  },
+  "category_eligibility": {
+    "notice_title": "Pour l'instant, vous ne pouvez pas jouer dans cette équipe",
+    "notice": {
+      "CATEGORY_GENDER_NOT_ALLOWED": "La catégorie de cette équipe est pour un autre genre. Vous restez dans l'effectif, mais aucun but ni carton ne vous sera enregistré.",
+      "CATEGORY_GENDER_REQUIRED": "La catégorie de cette équipe demande votre genre et vous ne l'avez pas encore indiqué. Complétez-le dans votre profil pour pouvoir jouer.",
+      "CATEGORY_BIRTH_DATE_REQUIRED": "La catégorie de cette équipe demande un âge et vous n'avez pas encore indiqué votre date de naissance. Complétez-la dans votre profil pour pouvoir jouer.",
+      "CATEGORY_TOO_YOUNG": "Vous êtes plus jeune que l'âge minimum de la catégorie de cette équipe. Vous restez dans l'effectif, mais aucun but ni carton ne vous sera enregistré.",
+      "CATEGORY_TOO_OLD": "Vous dépassez l'âge maximum de la catégorie de cette équipe. Vous restez dans l'effectif, mais aucun but ni carton ne vous sera enregistré.",
+      "UNKNOWN": "Vous ne remplissez pas ce que demande la catégorie de cette équipe, vous ne pouvez donc pas y jouer."
+    },
+    "refused_title": "Il manque des informations dans votre profil",
+    "refused": {
+      "CATEGORY_GENDER_NOT_ALLOWED": "Vous ne pouvez pas rejoindre cette équipe : sa catégorie est pour un autre genre.",
+      "CATEGORY_GENDER_REQUIRED": "La catégorie de cette équipe demande votre genre et vous ne l'avez pas encore indiqué. Complétez votre profil et réessayez.",
+      "CATEGORY_BIRTH_DATE_REQUIRED": "La catégorie de cette équipe demande un âge et vous n'avez pas encore indiqué votre date de naissance. Complétez votre profil et réessayez.",
+      "CATEGORY_TOO_YOUNG": "Vous ne pouvez pas rejoindre cette équipe : vous êtes plus jeune que l'âge minimum de sa catégorie.",
+      "CATEGORY_TOO_OLD": "Vous ne pouvez pas rejoindre cette équipe : vous dépassez l'âge maximum de sa catégorie."
+    },
+    "complete_profile": "Compléter mon profil",
+    "not_now": "Pas maintenant"
   }
 }

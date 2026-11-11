@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sport_platform/modules/users/domain/enums/gender.dart';
 import 'package:sport_platform/modules/users/presentation/widgets/complete_profile_body.dart';
 
 import '../../support/real_translations.dart';
 
 class _Form {
+  /// Por defecto el género y la fecha ya están dichos: estas pruebas son de los nombres, y esos dos son obligatorios.
+  _Form({this.withoutPersonalData = false});
+
+  final bool withoutPersonalData;
+  Gender? get gender => withoutPersonalData ? null : Gender.female;
+  DateTime? get birthDate => withoutPersonalData ? null : DateTime(2000, 1, 1);
   final formKey = GlobalKey<FormState>();
   final first = TextEditingController();
   final middle = TextEditingController();
@@ -23,6 +30,10 @@ class _Form {
             usernameController: username,
             isLoading: false,
             onSubmit: () {},
+            gender: gender,
+            onGenderChanged: (_) {},
+            birthDate: birthDate,
+            onBirthDateChanged: (_) {},
             editing: true,
           ),
         ),
@@ -79,5 +90,29 @@ void main() {
     await pumpWithRealTranslations(tester, home: (_) => form.build());
 
     expect(form.formKey.currentState!.validate(), isFalse);
+  });
+
+  testWidgets('el género y la fecha de nacimiento son obligatorios, porque la categoría de un equipo puede pedirlos', (tester) async {
+    final form = _Form(withoutPersonalData: true);
+    await pumpWithRealTranslations(tester, home: (_) => form.build());
+
+    await typeInto(tester, 0, 'María José');
+    await typeInto(tester, 2, 'Núñez');
+
+    expect(form.formKey.currentState!.validate(), isFalse);
+    await tester.pump();
+    // Un «Requerido» por cada uno de los dos (los nombres ya están bien).
+    expect(find.text('Requerido'), findsNWidgets(2));
+  });
+
+  testWidgets('con el género y la fecha dichos, el formulario muestra las dos opciones y la fecha', (tester) async {
+    final form = _Form();
+    await pumpWithRealTranslations(tester, home: (_) => form.build());
+
+    expect(find.text('Masculino'), findsOneWidget);
+    expect(find.text('Femenino'), findsOneWidget);
+    expect(find.byType(ChoiceChip), findsNWidgets(2));
+    expect(tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Femenino')).selected, isTrue);
+    expect(tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'Masculino')).selected, isFalse);
   });
 }

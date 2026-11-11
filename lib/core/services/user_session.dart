@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sport_platform/modules/users/domain/birth_date_rules.dart';
 import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
+import 'package:sport_platform/modules/users/domain/enums/gender.dart';
 
 /// Singleton que mantiene la sesión del usuario autenticado en memoria.
 ///
@@ -35,6 +37,14 @@ class UserSession {
     _current = user;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_storageKey, jsonEncode(_toMap(user)));
+  }
+
+  /// Completa el género y la fecha de nacimiento del usuario en sesión con los de su cuenta en el backend: el token con que
+  /// se inició la sesión no los trae. Lo demás de la sesión se queda como estaba.
+  static Future<void> mergePersonalData(UserEntity account) async {
+    final user = _current;
+    if (user == null) return;
+    await update(user.withPersonalData(gender: account.gender, birthDate: account.birthDate));
   }
 
   /// Recupera el usuario desde disco al arrancar la app (cold start).
@@ -100,6 +110,8 @@ class UserSession {
       secondLastName: m['secondLastName'] as String?,
       username: m['username'] as String?,
       email: m['email'] as String?,
+      gender: Gender.fromApi(m['gender'] as String?),
+      birthDate: parseBirthDate(m['birthDate']),
     );
   }
 
@@ -112,5 +124,7 @@ class UserSession {
         'secondLastName': e.secondLastName,
         'username': e.username,
         'email': e.email,
+        'gender': e.gender?.apiValue,
+        'birthDate': e.birthDate == null ? null : formatBirthDateForApi(e.birthDate!),
       };
 }

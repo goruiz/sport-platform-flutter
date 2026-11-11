@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/constants/strings_constants/logout_strings_constants.dart';
@@ -7,6 +9,7 @@ import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
 import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
@@ -14,6 +17,7 @@ import 'package:sport_platform/modules/users/data/datasource/image_picker_photo_
 import 'package:sport_platform/modules/users/data/datasource/player_photo_service.dart';
 import 'package:sport_platform/modules/users/domain/profile_photo_picker.dart';
 import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
+import 'package:sport_platform/modules/users/domain/repositories/i_user_profile_repository.dart';
 import 'package:sport_platform/modules/users/presentation/pages/change_password_page.dart';
 import 'package:sport_platform/modules/users/presentation/pages/complete_profile_page.dart';
 import 'package:sport_platform/modules/users/presentation/pages/delete_account_page.dart';
@@ -50,6 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _sessionLoaded = UserSession.loadFromStorage();
+    unawaited(_readPersonalData());
     _summary = ProfileSummaryNotifier(
       playersService: getIt<PlayersService>(),
       playerStatsService: getIt<PlayerStatsService>(),
@@ -65,6 +70,17 @@ class _ProfilePageState extends State<ProfilePage> {
     _summary.dispose();
     _photo.dispose();
     super.dispose();
+  }
+
+  /// El género y la fecha de nacimiento no vienen en el token con que se inició la sesión: se leen de la cuenta para
+  /// mostrarlos. Si no hay conexión, esas dos filas quedan con un guion hasta la próxima vez.
+  Future<void> _readPersonalData() async {
+    await _sessionLoaded;
+    try {
+      final account = await getIt<IUserProfileRepository>().getCurrentAccount();
+      await UserSession.mergePersonalData(account);
+      if (mounted) setState(() {});
+    } catch (_) {}
   }
 
   /// Pregunta qué hacer con la foto (tomarla, elegirla o quitarla), lo hace y avisa cómo terminó.
@@ -98,6 +114,13 @@ class _ProfilePageState extends State<ProfilePage> {
     if (!mounted || updated == null) return;
     setState(() {});
     AppSnackbar.success(context, 'profile.save_success'.tr());
+  }
+
+  /// El aviso de un equipo donde no puede jugar por faltarle datos abre el formulario del perfil; si guardó, se vuelve a leer
+  /// el resumen (el backend juzga de nuevo con los datos nuevos).
+  Future<void> _editProfileAndRefresh() async {
+    await _editProfile();
+    if (mounted) await _summary.load();
   }
 
   void _open(Widget page) {
@@ -175,6 +198,7 @@ class _ProfilePageState extends State<ProfilePage> {
             status: _summary.teamStatus,
             player: _summary.player,
             onRetry: _summary.load,
+            onCompleteProfile: _editProfileAndRefresh,
           ),
           const SizedBox(height: AppSpacing.xxl),
           if (_summary.hasTeam) ...[
@@ -199,6 +223,11 @@ class _ProfilePageState extends State<ProfilePage> {
         ProfileInfoRow(label: 'mobile.profile.middle_name'.tr(), value: user.middleName),
         ProfileInfoRow(label: 'mobile.profile.last_name'.tr(), value: user.lastName),
         ProfileInfoRow(label: 'mobile.profile.second_last_name'.tr(), value: user.secondLastName),
+        ProfileInfoRow(label: 'mobile.profile.gender'.tr(), value: user.gender?.translationKey.tr()),
+        ProfileInfoRow(
+          label: 'mobile.profile.birth_date'.tr(),
+          value: user.birthDate == null ? null : DateFormatters.date(user.birthDate!),
+        ),
       ],
     );
   }

@@ -28,6 +28,7 @@ const _keys = <String>[
   'mobile.complexes.empty_mine_subtitle',
   'mobile.complexes.see_all',
   'mobile.complexes.courts_without_complex',
+  'mobile.complexes.pick_event',
 ];
 
 void main() {

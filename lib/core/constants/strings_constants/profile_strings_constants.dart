@@ -11,6 +11,8 @@ class ProfileStringsConstants {
   static const String lastName = 'profile.last_name';
   static const String secondLastName = 'profile.second_last_name';
   static const String username = 'profile.username';
+  static const String gender = 'profile.gender';
+  static const String birthDate = 'profile.birth_date';
   static const String required = 'profile.required';
   static const String usernameTooShort = 'profile.username_too_short';
   static const String usernameNoSpaces = 'profile.username_no_spaces';

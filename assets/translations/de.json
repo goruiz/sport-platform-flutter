@@ -233,7 +233,9 @@
         "error_type": "Verwende ein JPG-, PNG- oder WebP-Foto.",
         "error_too_large": "Das Foto ist zu groß. Das Maximum beträgt {} MB.",
         "error_no_player": "Du hast noch kein Spielerprofil, in dem das Foto gespeichert werden kann."
-      }
+      },
+      "gender": "Geschlecht",
+      "birth_date": "Geburtsdatum"
     },
     "complexes": {
       "load_error": "Die Anlagen konnten nicht geladen werden.",
@@ -255,7 +257,8 @@
       "empty_mine_title": "Keine Anlagen für Ihr Team",
       "empty_mine_subtitle": "Hier erscheinen die Anlagen, in denen die Veranstaltungen Ihres Teams stattfinden. Bis dahin können Sie alle Anlagen ansehen.",
       "see_all": "Alle Anlagen ansehen",
-      "courts_without_complex": "Plätze ohne Anlage"
+      "courts_without_complex": "Plätze ohne Anlage",
+      "pick_event": "Veranstaltung"
     }
   },
   "session": {
@@ -290,7 +293,19 @@
     "skip_info": "Sie können Ihr Profil später in den Einstellungen vervollständigen.",
     "save_success": "Profil erfolgreich vervollständigt",
     "save_error": "Das Profil konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
-    "name_invalid": "Nur Buchstaben. Leerzeichen, Bindestriche und Apostrophe sind erlaubt; keine Zahlen oder Symbole."
+    "name_invalid": "Nur Buchstaben. Leerzeichen, Bindestriche und Apostrophe sind erlaubt; keine Zahlen oder Symbole.",
+    "gender": "Geschlecht *",
+    "birth_date": "Geburtsdatum *",
+    "birth_date_future": "Das Datum darf nicht in der Zukunft liegen.",
+    "birth_date_too_old": "Prüfen Sie das Datum: Es liegt zu weit zurück.",
+    "gender_options": {
+      "MALE": "Männlich",
+      "FEMALE": "Weiblich"
+    },
+    "errors": {
+      "INVALID_GENDER": "Wählen Sie eines der angebotenen Geschlechter.",
+      "INVALID_BIRTH_DATE": "Das Geburtsdatum ist ungültig."
+    }
   },
   "settings": {
     "select_language": "Sprache auswählen",
@@ -704,8 +719,10 @@
       "ASSIST": "Vorlage",
       "YELLOW_CARD": "Gelbe Karte",
       "RED_CARD": "Rote Karte",
-      "FOUL": "Foul"
-    }
+      "FOUL": "Foul",
+      "SUBSTITUTION": "Auswechslung"
+    },
+    "substitution_line": "Rein: {player_in} · Raus: {player_out}"
   },
   "match_detail": {
     "title": "Spieldetails",
@@ -872,5 +889,26 @@
       "EMAIL_NOT_VERIFIED": "Bestätige deine E-Mail, bevor du einem Team beitrittst.",
       "TOO_MANY_REQUESTS": "Zu viele Versuche. Warte eine Minute."
     }
+  },
+  "category_eligibility": {
+    "notice_title": "Du kannst vorerst nicht für dieses Team spielen",
+    "notice": {
+      "CATEGORY_GENDER_NOT_ALLOWED": "Die Kategorie dieses Teams ist für ein anderes Geschlecht. Du bleibst im Kader, aber für dich werden keine Tore oder Karten erfasst.",
+      "CATEGORY_GENDER_REQUIRED": "Die Kategorie dieses Teams verlangt dein Geschlecht, und du hast es noch nicht angegeben. Ergänze es in deinem Profil, um spielen zu können.",
+      "CATEGORY_BIRTH_DATE_REQUIRED": "Die Kategorie dieses Teams verlangt ein Alter, und du hast dein Geburtsdatum noch nicht angegeben. Ergänze es in deinem Profil, um spielen zu können.",
+      "CATEGORY_TOO_YOUNG": "Du bist jünger als das Mindestalter der Kategorie dieses Teams. Du bleibst im Kader, aber für dich werden keine Tore oder Karten erfasst.",
+      "CATEGORY_TOO_OLD": "Du bist älter als das Höchstalter der Kategorie dieses Teams. Du bleibst im Kader, aber für dich werden keine Tore oder Karten erfasst.",
+      "UNKNOWN": "Du erfüllst nicht, was die Kategorie dieses Teams verlangt, und kannst daher nicht für es spielen."
+    },
+    "refused_title": "In deinem Profil fehlen Angaben",
+    "refused": {
+      "CATEGORY_GENDER_NOT_ALLOWED": "Du kannst diesem Team nicht beitreten: Seine Kategorie ist für ein anderes Geschlecht.",
+      "CATEGORY_GENDER_REQUIRED": "Die Kategorie dieses Teams verlangt dein Geschlecht, und du hast es noch nicht angegeben. Vervollständige dein Profil und versuche es erneut.",
+      "CATEGORY_BIRTH_DATE_REQUIRED": "Die Kategorie dieses Teams verlangt ein Alter, und du hast dein Geburtsdatum noch nicht angegeben. Vervollständige dein Profil und versuche es erneut.",
+      "CATEGORY_TOO_YOUNG": "Du kannst diesem Team nicht beitreten: Du bist jünger als das Mindestalter seiner Kategorie.",
+      "CATEGORY_TOO_OLD": "Du kannst diesem Team nicht beitreten: Du bist älter als das Höchstalter seiner Kategorie."
+    },
+    "complete_profile": "Mein Profil vervollständigen",
+    "not_now": "Jetzt nicht"
   }
 }

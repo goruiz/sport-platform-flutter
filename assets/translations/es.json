@@ -233,7 +233,9 @@
         "error_type": "Usa una foto JPG, PNG o WebP.",
         "error_too_large": "La foto pesa demasiado. El máximo es {} MB.",
         "error_no_player": "Aún no tienes un perfil de jugador donde guardar la foto."
-      }
+      },
+      "gender": "Género",
+      "birth_date": "Fecha de nacimiento"
     },
     "complexes": {
       "load_error": "No se pudieron cargar los complejos.",
@@ -255,7 +257,8 @@
       "empty_mine_title": "Sin complejos para tu equipo",
       "empty_mine_subtitle": "Aquí aparecerán los complejos donde se juegan los eventos de tu equipo. Mientras tanto, puedes ver todos los complejos.",
       "see_all": "Ver todos los complejos",
-      "courts_without_complex": "Canchas sin complejo"
+      "courts_without_complex": "Canchas sin complejo",
+      "pick_event": "Evento"
     }
   },
   "session": {
@@ -290,7 +293,19 @@
     "skip_info": "Puedes completar tu perfil más tarde desde ajustes.",
     "save_success": "Perfil completado exitosamente",
     "save_error": "Error al guardar el perfil. Intenta de nuevo.",
-    "name_invalid": "Solo letras. Se permiten espacios, guion y apóstrofo; sin números ni símbolos."
+    "name_invalid": "Solo letras. Se permiten espacios, guion y apóstrofo; sin números ni símbolos.",
+    "gender": "Género *",
+    "birth_date": "Fecha de nacimiento *",
+    "birth_date_future": "La fecha no puede ser futura.",
+    "birth_date_too_old": "Revisa la fecha: es demasiado antigua.",
+    "gender_options": {
+      "MALE": "Masculino",
+      "FEMALE": "Femenino"
+    },
+    "errors": {
+      "INVALID_GENDER": "Elige uno de los géneros disponibles.",
+      "INVALID_BIRTH_DATE": "La fecha de nacimiento no es válida."
+    }
   },
   "settings": {
     "select_language": "Seleccionar idioma",
@@ -704,8 +719,10 @@
       "ASSIST": "Asistencia",
       "YELLOW_CARD": "Tarjeta amarilla",
       "RED_CARD": "Tarjeta roja",
-      "FOUL": "Falta"
-    }
+      "FOUL": "Falta",
+      "SUBSTITUTION": "Cambio"
+    },
+    "substitution_line": "Entra {player_in} · Sale {player_out}"
   },
   "match_detail": {
     "title": "Detalle del partido",
@@ -872,5 +889,26 @@
       "EMAIL_NOT_VERIFIED": "Confirma tu correo antes de unirte a un equipo.",
       "TOO_MANY_REQUESTS": "Demasiados intentos. Espera un minuto."
     }
+  },
+  "category_eligibility": {
+    "notice_title": "Por ahora no puedes jugar en este equipo",
+    "notice": {
+      "CATEGORY_GENDER_NOT_ALLOWED": "La categoría de este equipo es para otro género. Sigues en la plantilla, pero no se te registrarán goles ni tarjetas.",
+      "CATEGORY_GENDER_REQUIRED": "La categoría de este equipo pide tu género y aún no lo has indicado. Complétalo en tu perfil para poder jugar.",
+      "CATEGORY_BIRTH_DATE_REQUIRED": "La categoría de este equipo pide una edad y aún no has indicado tu fecha de nacimiento. Complétala en tu perfil para poder jugar.",
+      "CATEGORY_TOO_YOUNG": "Eres menor que la edad mínima de la categoría de este equipo. Sigues en la plantilla, pero no se te registrarán goles ni tarjetas.",
+      "CATEGORY_TOO_OLD": "Superas la edad máxima de la categoría de este equipo. Sigues en la plantilla, pero no se te registrarán goles ni tarjetas.",
+      "UNKNOWN": "No cumples lo que pide la categoría de este equipo, así que no puedes jugar en él."
+    },
+    "refused_title": "Falta información en tu perfil",
+    "refused": {
+      "CATEGORY_GENDER_NOT_ALLOWED": "No puedes entrar a este equipo: su categoría es para otro género.",
+      "CATEGORY_GENDER_REQUIRED": "La categoría de este equipo pide tu género y aún no lo has indicado. Completa tu perfil e inténtalo de nuevo.",
+      "CATEGORY_BIRTH_DATE_REQUIRED": "La categoría de este equipo pide una edad y aún no has indicado tu fecha de nacimiento. Completa tu perfil e inténtalo de nuevo.",
+      "CATEGORY_TOO_YOUNG": "No puedes entrar a este equipo: eres menor que la edad mínima de su categoría.",
+      "CATEGORY_TOO_OLD": "No puedes entrar a este equipo: superas la edad máxima de su categoría."
+    },
+    "complete_profile": "Completar mi perfil",
+    "not_now": "Ahora no"
   }
 }

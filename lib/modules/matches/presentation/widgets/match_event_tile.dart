@@ -3,12 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/matches/data/models/match_event_model.dart';
 
-/// Una línea de la cronología: minuto, qué pasó, quién y de qué equipo.
+/// Una línea de la cronología: minuto, qué pasó, quién y de qué equipo. En un cambio dice quién entra y quién sale.
 class MatchEventTile extends StatelessWidget {
   final MatchEventModel event;
   final String teamName;
 
   const MatchEventTile({super.key, required this.event, required this.teamName});
+
+  /// El jugador de la línea; en un cambio, «Entra X · Sale Y».
+  String _headline() {
+    final player = event.playerName ?? 'match_detail.unknown_player'.tr();
+    if (!event.isSubstitution) return player;
+    return 'match_events.substitution_line'.tr(namedArgs: {
+      'player_in': player,
+      'player_out': event.replacedPlayerName ?? 'match_detail.unknown_player'.tr(),
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +51,7 @@ class MatchEventTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  event.playerName ?? 'match_detail.unknown_player'.tr(),
+                  _headline(),
                   style: const TextStyle(
                     color: AppColors.white,
                     fontWeight: FontWeight.w600,

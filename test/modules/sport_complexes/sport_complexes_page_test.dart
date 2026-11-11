@@ -127,28 +127,55 @@ Future<void> _pumpFrames(WidgetTester tester, {int frames = 10}) async {
 Finder _scopeSegment(String label) =>
     find.descendant(of: find.byType(SegmentedButton<ComplexesScope>), matching: find.text(label));
 
+/// Los eventos que ofrece el selector, por id.
+List<String> _offeredEventIds(WidgetTester tester) => tester
+    .widget<DropdownButton<String>>(find.byType(DropdownButton<String>))
+    .items!
+    .map((item) => item.value!)
+    .toList();
+
+/// Abre el selector de eventos y elige el de nombre [eventName].
+Future<void> _chooseEvent(WidgetTester tester, String eventName) async {
+  await tester.tap(find.byType(DropdownButtonFormField<String>));
+  await _pumpFrames(tester);
+  // Con el menú abierto el nombre sale dos veces (el campo y la opción): la opción es la última.
+  await tester.tap(find.text(eventName).last);
+  await _pumpFrames(tester);
+}
+
 void main() {
   setUpAll(initRealTranslations);
   setUp(() => SharedPreferences.setMockInitialValues({}));
   tearDown(getIt.reset);
 
-  testWidgets('abre en «Mi equipo» organizado por evento: cada evento del equipo con sus complejos y canchas', (tester) async {
+  testWidgets('abre en «Mi equipo» con el selector de los eventos del equipo y, del primero, sus complejos y canchas', (tester) async {
     await _openComplexes(tester, player: _playerIn([_tigres, _pumas]));
 
     expect(find.byType(SegmentedButton<ComplexesScope>), findsOneWidget);
     expect(find.byType(ActiveTeamPill), findsOneWidget);
+    expect(_offeredEventIds(tester), ['liga', 'copa']);
     expect(find.text('Liga de Barrio'), findsOneWidget);
-    expect(find.text('Copa Quito'), findsOneWidget);
-    expect(find.text('Complejo Sur'), findsOneWidget);
-    // El Norte es sede de los dos eventos: sale bajo cada uno, con sus canchas.
-    expect(find.text('Complejo Norte'), findsNWidgets(2));
-    expect(find.text('Cancha Uno'), findsNWidgets(2));
-    expect(find.text('Cancha Dos'), findsNWidgets(2));
-    expect(find.text('Cancha Alfa'), findsOneWidget);
-    expect(find.text('Torneo Relámpago'), findsNothing);
-    // Lo de otros equipos o sin evento no aparece.
+    expect(find.text('Complejo Norte'), findsOneWidget);
+    expect(find.text('Cancha Uno'), findsOneWidget);
+    expect(find.text('Cancha Dos'), findsOneWidget);
+    // Los complejos de los otros eventos, de otros equipos o sin evento no aparecen.
+    expect(find.text('Complejo Sur'), findsNothing);
+    expect(find.text('Cancha Alfa'), findsNothing);
     expect(find.text('Complejo Este'), findsNothing);
     expect(find.text('Cancha suelta'), findsNothing);
+  });
+
+  testWidgets('elegir otro evento en el selector muestra sus complejos y canchas', (tester) async {
+    await _openComplexes(tester, player: _playerIn([_tigres, _pumas]));
+
+    await _chooseEvent(tester, 'Copa Quito');
+
+    // La Copa se juega en el Norte y en el Sur.
+    expect(find.text('Copa Quito'), findsOneWidget);
+    expect(find.text('Liga de Barrio'), findsNothing);
+    expect(find.text('Complejo Norte'), findsOneWidget);
+    expect(find.text('Complejo Sur'), findsOneWidget);
+    expect(find.text('Cancha Alfa'), findsOneWidget);
   });
 
   testWidgets('abre con el equipo que el jugador dejó elegido en «Equipo»', (tester) async {
@@ -156,12 +183,13 @@ void main() {
 
     await _openComplexes(tester, player: _playerIn([_tigres, _pumas]));
 
+    expect(_offeredEventIds(tester), ['torneo']);
     expect(find.text('Torneo Relámpago'), findsOneWidget);
     expect(find.text('Complejo Este'), findsOneWidget);
     expect(find.text('Complejo Norte'), findsNothing);
   });
 
-  testWidgets('cambiar de equipo desde la píldora muestra los complejos de los eventos del otro equipo', (tester) async {
+  testWidgets('cambiar de equipo desde la píldora ofrece los eventos del otro equipo y muestra sus complejos', (tester) async {
     await _openComplexes(tester, player: _playerIn([_tigres, _pumas]));
 
     await tester.tap(find.descendant(of: find.byType(ActiveTeamPill), matching: find.byType(InkWell)));
@@ -169,6 +197,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('team-option-pumas')));
     await _pumpFrames(tester);
 
+    expect(_offeredEventIds(tester), ['torneo']);
     expect(find.text('Torneo Relámpago'), findsOneWidget);
     expect(find.text('Complejo Este'), findsOneWidget);
     expect(find.text('Liga de Barrio'), findsNothing);
@@ -176,24 +205,51 @@ void main() {
     expect(find.text('Complejo Sur'), findsNothing);
   });
 
-  testWidgets('«Todos» muestra todos los complejos (sin repetir ni eventos) y las canchas sin complejo, y deja de mostrar el equipo', (tester) async {
+  testWidgets('al cambiar de equipo sigue elegido el mismo evento si el otro equipo también juega en él', (tester) async {
+    await _openComplexes(
+      tester,
+      player: _playerIn([_tigres, _pumas]),
+      eventsByTeam: {
+        'tigres': [_event('liga', 'Liga de Barrio', ['norte']), _event('copa', 'Copa Quito', ['norte', 'sur'])],
+        'pumas': [_event('torneo', 'Torneo Relámpago', ['este']), _event('copa', 'Copa Quito', ['norte', 'sur'])],
+      },
+    );
+    await _chooseEvent(tester, 'Copa Quito');
+
+    await tester.tap(find.descendant(of: find.byType(ActiveTeamPill), matching: find.byType(InkWell)));
+    await _pumpFrames(tester);
+    await tester.tap(find.byKey(const ValueKey('team-option-pumas')));
+    await _pumpFrames(tester);
+
+    expect(_offeredEventIds(tester), ['torneo', 'copa']);
+    expect(find.text('Copa Quito'), findsOneWidget);
+    expect(find.text('Complejo Sur'), findsOneWidget);
+  });
+
+  testWidgets('«Todos» muestra todos los complejos y las canchas sin complejo, sin selector de eventos ni equipo', (tester) async {
     await _openComplexes(tester, player: _playerIn([_tigres, _pumas]));
 
     await tester.tap(_scopeSegment('Todos'));
     await _pumpFrames(tester);
 
-    expect(find.text('Liga de Barrio'), findsNothing);
+    expect(find.byType(DropdownButtonFormField<String>), findsNothing);
+    expect(find.byType(ActiveTeamPill), findsNothing);
     expect(find.text('Complejo Este'), findsOneWidget);
     expect(find.text('Complejo Norte'), findsOneWidget);
+    expect(find.text('Complejo Sur'), findsOneWidget);
     expect(find.text('Canchas sin complejo'), findsOneWidget);
     expect(find.text('Cancha suelta'), findsOneWidget);
-    expect(find.byType(ActiveTeamPill), findsNothing);
   });
 
-  testWidgets('si los eventos del equipo no tienen complejos lo dice y ofrece ver todos', (tester) async {
-    await _openComplexes(tester, player: _playerIn([_tigres, _pumas]), eventsByTeam: {'tigres': [_event('liga', 'Liga de Barrio', const [])]});
+  testWidgets('si los eventos del equipo no tienen complejos lo dice, sin selector, y ofrece ver todos', (tester) async {
+    await _openComplexes(
+      tester,
+      player: _playerIn([_tigres, _pumas]),
+      eventsByTeam: {'tigres': [_event('liga', 'Liga de Barrio', const [])]},
+    );
 
     expect(find.text('Sin complejos para tu equipo'), findsOneWidget);
+    expect(find.byType(DropdownButtonFormField<String>), findsNothing);
     expect(find.text('Complejo Norte'), findsNothing);
 
     await tester.tap(find.text('Ver todos los complejos'));
@@ -203,30 +259,22 @@ void main() {
     expect(find.text('Sin complejos para tu equipo'), findsNothing);
   });
 
-  testWidgets('la búsqueda deja los complejos que coinciden por su nombre o por una de sus canchas', (tester) async {
+  testWidgets('la búsqueda mira los complejos y canchas del evento elegido', (tester) async {
     await _openComplexes(tester, player: _playerIn([_tigres, _pumas]));
 
+    // La Cancha Alfa es del Sur, que no se juega en la Liga (el evento elegido).
     await tester.enterText(find.byType(TextField), 'alfa');
     await _pumpFrames(tester);
 
-    // Solo el Sur tiene la Cancha Alfa, y solo se queda el evento que se juega en él.
-    expect(find.text('Complejo Sur'), findsOneWidget);
-    expect(find.text('Copa Quito'), findsOneWidget);
-    expect(find.text('Liga de Barrio'), findsNothing);
+    expect(find.text('Sin resultados'), findsOneWidget);
     expect(find.text('Complejo Norte'), findsNothing);
 
-    // Si coincide el nombre de un evento, sale con todos sus complejos.
-    await tester.enterText(find.byType(TextField), 'liga');
-    await _pumpFrames(tester);
+    // Al elegir la Copa, que sí se juega en el Sur, la búsqueda sigue puesta y lo encuentra.
+    await _chooseEvent(tester, 'Copa Quito');
 
-    expect(find.text('Liga de Barrio'), findsOneWidget);
-    expect(find.text('Complejo Norte'), findsOneWidget);
-    expect(find.text('Copa Quito'), findsNothing);
-
-    await tester.enterText(find.byType(TextField), 'inexistente');
-    await _pumpFrames(tester);
-
-    expect(find.text('Sin resultados'), findsOneWidget);
+    expect(find.text('Complejo Sur'), findsOneWidget);
+    expect(find.text('Complejo Norte'), findsNothing);
+    expect(find.text('Sin resultados'), findsNothing);
   });
 
   testWidgets('quien aún no tiene equipo ve todos los complejos y no el selector', (tester) async {
