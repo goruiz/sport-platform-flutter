@@ -10,10 +10,7 @@ class LeagueTeamsTab extends StatelessWidget {
   final List<TeamEventModel> teams;
   final bool isLoading;
   final String? error;
-  final bool isOwner;
   final VoidCallback onRetry;
-  final void Function(TeamEventModel) onManagePlayers;
-  final void Function(TeamEventModel)? onRemove;
 
   /// Abre el detalle de un equipo del evento.
   final void Function(TeamEventModel)? onOpen;
@@ -23,10 +20,7 @@ class LeagueTeamsTab extends StatelessWidget {
     required this.teams,
     required this.isLoading,
     required this.error,
-    required this.isOwner,
     required this.onRetry,
-    required this.onManagePlayers,
-    this.onRemove,
     this.onOpen,
   });
 
@@ -55,9 +49,6 @@ class LeagueTeamsTab extends StatelessWidget {
         itemBuilder: (_, i) => TeamEventCard(
           team: teams[i],
           onOpen: onOpen == null ? null : () => onOpen!(teams[i]),
-          // Sin callback la tarjeta no es tocable ni muestra el botón: solo quien gestiona el evento administra plantillas.
-          onManagePlayers: isOwner ? () => onManagePlayers(teams[i]) : null,
-          onRemove: isOwner ? () => onRemove?.call(teams[i]) : null,
         ),
       ),
     );

@@ -6,8 +6,6 @@ import 'package:sport_platform/shared/widgets/initials_avatar.dart';
 
 class TeamEventCard extends StatelessWidget {
   final TeamEventModel team;
-  final VoidCallback? onRemove;
-  final VoidCallback? onManagePlayers;
 
   /// Abre el detalle del equipo en el evento (balance, partidos, goleadores…). Con él la tarjeta se puede tocar.
   final VoidCallback? onOpen;
@@ -15,8 +13,6 @@ class TeamEventCard extends StatelessWidget {
   const TeamEventCard({
     super.key,
     required this.team,
-    this.onRemove,
-    this.onManagePlayers,
     this.onOpen,
   });
 
@@ -30,7 +26,7 @@ class TeamEventCard extends StatelessWidget {
         border: Border.all(color: AppColors.inputBorder),
       ),
       child: InkWell(
-        onTap: onOpen ?? onManagePlayers,
+        onTap: onOpen,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -50,12 +46,10 @@ class TeamEventCard extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    if (onManagePlayers != null || onOpen != null) ...[
+                    if (onOpen != null) ...[
                       const SizedBox(height: 2),
                       Text(
-                        onOpen != null
-                            ? 'leagues.team_detail.tap_hint'.tr()
-                            : 'leagues.tap_to_manage_players'.tr(),
+                        'leagues.team_detail.tap_hint'.tr(),
                         style: const TextStyle(
                           color: AppColors.whiteSubtle,
                           fontSize: 12,
@@ -65,34 +59,8 @@ class TeamEventCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (onManagePlayers != null)
-                IconButton(
-                  onPressed: onManagePlayers,
-                  icon: const Icon(
-                    Icons.manage_accounts_outlined,
-                    color: AppColors.primaryLight,
-                    size: 20,
-                  ),
-                  tooltip: 'leagues.manage_players'.tr(),
-                  padding: EdgeInsets.zero,
-                  constraints:
-                      const BoxConstraints(minWidth: 36, minHeight: 36),
-                ),
-              if (onOpen != null && onManagePlayers == null && onRemove == null)
+              if (onOpen != null)
                 const Icon(Icons.chevron_right, color: AppColors.whiteSubtle),
-              if (onRemove != null)
-                IconButton(
-                  onPressed: onRemove,
-                  icon: const Icon(
-                    Icons.remove_circle_outline,
-                    color: AppColors.error,
-                    size: 20,
-                  ),
-                  tooltip: 'leagues.remove_team'.tr(),
-                  padding: EdgeInsets.zero,
-                  constraints:
-                      const BoxConstraints(minWidth: 36, minHeight: 36),
-                ),
             ],
           ),
         ),

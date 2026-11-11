@@ -9,21 +9,17 @@ import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/status_badge.dart';
 
 /// Un evento en una lista: su nombre y formato, las fechas y, a la vista, en qué estado está
-/// (en curso, por iniciar, finalizado). Si recibe [onEdit] o [onDelete] muestra esos botones.
+/// (en curso, por iniciar, finalizado).
 class EventCard extends StatelessWidget {
   final EventModel event;
   final IconData typeIcon;
   final VoidCallback? onTap;
-  final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
 
   const EventCard({
     super.key,
     required this.event,
     this.typeIcon = Icons.sports,
     this.onTap,
-    this.onEdit,
-    this.onDelete,
   });
 
   @override
@@ -76,7 +72,6 @@ class EventCard extends StatelessWidget {
             ],
           ),
         ),
-        if (onEdit != null || onDelete != null) _buildActions(),
       ],
     );
   }
@@ -99,28 +94,6 @@ class EventCard extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.sm),
         StatusBadge.forEvent(event.status),
-      ],
-    );
-  }
-
-  Widget _buildActions() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (onEdit != null)
-          IconButton(
-            onPressed: onEdit,
-            icon: const Icon(Icons.edit_outlined, color: AppColors.primaryLight, size: 20),
-            tooltip: 'common.edit'.tr(),
-            visualDensity: VisualDensity.compact,
-          ),
-        if (onDelete != null)
-          IconButton(
-            onPressed: onDelete,
-            icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
-            tooltip: 'common.delete'.tr(),
-            visualDensity: VisualDensity.compact,
-          ),
       ],
     );
   }

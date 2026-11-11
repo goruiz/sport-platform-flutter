@@ -16,11 +16,5 @@ void main() {
     test('asText sirve para rellenar el {} de una traducción', () {
       expect(AppConstants.minPasswordLength.asText, '${AppConstants.minPasswordLength.value}');
     });
-
-    test('las fechas de los selectores salen de los años y el rango no está al revés', () {
-      expect(AppConstants.minPickerDate, DateTime(AppConstants.minPickerYear.value));
-      expect(AppConstants.maxPickerDate, DateTime(AppConstants.maxPickerYear.value));
-      expect(AppConstants.minPickerDate.isBefore(AppConstants.maxPickerDate), isTrue);
-    });
   });
 }

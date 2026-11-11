@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/modules/auth/data/datasource/login_service.dart';
 import 'package:sport_platform/modules/auth/domain/enums/login_failure.dart';
 import 'package:sport_platform/modules/auth/presentation/pages/register_page.dart';
@@ -20,12 +19,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(
-    text: AppConstants.fixedLoginEmail.value,
-  );
-  final _passwordController = TextEditingController(
-    text: AppConstants.fixedLoginPassword.value,
-  );
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
   final _loginService = LoginService();

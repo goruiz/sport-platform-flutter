@@ -8,20 +8,8 @@ import 'package:sport_platform/modules/events/shared/domain/enums/phase_status.d
 /// Lo primero del campeonato: de qué formato es, en qué etapa va y qué sigue (o quién ganó).
 class ChampionshipSummaryCard extends StatelessWidget {
   final ChampionshipModel championship;
-  final bool isOwner;
 
-  const ChampionshipSummaryCard({
-    super.key,
-    required this.championship,
-    required this.isOwner,
-  });
-
-  // Lo que el organizador debe hacer él mismo: la app solo lo muestra, se hace desde el panel.
-  static const _actionsForTheOrganizer = {
-    ChampionshipAction.generateCalendar,
-    ChampionshipAction.generateRound,
-    ChampionshipAction.needsTiebreak,
-  };
+  const ChampionshipSummaryCard({super.key, required this.championship});
 
   @override
   Widget build(BuildContext context) {
@@ -65,13 +53,6 @@ class ChampionshipSummaryCard extends StatelessWidget {
             _buildChampion()
           else if (action != null)
             _buildNextStep(action),
-          if (isOwner && _actionsForTheOrganizer.contains(action)) ...[
-            const SizedBox(height: 8),
-            Text(
-              'championship.owner_hint'.tr(),
-              style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
-            ),
-          ],
         ],
       ),
     );

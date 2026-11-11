@@ -9,56 +9,6 @@ class PlayersService {
 
   PlayersService({DioClient? client}) : _client = client ?? DioClient();
 
-  Future<PlayerModel> create({
-    required String firstName,
-    required String lastName,
-    required String email,
-    required String password,
-    required String teamId,
-    String? phone,
-  }) async {
-    final response = await _client.post(
-      ApiEndpoints.players,
-      data: {
-        'firstName': firstName,
-        'lastName': lastName,
-        'email': email,
-        'password': password,
-        'teamId': teamId,
-        if (phone != null && phone.isNotEmpty) 'phone': phone,
-      },
-    );
-    final dynamic raw = response.data;
-    final Map<String, dynamic> data =
-        raw is Map<String, dynamic> && raw.containsKey('data')
-            ? raw['data'] as Map<String, dynamic>
-            : raw as Map<String, dynamic>;
-    return PlayerModel.fromJson(data);
-  }
-
-  /// Returns the found user or null if not registered.
-  Future<PlayerModel?> searchByEmail(String email) async {
-    try {
-      final response = await _client.get(
-        ApiEndpoints.playersSearch,
-        queryParams: {'email': email},
-      );
-      final dynamic raw = response.data;
-      if (raw == null) return null;
-      final Map<String, dynamic>? data =
-          raw is Map<String, dynamic> && raw.containsKey('data')
-              ? raw['data'] as Map<String, dynamic>?
-              : raw is Map<String, dynamic>
-                  ? raw
-                  : null;
-      if (data == null) return null;
-      return PlayerModel.fromJson(data);
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 404) return null;
-      rethrow;
-    }
-  }
-
   /// El jugador que corresponde a la cuenta con sesión iniciada, o null si la cuenta aún no tiene
   /// (un 404 del backend significa "no existe", no un error).
   Future<PlayerModel?> getCurrent() async {
@@ -69,40 +19,6 @@ class PlayersService {
       if (e.response?.statusCode == 404) return null;
       rethrow;
     }
-  }
-
-  /// Sends an invitation email to an existing user to join the team.
-  Future<void> inviteExistingUser({
-    required String email,
-    required String teamId,
-  }) async {
-    await _client.post(
-      ApiEndpoints.playersInvite,
-      data: {'email': email, 'teamId': teamId},
-    );
-  }
-
-  Future<PlayerModel> updatePlayer(
-    String playerId, {
-    String? firstName,
-    String? lastName,
-    String? phone,
-  }) async {
-    final body = <String, dynamic>{
-      'firstName': ?firstName,
-      'lastName': ?lastName,
-      'phone': ?phone,
-    };
-    final response = await _client.put(
-      ApiEndpoints.playerById(playerId),
-      data: body,
-    );
-    final dynamic raw = response.data;
-    final Map<String, dynamic> data =
-        raw is Map<String, dynamic> && raw.containsKey('data')
-            ? raw['data'] as Map<String, dynamic>
-            : raw as Map<String, dynamic>;
-    return PlayerModel.fromJson(data);
   }
 
   /// Saca al jugador de un equipo; los demás en los que juega (de otras organizaciones) se quedan. [teamId] dice
@@ -129,17 +45,5 @@ class PlayersService {
     return list
         .map((e) => PlayerModel.fromJson(e as Map<String, dynamic>))
         .toList();
-  }
-
-  /// Sends a registration link to an unregistered email.
-  /// Once the user registers, they are automatically added to the team.
-  Future<void> inviteNewUser({
-    required String email,
-    required String teamId,
-  }) async {
-    await _client.post(
-      ApiEndpoints.playersInviteRegister,
-      data: {'email': email, 'teamId': teamId},
-    );
   }
 }

@@ -18,7 +18,7 @@ La API local tiene context path `/api` (p. ej. `http://localhost:8080/api`). El 
 
 - Flutter y Dart: `pubspec.yaml` fija `sdk: ^3.11.5`; aplicación `sport_platform`, versión `1.0.0+1`, privada (`publish_to: none`).
 - UI: Flutter Material, un tema visual oscuro propio y widgets compartidos. No usa Angular Material ni un kit externo de componentes.
-- Estado: `provider`/`ChangeNotifier` en la parte de ligas y `StatefulWidget`/`setState` en pantallas sencillas. Aunque existen directorios `application/bloc`, `cubit` y `state`, son scaffolding, no una migración real a BLoC/Cubit.
+- Estado: `provider`/`ChangeNotifier` en la parte de ligas y `StatefulWidget`/`setState` en pantallas sencillas. No hay BLoC/Cubit: el estado son notifiers (las carpetas `application/` vacías se borraron el 2026-11-11).
 - Inyección: `get_it` (`lib/core/di/service_locator.dart`); algunas pantallas crean directamente sus clientes/servicios, por lo que no toda dependencia está centralizada.
 - Navegación: `Navigator` y `MaterialPageRoute`; no hay `go_router` ni `auto_route`. El menú del servidor enruta mediante `ModuleRegistry`.
 - HTTP: `dio`, encapsulado por `DioClient`; modelos JSON se parsean manualmente, sin `json_serializable`/Freezed.
@@ -142,7 +142,7 @@ Un cambio de contrato o navegación puede requerir cambios en más de un reposit
 - `ApiEndpoints.refreshToken` existe como constante, pero no se usa; el contrato común del backend indica que no hay refresh.
 - El login tiene valores de prueba precargados en `login_page.dart` (`// DEV:`). Son deuda de desarrollo, no comportamiento que deba copiarse ni aceptar en una publicación.
 - La pantalla de registro contiene controlador de nombre, pero el request observado solo envía email/password/`confirm_password`; verificar DTO y requisitos del backend antes de dar por persistido ese nombre.
-- La configuración URL del manifest Android para invitaciones incluye un dominio de ejemplo (`yourdomain.com`); el backend envía un enlace HTTP(S), de modo que dominio, path `/register` y `inviteToken` deben coincidir con el despliegue real.
+- El `AndroidManifest.xml` solo declara los enlaces de desarrollo (`http://localhost:5021`) y el esquema `sportplatform://`; no hay enlaces `https` de producción hasta que exista un dominio (el de ejemplo `yourdomain.com` se quitó el 2026-11-11). El backend envía un enlace HTTP(S), de modo que dominio, path `/register` y `inviteToken` deben coincidir con el despliegue real.
 
 ## 9. Sesión, roles y deep links
 

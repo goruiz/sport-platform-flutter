@@ -245,7 +245,7 @@ class _RankingsPageState extends State<RankingsPage>
       children: [
         // La llave de la clave fuerza a releer las posiciones al cambiar de evento.
         event.hasChampionship
-            ? ChampionshipTab(key: ValueKey(event.id), eventId: event.id, isOwner: false)
+            ? ChampionshipTab(key: ValueKey(event.id), eventId: event.id)
             : StandingsTab(key: ValueKey(event.id), eventId: event.id),
         ..._buildLeaderboardTabs(),
       ],

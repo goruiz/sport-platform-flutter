@@ -32,8 +32,8 @@ class AppConfig {
 
     return switch (environment) {
       AppEnvironment.dev => _localBackendUrl,
-      AppEnvironment.staging => 'https://staging-api.sports-platform.com/v1',
-      AppEnvironment.prod => 'https://api.sports-platform.com/v1',
+      AppEnvironment.staging => 'https://staging-api.sports-platform.com/api',
+      AppEnvironment.prod => 'https://api.sports-platform.com/api',
     };
   }
 
@@ -61,7 +61,7 @@ class AppConfig {
   );
 
   // Quien sirve las teselas pide que la app se identifique: debe ser el applicationId de Android.
-  static const String mapUserAgentPackageName = 'com.example.sport_platform';
+  static const String mapUserAgentPackageName = 'com.plataformadeportiva.app';
 
   static const String mapAttribution = '© OpenStreetMap';
 

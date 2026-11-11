@@ -11,14 +11,7 @@ class LeagueMatchesTab extends StatelessWidget {
   final Map<String, String> teamMap;
   final bool isLoading;
   final String? error;
-  final bool isOwner;
   final VoidCallback onRetry;
-  final void Function(MatchModel) onEdit;
-  final void Function(MatchModel) onDelete;
-  final Future<void> Function(DateTime, DateTime?) onRescheduleDay;
-  final Future<void> Function(MatchModel)? onMatchPostpone;
-  final Future<void> Function(MatchModel)? onMatchSuspend;
-  final Future<void> Function(MatchModel, DateTime)? onMatchReschedule;
   final void Function(MatchModel)? onOpen;
 
   const LeagueMatchesTab({
@@ -27,14 +20,7 @@ class LeagueMatchesTab extends StatelessWidget {
     required this.teamMap,
     required this.isLoading,
     required this.error,
-    required this.isOwner,
     required this.onRetry,
-    required this.onEdit,
-    required this.onDelete,
-    required this.onRescheduleDay,
-    this.onMatchPostpone,
-    this.onMatchSuspend,
-    this.onMatchReschedule,
     this.onOpen,
   });
 
@@ -67,13 +53,6 @@ class LeagueMatchesTab extends StatelessWidget {
             date: date,
             matches: dayMatches,
             teamMap: teamMap,
-            isOwner: isOwner,
-            onEdit: onEdit,
-            onDelete: onDelete,
-            onRescheduleDay: onRescheduleDay,
-            onMatchPostpone: onMatchPostpone,
-            onMatchSuspend: onMatchSuspend,
-            onMatchReschedule: onMatchReschedule,
             onOpen: onOpen,
           );
         },

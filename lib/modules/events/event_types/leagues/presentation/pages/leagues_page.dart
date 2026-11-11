@@ -20,11 +20,10 @@ class LeaguesPage extends StatelessWidget {
         menuItem: item,
         translationPrefix: 'leagues',
         typeIcon: Icons.military_tech,
-        readOnly: true,
-        onEventTap: (EventModel event, _) {
+        onEventTap: (EventModel event) {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => LeagueDetailPage(event: event, isOwner: false),
+              builder: (_) => LeagueDetailPage(event: event),
             ),
           );
         },

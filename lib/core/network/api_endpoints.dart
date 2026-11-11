@@ -22,18 +22,12 @@ class ApiEndpoints {
   static String userById(String id) => '/users/$id';
 
   // Teams
-  static const String teams = '/teams';
   static String teamById(String id) => '/teams/$id';
 
   // Players
-  static const String players = '/players';
-  static String playerById(String id) => '/players/$id';
-  static const String playersSearch = '/players/search';
   static const String playersMe = '/players/me';
   static const String playersMePhoto = '/players/me/photo';
   static const String playersMeStats = '/players/me/stats';
-  static const String playersInvite = '/players/invite';
-  static const String playersInviteRegister = '/players/invite-register';
   static const String playersAuthRegister = '/players/auth/register';
   static const String playersJoinByCode = '/players/join-by-code';
   static String playersByTeam(String teamId) => '/players/by-team/$teamId';
@@ -50,8 +44,6 @@ class ApiEndpoints {
       '/events/by-event-type/$typeId/by-user/$userId';
 
   // Matches
-  static const String matches = '/matches';
-  static String matchById(String id) => '/matches/$id';
   static String matchesByEvent(String eventId) => '/matches/by-event/$eventId';
   static const String matchesMine = '/matches/mine';
   static String matchesByCourt(String courtId) => '/matches/by-court/$courtId';
@@ -73,9 +65,7 @@ class ApiEndpoints {
   // Teams-events
   static String teamsEventsByEvent(String eventId) =>
       '/teams-events/by-event/$eventId';
-  static const String teamsEvents = '/teams-events';
   static String teamsEventsById(String id) => '/teams-events/$id';
-  static String teamsEventsHardDelete(String id) => '/teams-events/$id/hard';
 
   // Courts
   static const String courts = '/courts';
@@ -93,21 +83,6 @@ class ApiEndpoints {
 
   // Reports
   static const String reports = '/reports';
-
-  // Schedule config
-  static String scheduleConfig(String eventId) =>
-      '/events/$eventId/schedule-config';
-  static String generateSchedule(String eventId) =>
-      '/events/$eventId/schedule-config/generate';
-
-  // Match day batch operations
-  static String rescheduleDateMatches(String eventId) =>
-      '/matches/by-event/$eventId/reschedule-date';
-
-  // Match status transitions
-  static String matchPostpone(String id) => '/matches/$id/postpone';
-  static String matchSuspend(String id) => '/matches/$id/suspend';
-  static String matchReschedule(String id) => '/matches/$id/reschedule';
 
   // Leagues
   static const String leagues = '/ligas';

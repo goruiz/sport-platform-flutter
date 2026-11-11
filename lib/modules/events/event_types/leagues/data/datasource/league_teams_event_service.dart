@@ -14,18 +14,4 @@ class LeagueTeamsEventService implements ILeagueTeamsRepository {
         .map((e) => TeamEventModel.fromJson(e as Map<String, dynamic>))
         .toList();
   }
-
-  @override
-  Future<TeamEventModel> add(String teamId, String eventId) async {
-    final response = await _client.post(
-      ApiEndpoints.teamsEvents,
-      data: {'teamId': teamId, 'eventId': eventId},
-    );
-    return TeamEventModel.fromJson(ResponseParser.toMap(response.data));
-  }
-
-  @override
-  Future<void> remove(String teamsEventsId) async {
-    await _client.delete(ApiEndpoints.teamsEventsHardDelete(teamsEventsId));
-  }
 }

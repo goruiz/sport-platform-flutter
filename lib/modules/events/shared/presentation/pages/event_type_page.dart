@@ -6,26 +6,23 @@ import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/event_card.dart';
-import 'package:sport_platform/modules/events/shared/presentation/widgets/event_form_sheet.dart';
-import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
 
-/// Página tabbed (Mis eventos / Todos) reutilizable para cualquier tipo de evento.
+/// Página tabbed (Mis eventos / Todos) reutilizable para cualquier tipo de evento. Solo lista: el organizador
+/// crea y gestiona los eventos desde el panel.
 /// Requiere un [EventsNotifier] provisto por el widget padre vía [ChangeNotifierProvider].
 class EventTypePage extends StatefulWidget {
   final MenuItemModel menuItem;
   final String translationPrefix;
   final IconData typeIcon;
-  final bool readOnly;
-  final void Function(EventModel event, bool isOwner)? onEventTap;
+  final void Function(EventModel event)? onEventTap;
 
   const EventTypePage({
     super.key,
     required this.menuItem,
     required this.translationPrefix,
     this.typeIcon = Icons.sports,
-    this.readOnly = false,
     this.onEventTap,
   });
 
@@ -34,6 +31,9 @@ class EventTypePage extends StatefulWidget {
 }
 
 class _EventTypePageState extends State<EventTypePage> {
+  /// La pestaña «Todos»: el jugador ve primero todo lo que su organización ofrece.
+  static const _allEventsTabIndex = 1;
+
   String get _prefix => widget.translationPrefix;
 
   @override
@@ -44,65 +44,11 @@ class _EventTypePageState extends State<EventTypePage> {
     });
   }
 
-  Future<void> _openCreate() async {
-    final notifier = context.read<EventsNotifier>();
-    await EventFormSheet.show(
-      context: context,
-      translationPrefix: _prefix,
-      onSave: (data) async {
-        await notifier.create(data);
-        if (mounted) _showSnack('$_prefix.success_created'.tr());
-      },
-    );
-    if (mounted) notifier.silentReload();
-  }
-
-  Future<void> _openEdit(EventModel event) async {
-    final notifier = context.read<EventsNotifier>();
-    await EventFormSheet.show(
-      context: context,
-      translationPrefix: _prefix,
-      event: event,
-      onSave: (data) async {
-        await notifier.update(event.id, data);
-        if (mounted) _showSnack('$_prefix.success_updated'.tr());
-      },
-    );
-  }
-
-  Future<void> _confirmDelete(EventModel event) async {
-    final confirmed = await showConfirmationDialog(
-      context,
-      title: '$_prefix.delete_item'.tr(),
-      content: '$_prefix.confirm_delete'.tr(args: [event.name]),
-      confirmLabel: '$_prefix.delete'.tr(),
-      cancelLabel: '$_prefix.cancel'.tr(),
-    );
-    if (!confirmed || !mounted) return;
-    try {
-      await context.read<EventsNotifier>().delete(event.id);
-      if (mounted) _showSnack('$_prefix.success_deleted'.tr());
-    } catch (_) {
-      if (mounted) _showSnack('$_prefix.error_delete'.tr(), isError: true);
-    }
-  }
-
-  void _showSnack(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
-      initialIndex: widget.readOnly ? 1 : 0,
+      initialIndex: _allEventsTabIndex,
       child: Scaffold(
         backgroundColor: AppColors.backgroundEnd,
         appBar: AppBar(
@@ -138,15 +84,6 @@ class _EventTypePageState extends State<EventTypePage> {
         body: Consumer<EventsNotifier>(
           builder: (context, notifier, child) => _buildBody(notifier),
         ),
-        floatingActionButton: widget.readOnly
-            ? null
-            : FloatingActionButton(
-                onPressed: _openCreate,
-                backgroundColor: AppColors.primaryLight,
-                foregroundColor: AppColors.white,
-                tooltip: '$_prefix.new_item'.tr(),
-                child: const Icon(Icons.add),
-              ),
       ),
     );
   }
@@ -167,26 +104,18 @@ class _EventTypePageState extends State<EventTypePage> {
       children: [
         _EventListView(
           events: notifier.mine,
-          myEventIds: notifier.myIds,
           typeIcon: widget.typeIcon,
           onRefresh: () => notifier.load(force: true),
-          onEdit: widget.readOnly ? null : _openEdit,
-          onDelete: widget.readOnly ? null : _confirmDelete,
           emptyTitle: '$_prefix.no_items_mine'.tr(),
           emptySubtitle: '$_prefix.no_items_mine_subtitle'.tr(),
-          onAdd: widget.readOnly ? null : _openCreate,
           onEventTap: widget.onEventTap,
         ),
         _EventListView(
           events: notifier.all.toList(),
-          myEventIds: notifier.myIds,
           typeIcon: widget.typeIcon,
           onRefresh: () => notifier.load(force: true),
-          onEdit: widget.readOnly ? null : _openEdit,
-          onDelete: widget.readOnly ? null : _confirmDelete,
           emptyTitle: '$_prefix.no_items'.tr(),
           emptySubtitle: '$_prefix.no_items_subtitle'.tr(),
-          onAdd: widget.readOnly ? null : _openCreate,
           onEventTap: widget.onEventTap,
         ),
       ],
@@ -198,26 +127,18 @@ class _EventTypePageState extends State<EventTypePage> {
 
 class _EventListView extends StatelessWidget {
   final List<EventModel> events;
-  final Set<String> myEventIds;
   final IconData typeIcon;
   final Future<void> Function() onRefresh;
-  final void Function(EventModel)? onEdit;
-  final void Function(EventModel)? onDelete;
   final String emptyTitle;
   final String emptySubtitle;
-  final VoidCallback? onAdd;
-  final void Function(EventModel event, bool isOwner)? onEventTap;
+  final void Function(EventModel event)? onEventTap;
 
   const _EventListView({
     required this.events,
-    required this.myEventIds,
     required this.typeIcon,
     required this.onRefresh,
-    required this.onEdit,
-    required this.onDelete,
     required this.emptyTitle,
     required this.emptySubtitle,
-    required this.onAdd,
     this.onEventTap,
   });
 
@@ -228,7 +149,6 @@ class _EventListView extends StatelessWidget {
         title: emptyTitle,
         subtitle: emptySubtitle,
         icon: typeIcon,
-        onAdd: onAdd,
       );
     }
 
@@ -240,19 +160,10 @@ class _EventListView extends StatelessWidget {
         itemCount: events.length,
         itemBuilder: (_, i) {
           final event = events[i];
-          final isCurrentUserOwner = myEventIds.contains(event.id);
           return EventCard(
             event: event,
             typeIcon: typeIcon,
-            onTap: onEventTap != null
-                ? () => onEventTap!(event, isCurrentUserOwner)
-                : null,
-            onEdit: isCurrentUserOwner && onEdit != null
-                ? () => onEdit!(event)
-                : null,
-            onDelete: isCurrentUserOwner && onDelete != null
-                ? () => onDelete!(event)
-                : null,
+            onTap: onEventTap != null ? () => onEventTap!(event) : null,
           );
         },
       ),

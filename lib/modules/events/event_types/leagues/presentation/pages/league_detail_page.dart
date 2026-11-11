@@ -4,36 +4,25 @@ import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_matches_repository.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_teams_repository.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/pages/team_in_event_page.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/providers/league_detail_notifier.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_players_sheet.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/add_team_sheet.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/auto_schedule_sheet.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/league_fab.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/league_info_card.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/league_matches_tab.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/league_teams_tab.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_form_sheet.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/standings_tab.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
-import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/championship_tab.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/event_rules_card.dart';
 import 'package:sport_platform/modules/matches/presentation/pages/match_detail_page.dart';
-import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
 
+/// El detalle de un evento para el jugador: información, equipos, partidos y posiciones (o campeonato).
+/// Solo se lee: el organizador lo gestiona desde el panel.
 class LeagueDetailPage extends StatefulWidget {
   final EventModel event;
-  final bool isOwner;
 
-  const LeagueDetailPage({
-    super.key,
-    required this.event,
-    required this.isOwner,
-  });
+  const LeagueDetailPage({super.key, required this.event});
 
   @override
   State<LeagueDetailPage> createState() => _LeagueDetailPageState();
@@ -43,12 +32,12 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   late final LeagueDetailNotifier _notifier;
-  late EventModel _event;
+
+  EventModel get _event => widget.event;
 
   @override
   void initState() {
     super.initState();
-    _event = widget.event;
     _tabController = TabController(length: 4, vsync: this);
     _notifier = LeagueDetailNotifier(
       teamsRepo: getIt<ILeagueTeamsRepository>(),
@@ -66,15 +55,6 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     super.dispose();
   }
 
-  // --------------- Teams ---------------
-
-  Future<void> _openManagePlayers(String teamId, String teamName) =>
-      AddPlayersSheet.show(
-        context: context,
-        team: TeamModel(id: teamId, name: teamName),
-        isEditMode: true,
-      );
-
   /// El detalle de un equipo del evento: su balance, sus partidos, sus goleadores y, si se ve, su plantilla.
   void _openTeam(TeamEventModel team) {
     Navigator.of(context).push(
@@ -87,41 +67,6 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       ),
     );
   }
-
-  Future<void> _openAddTeam() async {
-    final enrolledIds = _notifier.teams.map((t) => t.teamId).toSet();
-    await AddTeamSheet.show(
-      context: context,
-      enrolledTeamIds: enrolledIds,
-      onAdd: (teamId) async {
-        await _notifier.addTeam(teamId);
-        if (mounted) _showSnack('leagues.success_team_added'.tr());
-      },
-    );
-  }
-
-  Future<void> _confirmRemoveTeam(String teamsEventsId, String teamName) =>
-      _confirmAndExecute(
-        title: 'leagues.remove_team'.tr(),
-        content: 'leagues.confirm_remove_team'.tr(args: [teamName]),
-        confirmLabel: 'leagues.delete'.tr(),
-        cancelLabel: 'leagues.cancel'.tr(),
-        action: () => _notifier.removeTeam(teamsEventsId),
-        successMessage: 'leagues.success_team_removed'.tr(),
-        errorMessage: 'leagues.error_team_action'.tr(),
-      );
-
-  // --------------- Matches ---------------
-
-  Future<void> _openCreateMatch() => MatchFormSheet.show(
-        context: context,
-        enrolledTeams: _notifier.teams,
-        eventId: _event.id,
-        onSave: (data) async {
-          await _notifier.createMatch(data);
-          if (mounted) _showSnack('leagues.success_match_created'.tr());
-        },
-      );
 
   /// El detalle del partido: su cronología de goles y tarjetas (la registra el organizador en el panel).
   void _openMatch(MatchModel match) {
@@ -138,112 +83,6 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
     );
   }
 
-  Future<void> _openAutoSchedule() => AutoScheduleSheet.show(
-        context: context,
-        eventId: _event.id,
-        onGenerated: (generated) async => _notifier.addGeneratedMatches(generated),
-      );
-
-  Future<void> _openEditMatch(MatchModel match) => MatchFormSheet.show(
-        context: context,
-        enrolledTeams: _notifier.teams,
-        eventId: _event.id,
-        match: match,
-        onSave: (data) async {
-          await _notifier.updateMatch(match.id, data);
-          if (mounted) _showSnack('leagues.success_match_updated'.tr());
-        },
-      );
-
-  Future<void> _confirmDeleteMatch(MatchModel match) => _confirmAndExecute(
-        title: 'leagues.confirm_delete_match'.tr(),
-        confirmLabel: 'leagues.delete'.tr(),
-        cancelLabel: 'leagues.cancel'.tr(),
-        action: () => _notifier.deleteMatch(match.id),
-        successMessage: 'leagues.success_match_deleted'.tr(),
-        errorMessage: 'leagues.error_match_action'.tr(),
-      );
-
-  Future<void> _onRescheduleDay(DateTime fromDate, DateTime? toDate) async {
-    try {
-      await _notifier.rescheduleDateMatches(fromDate, toDate: toDate);
-      if (mounted) {
-        _showSnack(toDate != null
-            ? 'leagues.match_day_rescheduled'.tr()
-            : 'leagues.match_day_postponed'.tr());
-      }
-    } catch (_) {
-      if (mounted) _showSnack('leagues.match_day_error'.tr(), isError: true);
-    }
-  }
-
-  Future<void> _handleMatchPostpone(MatchModel match) async {
-    try {
-      await _notifier.postponeMatch(match.id);
-      if (mounted) _showSnack('leagues.match_postponed'.tr());
-    } catch (_) {
-      if (mounted) _showSnack('leagues.match_action_error'.tr(), isError: true);
-    }
-  }
-
-  Future<void> _handleMatchSuspend(MatchModel match) async {
-    try {
-      await _notifier.suspendMatch(match.id);
-      if (mounted) _showSnack('leagues.match_suspended'.tr());
-    } catch (_) {
-      if (mounted) _showSnack('leagues.match_action_error'.tr(), isError: true);
-    }
-  }
-
-  Future<void> _handleMatchReschedule(MatchModel match, DateTime newDate) async {
-    try {
-      await _notifier.rescheduleMatch(match.id, newDate);
-      if (mounted) _showSnack('leagues.match_rescheduled'.tr());
-    } catch (_) {
-      if (mounted) _showSnack('leagues.match_action_error'.tr(), isError: true);
-    }
-  }
-
-  // --------------- Helpers ---------------
-
-  Future<void> _confirmAndExecute({
-    required String title,
-    String? content,
-    required String confirmLabel,
-    required String cancelLabel,
-    required Future<void> Function() action,
-    required String successMessage,
-    required String errorMessage,
-  }) async {
-    final confirmed = await showConfirmationDialog(
-      context,
-      title: title,
-      content: content,
-      confirmLabel: confirmLabel,
-      cancelLabel: cancelLabel,
-    );
-    if (!confirmed || !mounted) return;
-    try {
-      await action();
-      if (mounted) _showSnack(successMessage);
-    } catch (_) {
-      if (mounted) _showSnack(errorMessage, isError: true);
-    }
-  }
-
-  void _showSnack(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? AppColors.error : AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
-
-  // --------------- Build ---------------
-
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -259,16 +98,6 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
             _buildStandingsTab(),
           ],
         ),
-        floatingActionButton: widget.isOwner
-            ? LeagueFab(
-                tabController: _tabController,
-                onAddTeam: _openAddTeam,
-                onCreateMatch: _openCreateMatch,
-                // Los partidos de un campeonato los genera el organizador fase a fase desde el
-                // panel: el calendario automático de una sola vuelta los desordenaría.
-                onAutoSchedule: _event.hasChampionship ? null : _openAutoSchedule,
-              )
-            : null,
       ),
     );
   }
@@ -300,19 +129,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          LeagueInfoCard(
-            event: _event,
-            isOwner: widget.isOwner,
-            onSave: (data) async {
-              final notifier = getIt<EventsNotifier>(instanceName: 'leagues');
-              final updated = await notifier.update(_event.id, data);
-              if (mounted) {
-                setState(() => _event = updated);
-                _showSnack('leagues.success_updated'.tr());
-              }
-            },
-            onError: () => _showSnack('leagues.error_update'.tr(), isError: true),
-          ),
+          LeagueInfoCard(event: _event),
           const SizedBox(height: 16),
           EventRulesCard(event: _event),
         ],
@@ -325,11 +142,8 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       teams: _notifier.teams,
       isLoading: _notifier.loadingTeams,
       error: _notifier.teamsError?.tr(),
-      isOwner: widget.isOwner,
       onRetry: _notifier.loadTeams,
       onOpen: _openTeam,
-      onManagePlayers: (team) => _openManagePlayers(team.teamId, team.teamName),
-      onRemove: (team) => _confirmRemoveTeam(team.id, team.teamName),
     );
   }
 
@@ -339,15 +153,8 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       teamMap: {for (final t in _notifier.teams) t.teamId: t.teamName},
       isLoading: _notifier.loadingMatches,
       error: _notifier.matchesError?.tr(),
-      isOwner: widget.isOwner,
       onRetry: _notifier.loadMatches,
       onOpen: _openMatch,
-      onEdit: _openEditMatch,
-      onDelete: _confirmDeleteMatch,
-      onRescheduleDay: _onRescheduleDay,
-      onMatchPostpone: widget.isOwner ? _handleMatchPostpone : null,
-      onMatchSuspend: widget.isOwner ? _handleMatchSuspend : null,
-      onMatchReschedule: widget.isOwner ? _handleMatchReschedule : null,
     );
   }
 
@@ -360,7 +167,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
       );
     }
     if (_event.hasChampionship) {
-      return ChampionshipTab(eventId: _event.id, isOwner: widget.isOwner);
+      return ChampionshipTab(eventId: _event.id);
     }
     return StandingsTab(eventId: _event.id);
   }

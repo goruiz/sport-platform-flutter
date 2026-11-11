@@ -15,9 +15,8 @@ import 'package:sport_platform/shared/widgets/error_retry.dart';
 /// Solo se lee: las fases las genera el organizador desde el panel.
 class ChampionshipTab extends StatefulWidget {
   final String eventId;
-  final bool isOwner;
 
-  const ChampionshipTab({super.key, required this.eventId, required this.isOwner});
+  const ChampionshipTab({super.key, required this.eventId});
 
   @override
   State<ChampionshipTab> createState() => _ChampionshipTabState();
@@ -88,7 +87,7 @@ class _ChampionshipTabState extends State<ChampionshipTab>
     final eliminationRounds = championship.eliminationRounds;
     final hasNothingToShow = championship.tables.isEmpty && eliminationRounds.isEmpty;
     return [
-      ChampionshipSummaryCard(championship: championship, isOwner: widget.isOwner),
+      ChampionshipSummaryCard(championship: championship),
       const SizedBox(height: 20),
       if (hasNothingToShow) _buildNothingGenerated(),
       for (final table in championship.tables) ...[

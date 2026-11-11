@@ -15,50 +15,43 @@ final _team = TeamEventModel(
   createdAt: DateTime(2026, 10, 1),
 );
 
-Widget _teamsTab({required bool isOwner, required List<TeamEventModel> managedTeams}) => Scaffold(
+Widget _teamsTab({required List<TeamEventModel> openedTeams, bool canOpen = true}) => Scaffold(
       body: LeagueTeamsTab(
         teams: [_team],
         isLoading: false,
         error: null,
-        isOwner: isOwner,
         onRetry: () {},
-        onManagePlayers: managedTeams.add,
+        onOpen: canOpen ? openedTeams.add : null,
       ),
     );
 
 void main() {
   setUpAll(initRealTranslations);
 
-  testWidgets('un jugador no ve el botón de plantilla ni puede abrirla tocando la tarjeta', (tester) async {
-    final managedTeams = <TeamEventModel>[];
-
-    await pumpWithRealTranslations(
-      tester,
-      home: (_) => _teamsTab(isOwner: false, managedTeams: managedTeams),
-    );
+  testWidgets('el jugador solo ve el equipo: sin botones de plantilla ni de quitarlo del evento', (tester) async {
+    await pumpWithRealTranslations(tester, home: (_) => _teamsTab(openedTeams: []));
 
     expect(find.text(_teamName), findsOneWidget);
     expect(find.byIcon(Icons.manage_accounts_outlined), findsNothing);
+    expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
+  });
+
+  testWidgets('tocar la tarjeta abre el detalle del equipo en el evento', (tester) async {
+    final openedTeams = <TeamEventModel>[];
+
+    await pumpWithRealTranslations(tester, home: (_) => _teamsTab(openedTeams: openedTeams));
+
+    expect(find.byIcon(Icons.chevron_right), findsOneWidget);
 
     await tester.tap(find.text(_teamName));
     await tester.pump();
 
-    expect(managedTeams, isEmpty);
+    expect(openedTeams, [_team]);
   });
 
-  testWidgets('quien gestiona el evento ve el botón y abre la plantilla del equipo', (tester) async {
-    final managedTeams = <TeamEventModel>[];
+  testWidgets('sin detalle al que ir la tarjeta no se ofrece como tocable', (tester) async {
+    await pumpWithRealTranslations(tester, home: (_) => _teamsTab(openedTeams: [], canOpen: false));
 
-    await pumpWithRealTranslations(
-      tester,
-      home: (_) => _teamsTab(isOwner: true, managedTeams: managedTeams),
-    );
-
-    expect(find.byIcon(Icons.manage_accounts_outlined), findsOneWidget);
-
-    await tester.tap(find.byIcon(Icons.manage_accounts_outlined));
-    await tester.pump();
-
-    expect(managedTeams, [_team]);
+    expect(find.byIcon(Icons.chevron_right), findsNothing);
   });
 }

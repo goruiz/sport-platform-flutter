@@ -143,7 +143,6 @@ class _AppRouterState extends State<_AppRouter> {
   /// Handles:
   ///   http://localhost:5021/register?inviteToken=...   (Android dev)
   ///   sportplatform://register?inviteToken=...         (iOS custom scheme)
-  ///   https://yourdomain.com/register?inviteToken=...  (production)
   String? _extractInviteToken(Uri uri) {
     if (uri.path == '/register' || uri.host == 'register') {
       return uri.queryParameters['inviteToken'];

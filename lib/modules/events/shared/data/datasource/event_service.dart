@@ -34,19 +34,4 @@ class EventService {
         .map((e) => (e as Map<String, dynamic>)['id'] as String)
         .toSet();
   }
-
-  Future<EventModel> create(Map<String, dynamic> data) async {
-    final payload = {...data, 'idEventType': eventTypeId};
-    final response = await _client.post(ApiEndpoints.events, data: payload);
-    return EventModel.fromJson(ResponseParser.toMap(response.data));
-  }
-
-  Future<EventModel> update(String id, Map<String, dynamic> data) async {
-    final response = await _client.put(ApiEndpoints.eventById(id), data: data);
-    return EventModel.fromJson(ResponseParser.toMap(response.data));
-  }
-
-  Future<void> delete(String id) async {
-    await _client.delete(ApiEndpoints.eventById(id));
-  }
 }

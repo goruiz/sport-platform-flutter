@@ -1,24 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_card.dart';
-import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
 
+/// Los partidos de una jornada (un día), con su encabezado.
 class MatchDaySection extends StatelessWidget {
   final int dayIndex;
   final DateTime date;
   final List<MatchModel> matches;
   final Map<String, String> teamMap;
-  final bool isOwner;
-  final void Function(MatchModel) onEdit;
-  final void Function(MatchModel) onDelete;
-  final Future<void> Function(DateTime fromDate, DateTime? toDate) onRescheduleDay;
-  final Future<void> Function(MatchModel)? onMatchPostpone;
-  final Future<void> Function(MatchModel)? onMatchSuspend;
-  final Future<void> Function(MatchModel, DateTime)? onMatchReschedule;
   final void Function(MatchModel)? onOpen;
 
   const MatchDaySection({
@@ -27,117 +18,20 @@ class MatchDaySection extends StatelessWidget {
     required this.date,
     required this.matches,
     required this.teamMap,
-    required this.isOwner,
-    required this.onEdit,
-    required this.onDelete,
-    required this.onRescheduleDay,
-    this.onMatchPostpone,
-    this.onMatchSuspend,
-    this.onMatchReschedule,
     this.onOpen,
   });
-
-  Future<void> _handlePostpone(BuildContext context) async {
-    final confirmed = await showConfirmationDialog(
-      context,
-      title: 'leagues.match_day_postpone'.tr(),
-      content: 'leagues.match_day_confirm_postpone'
-          .tr(namedArgs: {'date': DateFormatters.date(date)}),
-      confirmLabel: 'leagues.match_day_postpone_confirm'.tr(),
-      cancelLabel: 'leagues.cancel'.tr(),
-    );
-    if (!confirmed) return;
-    await onRescheduleDay(date, null);
-  }
-
-  Future<void> _handleReschedule(BuildContext context) async {
-    final newDate = await showDatePicker(
-      context: context,
-      initialDate: date.add(const Duration(days: 7)),
-      firstDate: AppConstants.minPickerDate,
-      lastDate: AppConstants.maxPickerDate,
-      helpText: 'leagues.match_day_pick_date'.tr(),
-    );
-    if (newDate == null || !context.mounted) return;
-
-    final confirmed = await showConfirmationDialog(
-      context,
-      title: 'leagues.match_day_reschedule'.tr(),
-      content: 'leagues.match_day_confirm_reschedule'.tr(namedArgs: {
-        'from': DateFormatters.date(date),
-        'to': DateFormatters.date(newDate),
-      }),
-      confirmLabel: 'leagues.match_day_reschedule_confirm'.tr(),
-      cancelLabel: 'leagues.cancel'.tr(),
-    );
-    if (!confirmed || !context.mounted) return;
-    await onRescheduleDay(date, newDate);
-  }
-
-  Future<void> _handleMatchPostpone(MatchModel m, BuildContext ctx) async {
-    final confirmed = await showConfirmationDialog(
-      ctx,
-      title: 'leagues.match_postpone'.tr(),
-      content: 'leagues.match_confirm_postpone'.tr(),
-      confirmLabel: 'leagues.match_postpone'.tr(),
-      cancelLabel: 'leagues.cancel'.tr(),
-    );
-    if (!confirmed || !ctx.mounted) return;
-    await onMatchPostpone?.call(m);
-  }
-
-  Future<void> _handleMatchSuspend(MatchModel m, BuildContext ctx) async {
-    final confirmed = await showConfirmationDialog(
-      ctx,
-      title: 'leagues.match_suspend'.tr(),
-      content: 'leagues.match_confirm_suspend'.tr(),
-      confirmLabel: 'leagues.match_suspend'.tr(),
-      cancelLabel: 'leagues.cancel'.tr(),
-    );
-    if (!confirmed || !ctx.mounted) return;
-    await onMatchSuspend?.call(m);
-  }
-
-  Future<void> _handleMatchReschedule(MatchModel m, BuildContext ctx) async {
-    final newDate = await showDatePicker(
-      context: ctx,
-      initialDate: m.matchDate.add(const Duration(days: 7)),
-      firstDate: AppConstants.minPickerDate,
-      lastDate: AppConstants.maxPickerDate,
-      helpText: 'leagues.match_pick_reschedule_date'.tr(),
-    );
-    if (newDate == null || !ctx.mounted) return;
-    await onMatchReschedule?.call(m, newDate);
-  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _DayHeader(
-          dayIndex: dayIndex,
-          date: date,
-          isOwner: isOwner,
-          onPostpone: () => _handlePostpone(context),
-          onReschedule: () => _handleReschedule(context),
-        ),
+        _DayHeader(dayIndex: dayIndex, date: date),
         ...matches.map((m) => MatchCard(
               match: m,
               homeTeamName: teamMap[m.homeTeamId] ?? m.homeTeamId,
               awayTeamName: teamMap[m.awayTeamId] ?? m.awayTeamId,
               onTap: onOpen == null ? null : () => onOpen!(m),
-              onEdit: isOwner ? () => onEdit(m) : null,
-              onDelete: isOwner ? () => onDelete(m) : null,
-              onMatchPostpone: isOwner && onMatchPostpone != null
-                  ? () => _handleMatchPostpone(m, context)
-                  : null,
-              onMatchSuspend: isOwner && onMatchSuspend != null
-                  ? () => _handleMatchSuspend(m, context)
-                  : null,
-              onMatchReschedule: isOwner && onMatchReschedule != null
-                  ? () => _handleMatchReschedule(m, context)
-                  : null,
             )),
         const SizedBox(height: 8),
       ],
@@ -148,17 +42,8 @@ class MatchDaySection extends StatelessWidget {
 class _DayHeader extends StatelessWidget {
   final int dayIndex;
   final DateTime date;
-  final bool isOwner;
-  final VoidCallback onPostpone;
-  final VoidCallback onReschedule;
 
-  const _DayHeader({
-    required this.dayIndex,
-    required this.date,
-    required this.isOwner,
-    required this.onPostpone,
-    required this.onReschedule,
-  });
+  const _DayHeader({required this.dayIndex, required this.date});
 
   @override
   Widget build(BuildContext context) {
@@ -200,53 +85,8 @@ class _DayHeader extends StatelessWidget {
               ),
             ),
           ),
-          if (isOwner)
-            PopupMenuButton<_DayAction>(
-              onSelected: (action) {
-                if (action == _DayAction.postpone) {
-                  onPostpone();
-                } else {
-                  onReschedule();
-                }
-              },
-              color: AppColors.sheetBackground,
-              icon: const Icon(Icons.more_vert,
-                  color: AppColors.whiteSubtle, size: 20),
-              itemBuilder: (_) => [
-                PopupMenuItem(
-                  value: _DayAction.reschedule,
-                  child: Row(
-                    children: [
-                      const Icon(Icons.edit_calendar_outlined,
-                          color: AppColors.primaryLight, size: 18),
-                      const SizedBox(width: 10),
-                      Text(
-                        'leagues.match_day_reschedule'.tr(),
-                        style: const TextStyle(color: AppColors.white),
-                      ),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  value: _DayAction.postpone,
-                  child: Row(
-                    children: [
-                      const Icon(Icons.pause_circle_outline,
-                          color: AppColors.warningLight, size: 18),
-                      const SizedBox(width: 10),
-                      Text(
-                        'leagues.match_day_postpone'.tr(),
-                        style: const TextStyle(color: AppColors.white),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
         ],
       ),
     );
   }
 }
-
-enum _DayAction { reschedule, postpone }

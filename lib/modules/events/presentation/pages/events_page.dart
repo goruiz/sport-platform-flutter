@@ -77,7 +77,7 @@ class _EventsPageState extends State<EventsPage> {
   void _openEvent(EventModel event) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => LeagueDetailPage(event: event, isOwner: false),
+        builder: (_) => LeagueDetailPage(event: event),
       ),
     );
   }
