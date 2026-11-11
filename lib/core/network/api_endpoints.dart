@@ -56,6 +56,8 @@ class ApiEndpoints {
   static const String matchesMine = '/matches/mine';
   static String matchesByCourt(String courtId) => '/matches/by-court/$courtId';
   static String matchAttendance(String matchId) => '/matches/$matchId/attendance';
+  // Avisos de un problema con el resultado (disputas): los abre y ve el dirigente de equipo, los responde el organizador
+  static String matchDisputes(String matchId) => '/matches/$matchId/disputes';
 
   // Match events (goals, assists, cards and fouls of a match): the app only reads them
   static String matchEventsByMatch(String matchId) =>

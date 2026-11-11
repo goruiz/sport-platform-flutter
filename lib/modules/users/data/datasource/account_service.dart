@@ -1,6 +1,7 @@
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/network/response_parser.dart';
+import 'package:sport_platform/modules/users/domain/enums/account_capability.dart';
 
 /// Lo que la persona hace con su propia cuenta: contraseña, correo y eliminarla. Los rechazos del backend llegan como
 /// excepción de la petición; `AccountError.fromException` dice cuál fue.
@@ -28,6 +29,13 @@ class AccountService {
   Future<bool> isEmailVerified() async {
     final response = await _client.get(ApiEndpoints.currentAccount);
     return ResponseParser.toMap(response.data)['emailVerified'] == true;
+  }
+
+  /// Lo extra que el rol de la cuenta le permite hacer. Se lee del backend (no del token): el rol puede haber cambiado
+  /// desde que se inició la sesión.
+  Future<Set<AccountCapability>> loadCapabilities() async {
+    final response = await _client.get(ApiEndpoints.currentAccount);
+    return AccountCapability.setFrom(ResponseParser.toMap(response.data)['capabilities']);
   }
 
   Future<void> resendEmailVerification() async {

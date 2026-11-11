@@ -4,6 +4,7 @@ import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_attendance_service.dart';
+import 'package:sport_platform/modules/matches/data/datasource/match_disputes_service.dart';
 import 'package:sport_platform/core/services/external_launcher.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
@@ -14,9 +15,13 @@ import 'package:sport_platform/modules/events/event_types/leagues/data/models/ma
 import 'package:sport_platform/modules/matches/data/datasource/match_events_service.dart';
 import 'package:sport_platform/modules/matches/presentation/providers/match_attendance_notifier.dart';
 import 'package:sport_platform/modules/matches/presentation/providers/match_detail_notifier.dart';
+import 'package:sport_platform/modules/matches/presentation/providers/match_result_dispute_notifier.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_attendance_card.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_event_tile.dart';
+import 'package:sport_platform/modules/matches/presentation/widgets/match_result_dispute_card.dart';
+import 'package:sport_platform/modules/matches/presentation/widgets/match_result_dispute_sheet.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_scoreboard.dart';
+import 'package:sport_platform/modules/users/presentation/providers/account_capabilities_notifier.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
@@ -49,6 +54,7 @@ class MatchDetailPage extends StatefulWidget {
 class _MatchDetailPageState extends State<MatchDetailPage> {
   late final MatchDetailNotifier _notifier;
   late final MatchAttendanceNotifier _attendance;
+  late final MatchResultDisputeNotifier _dispute;
 
   @override
   void initState() {
@@ -62,12 +68,19 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
       service: getIt<MatchAttendanceService>(),
       match: widget.match,
     )..load();
+    _dispute = MatchResultDisputeNotifier(
+      capabilities: getIt<AccountCapabilitiesNotifier>(),
+      playersService: getIt<PlayersService>(),
+      service: getIt<MatchDisputesService>(),
+      match: widget.match,
+    )..load();
   }
 
   @override
   void dispose() {
     _notifier.dispose();
     _attendance.dispose();
+    _dispute.dispose();
     super.dispose();
   }
 
@@ -88,9 +101,13 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
       backgroundColor: AppColors.backgroundEnd,
       appBar: AppBar(title: Text('match_detail.title'.tr())),
       body: ListenableBuilder(
-        listenable: Listenable.merge([_notifier, _attendance]),
+        listenable: Listenable.merge([_notifier, _attendance, _dispute]),
         builder: (context, _) => RefreshIndicator(
-          onRefresh: () => Future.wait([_notifier.load(), _attendance.load()]),
+          onRefresh: () => Future.wait([
+            _notifier.load(),
+            _attendance.load(),
+            _dispute.load(forceCapabilities: true),
+          ]),
           color: AppColors.primaryLight,
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -100,6 +117,7 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
               const SizedBox(height: AppSpacing.md),
               _buildActions(),
               ..._buildAttendance(),
+              ..._buildResultDispute(),
               const SizedBox(height: AppSpacing.xxl),
               _buildTimelineTitle(),
               ..._buildTimeline(),
@@ -218,6 +236,53 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
         onClearAnswer: () => _saveAttendance(_attendance.clearAnswer),
       ),
     ];
+  }
+
+  /// «¿Hay un problema con el resultado?», solo para el dirigente de uno de los equipos del partido: nadie más la ve.
+  List<Widget> _buildResultDispute() {
+    if (_dispute.status == SummaryStatus.loading) return const [];
+    if (_dispute.status == SummaryStatus.failed) {
+      return [
+        const SizedBox(height: AppSpacing.md),
+        AppCard(
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  (_dispute.loadErrorKey ?? 'match_detail.dispute.error_load').tr(),
+                  style: AppTextStyles.bodyMuted,
+                ),
+              ),
+              TextButton(onPressed: _dispute.load, child: Text('common.retry'.tr())),
+            ],
+          ),
+        ),
+      ];
+    }
+    if (!_dispute.isAvailable) return const [];
+    return [
+      const SizedBox(height: AppSpacing.md),
+      MatchResultDisputeCard(
+        disputes: _dispute.disputes,
+        homeName: widget.homeName,
+        awayName: widget.awayName,
+        isSaving: _dispute.isSaving,
+        onReport: _reportResultProblem,
+      ),
+    ];
+  }
+
+  /// Abre el formulario del aviso y, si se envió, lo confirma.
+  Future<void> _reportResultProblem() async {
+    final wasSent = await MatchResultDisputeSheet.show(
+      context: context,
+      match: widget.match,
+      homeName: widget.homeName,
+      awayName: widget.awayName,
+      onSend: _dispute.report,
+    );
+    if (!mounted || wasSent != true) return;
+    AppSnackbar.success(context, 'match_detail.dispute.sent'.tr());
   }
 
   /// El resultado si ya hay, y si no, quién juega con quién y cuándo.

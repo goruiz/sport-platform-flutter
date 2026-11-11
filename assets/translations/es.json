@@ -750,6 +750,37 @@
       "error_save": "No se pudo guardar tu respuesta. Inténtalo de nuevo.",
       "error_closed": "El partido ya no admite respuestas.",
       "error_not_participant": "Solo los jugadores de los equipos del partido pueden responder."
+    },
+    "dispute": {
+      "title": "¿Hay un problema con el resultado?",
+      "hint": "Si el marcador no es el correcto, avísale al organizador. Lo revisará y te responderá aquí.",
+      "report": "Avisar del problema",
+      "report_again": "Avisar de otro problema",
+      "sheet_title": "Cuéntanos qué pasó",
+      "current_result": "Resultado registrado: {home} {homeScore} – {awayScore} {away}",
+      "reason_label": "¿Qué está mal?",
+      "reason_hint": "Ej.: el gol del minuto 80 no fue de nuestro equipo",
+      "score_title": "Si lo sabes, ¿cuál es el marcador correcto? (opcional)",
+      "send": "Enviar aviso",
+      "sent": "Listo: el organizador recibió tu aviso.",
+      "status_open": "Esperando respuesta del organizador",
+      "status_accepted": "El organizador te dio la razón",
+      "status_rejected": "El resultado se mantiene",
+      "your_reason": "Tu aviso: {reason}",
+      "proposed_score": "Marcador que propones: {home} {homeScore} – {awayScore} {away}",
+      "organizer_note": "Respuesta del organizador: {note}",
+      "error_load": "No se pudo cargar el aviso de este partido.",
+      "error_save": "No se pudo enviar el aviso. Inténtalo de nuevo.",
+      "errors": {
+        "RESULT_NOT_RECORDED": "Este partido todavía no tiene resultado.",
+        "WINDOW_CLOSED": "Ya pasó el tiempo para avisar de un problema con este resultado.",
+        "TEAM_NOT_IN_MATCH": "Tu equipo no juega este partido.",
+        "NOT_ALLOWED_FOR_TEAM": "Solo el dirigente del equipo puede avisar de un problema con el resultado.",
+        "ALREADY_OPEN": "Ya enviaste un aviso de este partido: espera la respuesta del organizador.",
+        "REASON_REQUIRED": "Cuéntanos qué está mal.",
+        "SCORE_INCOMPLETE": "Escribe los goles de los dos equipos, o deja las dos casillas vacías.",
+        "INVALID_SCORE": "Los goles deben ser números enteros desde 0."
+      }
     }
   },
   "invitations": {

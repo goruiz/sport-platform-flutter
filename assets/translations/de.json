@@ -750,6 +750,37 @@
       "error_save": "Deine Antwort konnte nicht gespeichert werden. Bitte versuche es erneut.",
       "error_closed": "Das Spiel nimmt keine Antworten mehr an.",
       "error_not_participant": "Nur Spieler der beteiligten Teams können antworten."
+    },
+    "dispute": {
+      "title": "Gibt es ein Problem mit dem Ergebnis?",
+      "hint": "Wenn das Ergebnis nicht stimmt, sag dem Veranstalter Bescheid. Er prüft es und antwortet dir hier.",
+      "report": "Problem melden",
+      "report_again": "Ein weiteres Problem melden",
+      "sheet_title": "Erzähl uns, was passiert ist",
+      "current_result": "Eingetragenes Ergebnis: {home} {homeScore} – {awayScore} {away}",
+      "reason_label": "Was stimmt nicht?",
+      "reason_hint": "z. B. das Tor in der 80. Minute hat nicht unser Team geschossen",
+      "score_title": "Wenn du es weißt: Wie lautet das richtige Ergebnis? (optional)",
+      "send": "Meldung senden",
+      "sent": "Erledigt: Der Veranstalter hat deine Meldung erhalten.",
+      "status_open": "Warten auf die Antwort des Veranstalters",
+      "status_accepted": "Der Veranstalter hat dir recht gegeben",
+      "status_rejected": "Das Ergebnis bleibt bestehen",
+      "your_reason": "Deine Meldung: {reason}",
+      "proposed_score": "Ergebnis, das du vorschlägst: {home} {homeScore} – {awayScore} {away}",
+      "organizer_note": "Antwort des Veranstalters: {note}",
+      "error_load": "Die Meldung zu diesem Spiel konnte nicht geladen werden.",
+      "error_save": "Die Meldung konnte nicht gesendet werden. Bitte versuche es erneut.",
+      "errors": {
+        "RESULT_NOT_RECORDED": "Für dieses Spiel gibt es noch kein Ergebnis.",
+        "WINDOW_CLOSED": "Die Frist, ein Problem mit diesem Ergebnis zu melden, ist abgelaufen.",
+        "TEAM_NOT_IN_MATCH": "Dein Team spielt dieses Spiel nicht.",
+        "NOT_ALLOWED_FOR_TEAM": "Nur der Teamverantwortliche kann ein Problem mit dem Ergebnis melden.",
+        "ALREADY_OPEN": "Du hast für dieses Spiel schon eine Meldung gesendet: Warte auf die Antwort des Veranstalters.",
+        "REASON_REQUIRED": "Sag uns, was nicht stimmt.",
+        "SCORE_INCOMPLETE": "Gib die Tore beider Teams ein oder lass beide Felder leer.",
+        "INVALID_SCORE": "Tore müssen ganze Zahlen ab 0 sein."
+      }
     }
   },
   "invitations": {

@@ -750,6 +750,37 @@
       "error_save": "Your answer could not be saved. Please try again.",
       "error_closed": "The match no longer accepts answers.",
       "error_not_participant": "Only players from the match's teams can answer."
+    },
+    "dispute": {
+      "title": "Is there a problem with the result?",
+      "hint": "If the score is not right, let the organizer know. They will review it and reply here.",
+      "report": "Report the problem",
+      "report_again": "Report another problem",
+      "sheet_title": "Tell us what happened",
+      "current_result": "Recorded result: {home} {homeScore} – {awayScore} {away}",
+      "reason_label": "What is wrong?",
+      "reason_hint": "E.g. the goal in minute 80 was not scored by our team",
+      "score_title": "If you know it, what is the correct score? (optional)",
+      "send": "Send report",
+      "sent": "Done: the organizer received your report.",
+      "status_open": "Waiting for the organizer's reply",
+      "status_accepted": "The organizer agreed with you",
+      "status_rejected": "The result stands",
+      "your_reason": "Your report: {reason}",
+      "proposed_score": "Score you suggest: {home} {homeScore} – {awayScore} {away}",
+      "organizer_note": "Organizer's reply: {note}",
+      "error_load": "The report for this match could not be loaded.",
+      "error_save": "The report could not be sent. Please try again.",
+      "errors": {
+        "RESULT_NOT_RECORDED": "This match has no result yet.",
+        "WINDOW_CLOSED": "The time to report a problem with this result is over.",
+        "TEAM_NOT_IN_MATCH": "Your team does not play this match.",
+        "NOT_ALLOWED_FOR_TEAM": "Only the team manager can report a problem with the result.",
+        "ALREADY_OPEN": "You already sent a report for this match: wait for the organizer's reply.",
+        "REASON_REQUIRED": "Tell us what is wrong.",
+        "SCORE_INCOMPLETE": "Enter the goals of both teams, or leave both boxes empty.",
+        "INVALID_SCORE": "Goals must be whole numbers from 0."
+      }
     }
   },
   "invitations": {

@@ -750,6 +750,37 @@
       "error_save": "Impossible d'enregistrer votre réponse. Réessayez.",
       "error_closed": "Le match n'accepte plus de réponses.",
       "error_not_participant": "Seuls les joueurs des équipes du match peuvent répondre."
+    },
+    "dispute": {
+      "title": "Y a-t-il un problème avec le résultat ?",
+      "hint": "Si le score n'est pas le bon, prévenez l'organisateur. Il vérifiera et vous répondra ici.",
+      "report": "Signaler le problème",
+      "report_again": "Signaler un autre problème",
+      "sheet_title": "Dites-nous ce qui s'est passé",
+      "current_result": "Résultat enregistré : {home} {homeScore} – {awayScore} {away}",
+      "reason_label": "Qu'est-ce qui ne va pas ?",
+      "reason_hint": "Ex. : le but de la 80e minute n'a pas été marqué par notre équipe",
+      "score_title": "Si vous le savez, quel est le bon score ? (facultatif)",
+      "send": "Envoyer le signalement",
+      "sent": "C'est fait : l'organisateur a reçu votre signalement.",
+      "status_open": "En attente de la réponse de l'organisateur",
+      "status_accepted": "L'organisateur vous a donné raison",
+      "status_rejected": "Le résultat est maintenu",
+      "your_reason": "Votre signalement : {reason}",
+      "proposed_score": "Score que vous proposez : {home} {homeScore} – {awayScore} {away}",
+      "organizer_note": "Réponse de l'organisateur : {note}",
+      "error_load": "Impossible de charger le signalement de ce match.",
+      "error_save": "Impossible d'envoyer le signalement. Réessayez.",
+      "errors": {
+        "RESULT_NOT_RECORDED": "Ce match n'a pas encore de résultat.",
+        "WINDOW_CLOSED": "Le délai pour signaler un problème avec ce résultat est écoulé.",
+        "TEAM_NOT_IN_MATCH": "Votre équipe ne joue pas ce match.",
+        "NOT_ALLOWED_FOR_TEAM": "Seul le dirigeant de l'équipe peut signaler un problème avec le résultat.",
+        "ALREADY_OPEN": "Vous avez déjà envoyé un signalement pour ce match : attendez la réponse de l'organisateur.",
+        "REASON_REQUIRED": "Dites-nous ce qui ne va pas.",
+        "SCORE_INCOMPLETE": "Saisissez les buts des deux équipes, ou laissez les deux cases vides.",
+        "INVALID_SCORE": "Les buts doivent être des nombres entiers à partir de 0."
+      }
     }
   },
   "invitations": {

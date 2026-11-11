@@ -20,6 +20,7 @@ import 'package:sport_platform/modules/events/shared/data/datasource/events_cata
 import 'package:sport_platform/modules/events/shared/data/datasource/team_events_service.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_attendance_service.dart';
+import 'package:sport_platform/modules/matches/data/datasource/match_disputes_service.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_events_service.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
@@ -27,6 +28,7 @@ import 'package:sport_platform/modules/players/data/datasource/join_team_service
 import 'package:sport_platform/modules/players/data/datasource/team_invitations_service.dart';
 import 'package:sport_platform/modules/users/data/datasource/account_service.dart';
 import 'package:sport_platform/modules/users/data/datasource/player_photo_service.dart';
+import 'package:sport_platform/modules/users/presentation/providers/account_capabilities_notifier.dart';
 import 'package:sport_platform/modules/users/presentation/providers/email_verification_notifier.dart';
 import 'package:sport_platform/modules/players/presentation/providers/invitations_notifier.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
@@ -72,6 +74,7 @@ void setupServiceLocator() {
   getIt.registerLazySingleton<MatchesService>(() => MatchesService());
   getIt.registerLazySingleton<MatchEventsService>(() => MatchEventsService());
   getIt.registerLazySingleton<MatchAttendanceService>(() => MatchAttendanceService());
+  getIt.registerLazySingleton<MatchDisputesService>(() => MatchDisputesService());
   getIt.registerLazySingleton<PlayerStatsService>(() => PlayerStatsService());
   getIt.registerLazySingleton<TeamInvitationsService>(() => TeamInvitationsService());
   getIt.registerLazySingleton<InvitationsNotifier>(
@@ -82,6 +85,9 @@ void setupServiceLocator() {
   getIt.registerLazySingleton<PlayerPhotoService>(() => PlayerPhotoService());
   getIt.registerLazySingleton<EmailVerificationNotifier>(
     () => EmailVerificationNotifier(getIt<AccountService>()),
+  );
+  getIt.registerLazySingleton<AccountCapabilitiesNotifier>(
+    () => AccountCapabilitiesNotifier(getIt<AccountService>()),
   );
   getIt.registerLazySingleton<JoinTeamService>(() => JoinTeamService());
   getIt.registerLazySingleton<EventsSearchService>(() => EventsSearchService());
@@ -115,5 +121,9 @@ void _resetSessionScopedServices() {
   }
   if (getIt.isRegistered<EmailVerificationNotifier>()) {
     getIt.resetLazySingleton<EmailVerificationNotifier>();
+  }
+  // Lo que el rol de la cuenta anterior le permitía no le toca al siguiente.
+  if (getIt.isRegistered<AccountCapabilitiesNotifier>()) {
+    getIt.resetLazySingleton<AccountCapabilitiesNotifier>();
   }
 }
