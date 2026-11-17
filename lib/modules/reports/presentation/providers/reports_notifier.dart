@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
 import 'package:sport_platform/modules/matches/domain/match_rules.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/reports/domain/team_report.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 import 'package:sport_platform/shared/enums/summary_status.dart';
 
 /// El estado del reporte del equipo activo del usuario, calculado con sus partidos. Quien juega en varios equipos (uno
@@ -97,9 +99,10 @@ class ReportsNotifier extends ChangeNotifier {
       } else {
         await _buildReport(teamId);
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('ReportsNotifier.load', error, stackTrace);
       if (loadId != _loadCount) return;
-      _error = 'reports.load_error';
+      _error = LocaleKeys.reports_load_error;
     }
     if (loadId != _loadCount) return;
     _loading = false;
@@ -132,7 +135,7 @@ class ReportsNotifier extends ChangeNotifier {
     // El nombre del evento viene en cada partido: no hace falta bajar todos los eventos solo para rotular el reporte.
     final eventNames = <String, String>{
       for (final match in matches)
-        if (match.eventName != null) match.eventId: match.eventName!,
+        if (match.eventId != null && match.eventName != null) match.eventId!: match.eventName!,
     };
     _record = buildTeamRecord(teamId, matches);
     _recentForm = buildRecentForm(teamId, matches, limit: recentFormLength);
@@ -152,7 +155,7 @@ class ReportsNotifier extends ChangeNotifier {
 
   Set<String> _eventIdsOf(Iterable<MatchModel> matches) => {
     for (final match in matches)
-      if (match.eventId.isNotEmpty) match.eventId,
+      ?match.eventId,
   };
 
   /// Las tarjetas y faltas del equipo: lo de sus jugadores en cada evento donde juega.
@@ -166,7 +169,8 @@ class ReportsNotifier extends ChangeNotifier {
         _eventIds.map(_playerStatsService.getByEvent),
       );
       discipline = buildTeamDiscipline(teamId, statsByEvent);
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('ReportsNotifier._loadDiscipline', error, stackTrace);
       status = SummaryStatus.failed;
     }
     if (loadId != _loadCount) return;

@@ -1,14 +1,16 @@
 import 'package:flutter/foundation.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/courts_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
+import 'package:sport_platform/modules/courts/data/datasource/courts_service.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/courts/data/models/court_model.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/team_events_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/domain/event_rules.dart';
 import 'package:sport_platform/modules/sport_complexes/data/datasource/sport_complexes_service.dart';
 import 'package:sport_platform/modules/sport_complexes/domain/complex_overview.dart';
 import 'package:sport_platform/modules/sport_complexes/domain/event_complexes.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 
 /// De qué complejos se habla: los de los eventos del equipo activo del jugador o todos los que ve.
 enum ComplexesScope { myTeam, all }
@@ -21,7 +23,7 @@ enum ComplexesScope { myTeam, all }
 /// o de alcance no vuelve a pedir lo que ya se leyó. Descarta la respuesta de una lectura que ya no es la actual, para que
 /// una respuesta lenta nunca pise a una más nueva.
 class SportComplexesNotifier extends ChangeNotifier {
-  static const _loadErrorKey = 'mobile.complexes.load_error';
+  static const _loadErrorKey = LocaleKeys.mobile_complexes_load_error;
 
   final SportComplexesService _complexesService;
   final CourtsService _courtsService;
@@ -154,7 +156,8 @@ class SportComplexesNotifier extends ChangeNotifier {
   Future<void> _syncActiveTeam() async {
     try {
       await _activeTeam.sync(await _playersService.getCurrent());
-    } catch (_) {
+    } catch (error) {
+      AppLogger.warning('SportComplexesNotifier._syncActiveTeam', error);
       // Sin el jugador no se sabe más: se queda con lo que hay.
     }
     _watchedTeamId = _activeTeam.activeTeamId;
@@ -190,7 +193,8 @@ class SportComplexesNotifier extends ChangeNotifier {
         _courtsWithoutComplex = catalog.courtsWithoutComplex;
       }
       if (teamEvents != null) _eventsByTeam[teamId!] = teamEvents;
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('SportComplexesNotifier._read', error, stackTrace);
       if (generation != _readGeneration) return;
       _error = _loadErrorKey;
     } finally {

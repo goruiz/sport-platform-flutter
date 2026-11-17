@@ -1,3 +1,5 @@
+import 'package:sport_platform/core/network/json_reader.dart';
+
 /// En qué va un aviso de problema con el resultado (una «disputa»). El backend lo guarda por nombre.
 enum DisputeStatus {
   /// El organizador todavía no responde.
@@ -62,21 +64,18 @@ class MatchDisputeModel {
   static MatchDisputeModel? fromJson(Map<String, dynamic> json) {
     final status = DisputeStatus.fromApi(json['status']);
     if (status == null) return null;
+    final reader = JsonReader(json, resource: 'disputa');
     return MatchDisputeModel(
-      id: json['id']?.toString() ?? '',
-      matchId: json['matchId']?.toString() ?? '',
+      id: reader.requiredString('id'),
+      matchId: reader.requiredString('matchId'),
       status: status,
-      teamId: json['teamId']?.toString() ?? '',
-      reason: json['reason']?.toString() ?? '',
-      proposedHomeScore: _asInt(json['proposedHomeScore']),
-      proposedAwayScore: _asInt(json['proposedAwayScore']),
-      createdAt: _asDateTime(json['createdAt']) ?? DateTime.now(),
-      resolutionNote: json['resolutionNote']?.toString(),
-      resolvedAt: _asDateTime(json['resolvedAt']),
+      teamId: reader.requiredString('teamId'),
+      reason: reader.requiredString('reason'),
+      proposedHomeScore: reader.optionalInt('proposedHomeScore'),
+      proposedAwayScore: reader.optionalInt('proposedAwayScore'),
+      createdAt: reader.requiredDateTime('createdAt'),
+      resolutionNote: reader.optionalString('resolutionNote'),
+      resolvedAt: reader.optionalDateTime('resolvedAt'),
     );
   }
-
-  static int? _asInt(Object? value) => value is num ? value.toInt() : null;
-
-  static DateTime? _asDateTime(Object? value) => value == null ? null : DateTime.tryParse(value.toString());
 }

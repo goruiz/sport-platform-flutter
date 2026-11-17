@@ -1,12 +1,13 @@
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/network/api_error_codes.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/shared/enums/match_status.dart';
 import 'package:sport_platform/modules/matches/data/models/match_attendance_model.dart';
 
 /// Por qué el backend rechaza una respuesta de asistencia (`MatchAttendanceError`), con la frase que se le muestra.
 enum MatchAttendanceError {
-  notAParticipant('NOT_A_PARTICIPANT', 'match_detail.attendance.error_not_participant'),
-  matchNotOpen('MATCH_NOT_OPEN', 'match_detail.attendance.error_closed');
+  notAParticipant('NOT_A_PARTICIPANT', LocaleKeys.match_detail_attendance_error_not_participant),
+  matchNotOpen('MATCH_NOT_OPEN', LocaleKeys.match_detail_attendance_error_closed);
 
   const MatchAttendanceError(this.backendCode, this.translationKey);
 

@@ -2,11 +2,11 @@ import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/home/presentation/constants/menu_colors.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/quick_action_card.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
@@ -160,7 +160,7 @@ class QuickActionsGrid extends StatelessWidget {
           const Icon(Icons.refresh, color: AppColors.primaryLight, size: 22),
           const SizedBox(width: AppSpacing.md),
           Expanded(
-            child: Text(HomeStringsConstants.menuError.tr(), style: AppTextStyles.bodyMuted),
+            child: Text(LocaleKeys.home_menu_error.tr(), style: AppTextStyles.bodyMuted),
           ),
         ],
       ),
@@ -174,7 +174,7 @@ class QuickActionsGrid extends StatelessWidget {
           const Icon(Icons.apps_outlined, color: AppColors.whiteSubtle, size: 22),
           const SizedBox(width: AppSpacing.md),
           Expanded(
-            child: Text(HomeStringsConstants.menuEmpty.tr(), style: AppTextStyles.bodyMuted),
+            child: Text(LocaleKeys.home_menu_empty.tr(), style: AppTextStyles.bodyMuted),
           ),
         ],
       ),

@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/shared/enums/match_status.dart';
 
 /// Badge de estado reutilizable para eventos y partidos.
 /// Usa [StatusBadge.forEvent] o [StatusBadge.forMatch] como constructores de fábrica.
@@ -47,10 +48,10 @@ class StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.snug, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Row(

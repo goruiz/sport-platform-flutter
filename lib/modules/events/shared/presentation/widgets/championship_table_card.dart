@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/shared/data/models/championship_model.dart';
 import 'package:sport_platform/modules/events/shared/presentation/utils/championship_labels.dart';
@@ -25,7 +26,7 @@ class ChampionshipTableCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 8, left: 4),
+          padding: const EdgeInsets.only(bottom: AppSpacing.sm, left: AppSpacing.xs),
           child: Text(
             title.key.tr(args: title.args),
             style: const TextStyle(

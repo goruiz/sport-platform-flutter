@@ -1,12 +1,13 @@
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 
 /// Los listados que se arman con las estadísticas de los jugadores de un evento.
 enum LeaderboardKind {
-  scorers('rankings.scorers'),
-  assists('rankings.assists'),
-  cards('rankings.cards');
+  scorers(LocaleKeys.rankings_scorers),
+  assists(LocaleKeys.rankings_assists),
+  cards(LocaleKeys.rankings_cards);
 
   const LeaderboardKind(this.translationKey);
 
@@ -22,8 +23,8 @@ enum LeaderboardKind {
 
 /// A quiénes abarca un ranking: a todos los del evento o solo a los compañeros del propio equipo.
 enum LeaderboardScope {
-  event('rankings.scope_event'),
-  myTeam('rankings.scope_team');
+  event(LocaleKeys.rankings_scope_event),
+  myTeam(LocaleKeys.rankings_scope_team);
 
   const LeaderboardScope(this.translationKey);
 

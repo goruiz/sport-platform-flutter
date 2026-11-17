@@ -1,16 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/modules/module_urls.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/home/data/datasource/home_dashboard_service.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/home/presentation/enums/menu_style.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/drawer_hint_card.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/email_verification_banner.dart';
@@ -24,7 +24,7 @@ import 'package:sport_platform/modules/home/presentation/widgets/summary_tile.da
 import 'package:sport_platform/modules/matches/presentation/pages/match_detail_page.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_summary_card.dart';
 import 'package:sport_platform/modules/players/presentation/pages/join_team_page.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 import 'package:sport_platform/modules/teams/presentation/widgets/active_team_pill.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/skeleton_box.dart';
@@ -167,7 +167,7 @@ class _HomeTabState extends State<HomeTab> {
   Widget _buildHeroSection(AsyncSnapshot<HomeDashboardData> snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) {
       return _section(
-        title: 'mobile.home.next_match'.tr(),
+        title: LocaleKeys.mobile_home_next_match.tr(),
         child: const SkeletonBox(height: 190),
       );
     }
@@ -178,7 +178,7 @@ class _HomeTabState extends State<HomeTab> {
 
     final match = data.nextMatch();
     return _section(
-      title: 'mobile.home.next_match'.tr(),
+      title: LocaleKeys.mobile_home_next_match.tr(),
       child: match == null
           ? _buildNoNextMatch()
           : NextMatchCard(
@@ -194,8 +194,8 @@ class _HomeTabState extends State<HomeTab> {
   Widget _buildNoNextMatch() {
     return SummaryTile(
       leading: SummaryTile.iconBadge(Icons.sports_soccer_outlined),
-      title: 'mobile.home.no_next_match'.tr(),
-      subtitle: 'mobile.matches.empty_mine_subtitle'.tr(),
+      title: LocaleKeys.mobile_home_no_next_match.tr(),
+      subtitle: LocaleKeys.mobile_matches_empty_mine_subtitle.tr(),
       onTap: () => widget.onNavigate?.call(ModuleUrls.matches),
     );
   }
@@ -210,7 +210,7 @@ class _HomeTabState extends State<HomeTab> {
               const Icon(Icons.cloud_off_outlined, color: AppColors.whiteSubtle, size: 26),
               const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: Text('mobile.home.load_error'.tr(), style: AppTextStyles.cardTitle),
+                child: Text(LocaleKeys.mobile_home_load_error.tr(), style: AppTextStyles.cardTitle),
               ),
             ],
           ),
@@ -218,7 +218,7 @@ class _HomeTabState extends State<HomeTab> {
           TextButton.icon(
             onPressed: _refreshDashboard,
             icon: const Icon(Icons.refresh, size: 18),
-            label: Text('common.retry'.tr()),
+            label: Text(LocaleKeys.common_retry.tr()),
           ),
         ],
       ),
@@ -230,7 +230,7 @@ class _HomeTabState extends State<HomeTab> {
   Widget _buildQuickActionsSection() {
     final isGrid = widget.menuStyle == HomeMenuStyle.grid;
     return _section(
-      title: HomeStringsConstants.sectionQuickActions.tr(),
+      title: LocaleKeys.home_section_quick_actions.tr(),
       action: IconButton(
         icon: Icon(
           isGrid ? Icons.view_sidebar_outlined : Icons.grid_view_outlined,
@@ -238,8 +238,8 @@ class _HomeTabState extends State<HomeTab> {
           size: 22,
         ),
         tooltip: isGrid
-            ? HomeStringsConstants.switchToDrawer.tr()
-            : HomeStringsConstants.switchToGrid.tr(),
+            ? LocaleKeys.home_switch_to_drawer.tr()
+            : LocaleKeys.home_switch_to_grid.tr(),
         onPressed: widget.onToggleMenuStyle,
       ),
       child: isGrid
@@ -279,11 +279,11 @@ class _HomeTabState extends State<HomeTab> {
         if (team != null) ...[
           const SizedBox(height: AppSpacing.section),
           _section(
-            title: 'mobile.teams.your_team'.tr(),
+            title: LocaleKeys.mobile_teams_your_team.tr(),
             child: SummaryTile(
               leading: InitialsAvatar(name: team.name, logoUrl: team.logoUrl),
               title: team.name,
-              subtitle: 'home.view_team'.tr(),
+              subtitle: LocaleKeys.home_view_team.tr(),
               onTap: () => widget.onNavigate?.call(ModuleUrls.teams),
             ),
           ),
@@ -291,7 +291,7 @@ class _HomeTabState extends State<HomeTab> {
         if (latestResult != null) ...[
           const SizedBox(height: AppSpacing.section),
           _section(
-            title: HomeStringsConstants.sectionLatestResult.tr(),
+            title: LocaleKeys.home_section_latest_result.tr(),
             child: MatchSummaryCard(
               match: latestResult,
               homeName: data.teamName(latestResult.homeTeamId),
@@ -303,7 +303,7 @@ class _HomeTabState extends State<HomeTab> {
         ],
         const SizedBox(height: AppSpacing.section),
         _section(
-          title: HomeStringsConstants.sectionNextEvent.tr(),
+          title: LocaleKeys.home_section_next_event.tr(),
           child: _buildEventTile(data.nextEvent()),
         ),
       ],
@@ -314,8 +314,8 @@ class _HomeTabState extends State<HomeTab> {
     if (event == null) {
       return SummaryTile(
         leading: SummaryTile.iconBadge(Icons.event_outlined),
-        title: HomeStringsConstants.noNextEvent.tr(),
-        subtitle: HomeStringsConstants.noNextEventSubtitle.tr(),
+        title: LocaleKeys.home_no_next_event.tr(),
+        subtitle: LocaleKeys.home_no_next_event_subtitle.tr(),
         onTap: () => widget.onNavigate?.call(ModuleUrls.events),
       );
     }

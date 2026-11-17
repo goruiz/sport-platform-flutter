@@ -346,6 +346,7 @@
     "match_day_label": "Jornada {n}",
     "match_status_suspended": "Suspendido",
     "match_status_rescheduled": "Reagendado",
+    "match_status_unknown": "Estado desconocido",
     "standings_col_gd": "DG",
     "info_dates": "Fechas",
     "info_format": "Formato",

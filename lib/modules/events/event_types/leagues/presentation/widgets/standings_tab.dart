@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
-import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/standings_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/standing_model.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
@@ -20,18 +21,18 @@ class StandingsTab extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-            child: CircularProgressIndicator(color: AppColors.primaryLight),
+            child: CircularProgressIndicator(),
           );
         }
         if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
           return EmptyState(
             icon: Icons.leaderboard_outlined,
-            title: 'leagues.standings_empty'.tr(),
-            subtitle: 'leagues.standings_empty_subtitle'.tr(),
+            title: LocaleKeys.leagues_standings_empty.tr(),
+            subtitle: LocaleKeys.leagues_standings_empty_subtitle.tr(),
           );
         }
         return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+          padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.listBottom),
           child: StandingsTable(rows: snapshot.data!.map(_toRow).toList()),
         );
       },

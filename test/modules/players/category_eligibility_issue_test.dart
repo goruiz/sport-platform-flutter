@@ -2,10 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
-import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
-import 'package:sport_platform/modules/players/presentation/widgets/category_eligibility_notice.dart';
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
+import 'package:sport_platform/shared/enums/category_eligibility_issue.dart';
+import 'package:sport_platform/shared/widgets/category_eligibility_notice.dart';
+import 'package:sport_platform/core/models/gender.dart';
 
 import '../../support/real_translations.dart';
 

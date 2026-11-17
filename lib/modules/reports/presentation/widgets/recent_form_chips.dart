@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/reports/domain/team_report.dart';
 
@@ -16,9 +17,9 @@ class RecentFormChips extends StatelessWidget {
 
   Widget _chip(MatchResult result) {
     final (label, color) = switch (result) {
-      MatchResult.win => ('reports.form_win'.tr(), AppColors.success),
-      MatchResult.draw => ('reports.form_draw'.tr(), AppColors.whiteSubtle),
-      MatchResult.loss => ('reports.form_loss'.tr(), AppColors.error),
+      MatchResult.win => (LocaleKeys.reports_form_win.tr(), AppColors.success),
+      MatchResult.draw => (LocaleKeys.reports_form_draw.tr(), AppColors.whiteSubtle),
+      MatchResult.loss => (LocaleKeys.reports_form_loss.tr(), AppColors.error),
     };
     return Container(
       width: 34,

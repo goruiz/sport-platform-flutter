@@ -1,5 +1,5 @@
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/shared/enums/match_status.dart';
 
 /// Los partidos de un equipo en un evento, repartidos entre los que faltan y los que ya tienen resultado.
 class TeamMatchesInEvent {

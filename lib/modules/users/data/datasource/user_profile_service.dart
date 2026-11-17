@@ -2,8 +2,8 @@ import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/network/response_parser.dart';
 import 'package:sport_platform/modules/users/data/models/user_model.dart';
-import 'package:sport_platform/modules/users/domain/birth_date_rules.dart';
-import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
+import 'package:sport_platform/core/utils/birth_date_rules.dart';
+import 'package:sport_platform/core/models/user_entity.dart';
 import 'package:sport_platform/modules/users/domain/entities/user_profile_update.dart';
 import 'package:sport_platform/modules/users/domain/repositories/i_user_profile_repository.dart';
 

@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
-import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
@@ -46,7 +48,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       setState(() => _requestSubmitted = true);
     } on DioException {
       if (!mounted) return;
-      AppSnackbar.error(context, LoginStringsConstants.recoveryError.tr());
+      AppSnackbar.error(context, LocaleKeys.login_recovery_error.tr());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -55,13 +57,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return _RecoveryScaffold(
-      title: LoginStringsConstants.recoveryTitle.tr(),
-      subtitle: LoginStringsConstants.recoverySubtitle.tr(),
+      title: LocaleKeys.login_recovery_title.tr(),
+      subtitle: LocaleKeys.login_recovery_subtitle.tr(),
       child: _requestSubmitted
           ? Text(
-              LoginStringsConstants.recoverySent.tr(),
+              LocaleKeys.login_recovery_sent.tr(),
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.white, fontSize: 15),
+              style: AppTextStyles.bodyLarge,
             )
           : Form(
               key: _formKey,
@@ -69,14 +71,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 children: [
                   SportTextField(
                     controller: _emailController,
-                    hint: LoginStringsConstants.emailHint.tr(),
+                    hint: LocaleKeys.login_email_hint.tr(),
                     icon: Icons.email_outlined,
                     keyboardType: TextInputType.emailAddress,
                     validator: _validateEmail,
                   ),
                   const SizedBox(height: 22),
                   _PrimaryButton(
-                    label: LoginStringsConstants.recoverySend.tr(),
+                    label: LocaleKeys.login_recovery_send.tr(),
                     isLoading: _isLoading,
                     onPressed: _requestReset,
                   ),
@@ -131,7 +133,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       await AuthStorage.clearToken();
       await UserSession.clear();
       if (!mounted) return;
-      AppSnackbar.success(context, LoginStringsConstants.resetSuccess.tr());
+      AppSnackbar.success(context, LocaleKeys.login_reset_success.tr());
       widget.onCompleted();
     } on DioException catch (error) {
       if (!mounted) return;
@@ -143,8 +145,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       AppSnackbar.error(
         context,
         (tokenError
-                ? LoginStringsConstants.resetTokenInvalid
-                : LoginStringsConstants.resetError)
+                ? LocaleKeys.login_reset_token_invalid
+                : LocaleKeys.login_reset_error)
             .tr(),
       );
     } finally {
@@ -155,14 +157,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return _RecoveryScaffold(
-      title: LoginStringsConstants.resetTitle.tr(),
-      subtitle: LoginStringsConstants.resetSubtitle.tr(),
+      title: LocaleKeys.login_reset_title.tr(),
+      subtitle: LocaleKeys.login_reset_subtitle.tr(),
       onBack: widget.onBack,
       child: widget.token.isEmpty
           ? Text(
-              LoginStringsConstants.resetTokenInvalid.tr(),
+              LocaleKeys.login_reset_token_invalid.tr(),
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.white, fontSize: 15),
+              style: AppTextStyles.bodyLarge,
             )
           : Form(
               key: _formKey,
@@ -170,7 +172,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 children: [
                   SportTextField(
                     controller: _passwordController,
-                    hint: LoginStringsConstants.newPasswordHint.tr(),
+                    hint: LocaleKeys.login_new_password_hint.tr(),
                     icon: Icons.lock_outline,
                     obscureText: _obscurePassword,
                     suffixIcon: IconButton(
@@ -186,10 +188,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     ),
                     validator: _validatePassword,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   SportTextField(
                     controller: _confirmPasswordController,
-                    hint: LoginStringsConstants.confirmPasswordHint.tr(),
+                    hint: LocaleKeys.login_confirm_password_hint.tr(),
                     icon: Icons.lock_reset_outlined,
                     obscureText: _obscureConfirmation,
                     suffixIcon: IconButton(
@@ -206,17 +208,17 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return LoginStringsConstants.passwordRequired.tr();
+                        return LocaleKeys.login_password_required.tr();
                       }
                       if (value != _passwordController.text) {
-                        return LoginStringsConstants.passwordsDoNotMatch.tr();
+                        return LocaleKeys.login_passwords_do_not_match.tr();
                       }
                       return null;
                     },
                   ),
                   const SizedBox(height: 22),
                   _PrimaryButton(
-                    label: LoginStringsConstants.resetPassword.tr(),
+                    label: LocaleKeys.login_reset_password.tr(),
                     isLoading: _isLoading,
                     onPressed: _resetPassword,
                   ),
@@ -246,13 +248,13 @@ class _RecoveryScaffold extends StatelessWidget {
       body: GradientBackground(
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.section, vertical: AppSpacing.xxxl),
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 440),
                 child: Column(
                   children: [
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.xxl),
                     const AuthLogo(),
                     const SizedBox(height: 36),
                     Text(
@@ -264,14 +266,11 @@ class _RecoveryScaffold extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppSpacing.snug),
                     Text(
                       subtitle,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AppColors.whiteSubtle,
-                        fontSize: 14,
-                      ),
+                      style: AppTextStyles.bodyMuted,
                     ),
                     const SizedBox(height: 30),
                     child,
@@ -279,7 +278,7 @@ class _RecoveryScaffold extends StatelessWidget {
                     TextButton(
                       onPressed:
                           onBack ?? () => Navigator.of(context).maybePop(),
-                      child: Text(LoginStringsConstants.backToLogin.tr()),
+                      child: Text(LocaleKeys.login_back_to_login.tr()),
                     ),
                   ],
                 ),
@@ -333,21 +332,21 @@ class _PrimaryButton extends StatelessWidget {
 
 String? _validateEmail(String? value) {
   if (value == null || value.isEmpty) {
-    return LoginStringsConstants.emailRequired.tr();
+    return LocaleKeys.login_email_required.tr();
   }
-  if (!value.contains('@')) return LoginStringsConstants.emailInvalid.tr();
+  if (!value.contains('@')) return LocaleKeys.login_email_invalid.tr();
   return null;
 }
 
 String? _validatePassword(String? value) {
   if (value == null || value.isEmpty) {
-    return LoginStringsConstants.passwordRequired.tr();
+    return LocaleKeys.login_password_required.tr();
   }
   if (value.length < AppConstants.minPasswordLength.value) {
-    return LoginStringsConstants.passwordTooShort.tr(args: [AppConstants.minPasswordLength.asText]);
+    return LocaleKeys.login_password_too_short.tr(args: [AppConstants.minPasswordLength.asText]);
   }
   if (value.length > AppConstants.maxPasswordLength.value) {
-    return LoginStringsConstants.passwordTooLong.tr(args: [AppConstants.maxPasswordLength.asText]);
+    return LocaleKeys.login_password_too_long.tr(args: [AppConstants.maxPasswordLength.asText]);
   }
   return null;
 }

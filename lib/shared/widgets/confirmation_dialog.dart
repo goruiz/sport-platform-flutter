@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 /// Pregunta «¿seguro?» antes de una acción. Devuelve true solo si la persona confirma.
@@ -17,7 +18,7 @@ Future<bool> showConfirmationDialog(
     builder: (ctx) => AlertDialog(
       title: Text(title),
       content: content != null ? Text(content) : null,
-      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      actionsPadding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(ctx).pop(false),

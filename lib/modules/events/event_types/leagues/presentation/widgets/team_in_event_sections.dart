@@ -1,9 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/initials_avatar.dart';
@@ -34,7 +35,7 @@ class TeamInEventMessage extends StatelessWidget {
           children: [
             Expanded(child: Text(message, style: AppTextStyles.bodyMuted)),
             if (onRetry != null)
-              TextButton(onPressed: onRetry, child: Text('common.retry'.tr())),
+              TextButton(onPressed: onRetry, child: Text(LocaleKeys.common_retry.tr())),
           ],
         ),
       );
@@ -67,7 +68,7 @@ class TeamScorersList extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      player.playerName ?? 'match_detail.unknown_player'.tr(),
+                      player.playerName ?? LocaleKeys.match_detail_unknown_player.tr(),
                       style: AppTextStyles.body,
                     ),
                   ),
@@ -106,7 +107,7 @@ class TeamRosterList extends StatelessWidget {
                   const SizedBox(width: AppSpacing.md),
                   Expanded(child: Text(player.fullName, style: AppTextStyles.body)),
                   if (player.isCaptain)
-                    Text('mobile.teams.captain'.tr(), style: AppTextStyles.overline),
+                    Text(LocaleKeys.mobile_teams_captain.tr(), style: AppTextStyles.overline),
                 ],
               ),
             ),

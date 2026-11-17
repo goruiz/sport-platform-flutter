@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/shared/enums/match_status.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_scoreboard.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_summary_card.dart';
 

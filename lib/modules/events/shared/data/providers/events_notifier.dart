@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/event_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 
@@ -8,7 +9,7 @@ class EventsNotifier extends ChangeNotifier {
   List<EventModel> _all = [];
   Set<String> _myIds = {};
   bool _loading = false;
-  String? _error;
+  bool _hasError = false;
   DateTime? _lastFetched;
 
   static const _ttl = Duration(minutes: 3);
@@ -17,7 +18,7 @@ class EventsNotifier extends ChangeNotifier {
 
   List<EventModel> get all => List.unmodifiable(_all);
   bool get loading => _loading;
-  String? get error => _error;
+  bool get hasError => _hasError;
   List<EventModel> get mine =>
       _all.where((e) => _myIds.contains(e.id)).toList();
 
@@ -28,7 +29,7 @@ class EventsNotifier extends ChangeNotifier {
   Future<void> load({bool force = false}) async {
     if (!force && _isFresh) return;
     _loading = true;
-    _error = null;
+    _hasError = false;
     notifyListeners();
     try {
       final results = await Future.wait([
@@ -38,8 +39,9 @@ class EventsNotifier extends ChangeNotifier {
       _all = results[0] as List<EventModel>;
       _myIds = results[1] as Set<String>;
       _lastFetched = DateTime.now();
-    } catch (_) {
-      _error = 'error';
+    } catch (error, stackTrace) {
+      AppLogger.error('EventsNotifier.load', error, stackTrace);
+      _hasError = true;
     } finally {
       _loading = false;
       notifyListeners();

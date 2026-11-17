@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
-import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/auth_logo.dart';
@@ -43,17 +44,17 @@ class LoginBody extends StatelessWidget {
         _buildHeader(),
         const SizedBox(height: 36),
         _buildForm(),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.md),
         _buildForgotPassword(),
-        const SizedBox(height: 28),
+        const SizedBox(height: AppSpacing.section),
         _buildLoginButton(),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.xxl),
         _buildDivider(),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.xxl),
         _buildSocialButtons(),
-        const SizedBox(height: 32),
+        const SizedBox(height: AppSpacing.xxxl),
         _buildSignUp(),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.xxl),
       ],
     );
   }
@@ -62,7 +63,7 @@ class LoginBody extends StatelessWidget {
     return Column(
       children: [
         Text(
-          LoginStringsConstants.welcomeBack.tr(),
+          LocaleKeys.login_welcome_back.tr(),
           style: const TextStyle(
             color: AppColors.white,
             fontSize: 28,
@@ -70,10 +71,10 @@ class LoginBody extends StatelessWidget {
             letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         Text(
-          LoginStringsConstants.signInSubtitle.tr(),
-          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+          LocaleKeys.login_sign_in_subtitle.tr(),
+          style: AppTextStyles.bodyMuted,
         ),
       ],
     );
@@ -87,25 +88,25 @@ class LoginBody extends StatelessWidget {
           children: [
             SportTextField(
               controller: emailController,
-              hint: LoginStringsConstants.emailHint.tr(),
+              hint: LocaleKeys.login_email_hint.tr(),
               icon: Icons.email_outlined,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.email],
             validator: (v) {
               if (v == null || v.isEmpty) {
-                return LoginStringsConstants.emailRequired.tr();
+                return LocaleKeys.login_email_required.tr();
               }
               if (!v.contains('@')) {
-                return LoginStringsConstants.emailInvalid.tr();
+                return LocaleKeys.login_email_invalid.tr();
               }
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           SportTextField(
             controller: passwordController,
-            hint: LoginStringsConstants.passwordHint.tr(),
+            hint: LocaleKeys.login_password_hint.tr(),
             icon: Icons.lock_outline,
             obscureText: obscurePassword,
             textInputAction: TextInputAction.done,
@@ -122,15 +123,15 @@ class LoginBody extends StatelessWidget {
                 color: AppColors.whiteSubtle,
                 size: 20,
               ),
-              tooltip: LoginStringsConstants.showHidePassword.tr(),
+              tooltip: LocaleKeys.login_show_hide_password.tr(),
               onPressed: onTogglePassword,
             ),
             validator: (v) {
               if (v == null || v.isEmpty) {
-                return LoginStringsConstants.passwordRequired.tr();
+                return LocaleKeys.login_password_required.tr();
               }
               if (v.length < AppConstants.minPasswordLength.value) {
-                return LoginStringsConstants.passwordTooShort.tr(args: [AppConstants.minPasswordLength.asText]);
+                return LocaleKeys.login_password_too_short.tr(args: [AppConstants.minPasswordLength.asText]);
               }
               return null;
             },
@@ -148,7 +149,7 @@ class LoginBody extends StatelessWidget {
         onPressed: onForgotPassword,
         style: TextButton.styleFrom(padding: EdgeInsets.zero),
         child: Text(
-          LoginStringsConstants.forgotPassword.tr(),
+          LocaleKeys.login_forgot_password.tr(),
           style: const TextStyle(color: AppColors.primaryLight, fontSize: 13),
         ),
       ),
@@ -170,7 +171,7 @@ class LoginBody extends StatelessWidget {
                   strokeWidth: 2.5,
                 ),
               )
-            : Text(LoginStringsConstants.signIn.tr()),
+            : Text(LocaleKeys.login_sign_in.tr()),
       ),
     );
   }
@@ -182,10 +183,10 @@ class LoginBody extends StatelessWidget {
           child: Divider(color: AppColors.inputBorder, thickness: 1),
         ),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: Text(
-            LoginStringsConstants.orContinueWith.tr(),
-            style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+            LocaleKeys.login_or_continue_with.tr(),
+            style: AppTextStyles.footnote,
           ),
         ),
         const Expanded(
@@ -200,14 +201,14 @@ class LoginBody extends StatelessWidget {
       children: [
         Expanded(
           child: SocialButton(
-            label: LoginStringsConstants.google.tr(),
+            label: LocaleKeys.login_google.tr(),
             icon: Icons.g_mobiledata,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: SocialButton(
-            label: LoginStringsConstants.apple.tr(),
+            label: LocaleKeys.login_apple.tr(),
             icon: Icons.apple,
           ),
         ),
@@ -221,13 +222,13 @@ class LoginBody extends StatelessWidget {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
-          LoginStringsConstants.noAccount.tr(),
-          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+          LocaleKeys.login_no_account.tr(),
+          style: AppTextStyles.bodyMuted,
         ),
         TextButton(
           onPressed: onSignUp,
           child: Text(
-            LoginStringsConstants.signUp.tr(),
+            LocaleKeys.login_sign_up.tr(),
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
         ),

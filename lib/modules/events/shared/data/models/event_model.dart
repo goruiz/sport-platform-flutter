@@ -1,3 +1,4 @@
+import 'package:sport_platform/core/network/json_reader.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_format_rules.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_format_structure.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
@@ -55,28 +56,22 @@ class EventModel {
   factory EventModel.fromJson(Map<String, dynamic> json) {
     final eventType = json['eventType'] as Map<String, dynamic>?;
     final eventFormat = json['eventFormat'] as Map<String, dynamic>?;
+    final reader = JsonReader(json, resource: 'evento');
     return EventModel(
-      id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      description: json['description']?.toString(),
-      format: json['format']?.toString() ?? '',
-      status: json['status']?.toString() ?? '',
-      startDate: json['startDate'] != null
-          ? DateTime.parse(json['startDate'].toString())
-          : DateTime.now(),
-      endDate: json['endDate'] != null
-          ? DateTime.parse(json['endDate'].toString())
-          : DateTime.now(),
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'].toString())
-          : DateTime.now(),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'].toString())
-          : null,
+      id: reader.requiredString('id'),
+      name: reader.requiredString('name'),
+      description: reader.optionalString('description'),
+      format: reader.textOrEmpty('format'),
+      // El estado es texto libre en el backend: uno vacío o desconocido se enseña tal cual (ver EventStatus).
+      status: reader.textOrEmpty('status'),
+      startDate: reader.requiredDateTime('startDate'),
+      endDate: reader.requiredDateTime('endDate'),
+      createdAt: reader.requiredDateTime('createdAt'),
+      updatedAt: reader.optionalDateTime('updatedAt'),
       eventTypeName: eventType?['name']?.toString(),
       formatRules: EventFormatRules.fromJson(eventFormat),
-      minPlayersPerTeam: _asInt(json['minPlayersPerTeam']),
-      maxPlayersPerTeam: _asInt(json['maxPlayersPerTeam']),
+      minPlayersPerTeam: reader.optionalInt('minPlayersPerTeam'),
+      maxPlayersPerTeam: reader.optionalInt('maxPlayersPerTeam'),
       sportComplexIds: [
         for (final id in json['sportComplexIds'] as List<dynamic>? ?? const []) id.toString(),
       ],
@@ -123,8 +118,6 @@ class EventModel {
         maxPlayersPerTeam: maxPlayersPerTeam ?? this.maxPlayersPerTeam,
         sportComplexIds: sportComplexIds ?? this.sportComplexIds,
       );
-
-  static int? _asInt(dynamic value) => value is num ? value.toInt() : null;
 
   static String _apiDate(DateTime d) =>
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';

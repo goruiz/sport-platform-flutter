@@ -1,12 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/courts/presentation/pages/court_detail_page.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/modules/courts/data/models/court_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/sport_complexes/domain/complex_overview.dart';
 import 'package:sport_platform/modules/sport_complexes/presentation/pages/sport_complex_detail_page.dart';
 import 'package:sport_platform/modules/sport_complexes/presentation/providers/sport_complexes_notifier.dart';
@@ -61,7 +62,12 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
   /// [overview] es el complejo de la cancha, para ofrecer desde ella el enlace a su mapa; null si no tiene complejo.
   void _openCourt(CourtModel court, ComplexOverview? overview) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => CourtDetailPage(court: court, complex: overview)),
+      MaterialPageRoute(
+        builder: (_) => CourtDetailPage(
+          court: court,
+          onOpenComplex: overview == null ? null : () => _openComplex(overview),
+        ),
+      ),
     );
   }
 
@@ -74,7 +80,7 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
         actions: [
           IconButton(
             onPressed: _notifier.load,
-            tooltip: 'common.retry'.tr(),
+            tooltip: LocaleKeys.common_retry.tr(),
             icon: const Icon(Icons.refresh),
           ),
         ],
@@ -85,7 +91,7 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(AppSpacing.page, AppSpacing.md, AppSpacing.page, AppSpacing.sm),
             child: AppSearchField(
-              hint: 'mobile.complexes.search_hint'.tr(),
+              hint: LocaleKeys.mobile_complexes_search_hint.tr(),
               onChanged: (value) => setState(() => _query = value),
             ),
           ),
@@ -113,12 +119,12 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
                   ButtonSegment(
                     value: ComplexesScope.myTeam,
                     icon: const Icon(Icons.shield_outlined),
-                    label: Text('mobile.complexes.scope_mine'.tr()),
+                    label: Text(LocaleKeys.mobile_complexes_scope_mine.tr()),
                   ),
                   ButtonSegment(
                     value: ComplexesScope.all,
                     icon: const Icon(Icons.public),
-                    label: Text('mobile.complexes.scope_all'.tr()),
+                    label: Text(LocaleKeys.mobile_complexes_scope_all.tr()),
                   ),
                 ],
                 selected: {_notifier.scope},
@@ -155,7 +161,7 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
             isExpanded: true,
             dropdownColor: AppColors.sheetBackground,
             style: const TextStyle(color: AppColors.white),
-            decoration: AppInputDecoration.standard('mobile.complexes.pick_event'.tr()),
+            decoration: AppInputDecoration.standard(LocaleKeys.mobile_complexes_pick_event.tr()),
             items: [
               for (final group in _notifier.eventGroups)
                 DropdownMenuItem(
@@ -179,7 +185,7 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
 
   Widget _buildResults() {
     if (_notifier.loading) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primaryLight));
+      return const Center(child: CircularProgressIndicator());
     }
     final error = _notifier.error;
     if (error != null) return ErrorRetry(message: error.tr(), onRetry: _notifier.load);
@@ -197,8 +203,8 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
       return _scrollableEmptyState(
         EmptyState(
           icon: Icons.search_off,
-          title: 'mobile.complexes.filtered_empty_title'.tr(),
-          subtitle: 'mobile.complexes.filtered_empty_subtitle'.tr(),
+          title: LocaleKeys.mobile_complexes_filtered_empty_title.tr(),
+          subtitle: LocaleKeys.mobile_complexes_filtered_empty_subtitle.tr(),
         ),
       );
     }
@@ -213,7 +219,7 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
           if (visibleLooseCourts.isNotEmpty)
             ComplexSectionCard(
               icon: Icons.location_off_outlined,
-              title: 'mobile.complexes.courts_without_complex'.tr(),
+              title: LocaleKeys.mobile_complexes_courts_without_complex.tr(),
               courts: visibleLooseCourts,
               onTapCourt: (court) => _openCourt(court, null),
             ),
@@ -228,7 +234,7 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
       icon: Icons.stadium_outlined,
       title: complex.name,
       location: complex.location,
-      note: complex.hasMapPosition ? null : 'mobile.complexes.no_location'.tr(),
+      note: complex.hasMapPosition ? null : LocaleKeys.mobile_complexes_no_location.tr(),
       onTapHeader: () => _openComplex(overview),
       courts: overview.courts,
       onTapCourt: (court) => _openCourt(court, overview),
@@ -242,10 +248,10 @@ class _SportComplexesPageState extends State<SportComplexesPage> {
     return _scrollableEmptyState(
       EmptyState(
         icon: Icons.stadium_outlined,
-        title: (isTeamScope ? 'mobile.complexes.empty_mine_title' : 'mobile.complexes.empty_title').tr(),
-        subtitle: (isTeamScope ? 'mobile.complexes.empty_mine_subtitle' : 'mobile.complexes.empty_subtitle').tr(),
+        title: (isTeamScope ? LocaleKeys.mobile_complexes_empty_mine_title : LocaleKeys.mobile_complexes_empty_title).tr(),
+        subtitle: (isTeamScope ? LocaleKeys.mobile_complexes_empty_mine_subtitle : LocaleKeys.mobile_complexes_empty_subtitle).tr(),
         onAdd: isTeamScope ? () => _notifier.selectScope(ComplexesScope.all) : null,
-        actionLabel: 'mobile.complexes.see_all'.tr(),
+        actionLabel: LocaleKeys.mobile_complexes_see_all.tr(),
         actionIcon: Icons.public,
       ),
     );

@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 import 'package:sport_platform/modules/reports/presentation/providers/reports_notifier.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 import 'package:sport_platform/shared/enums/summary_status.dart';
 
 import '../../support/builders.dart';

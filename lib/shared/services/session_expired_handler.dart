@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/session_strings_constants.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
 import 'package:sport_platform/core/services/session_expired_listener.dart';
 import 'package:sport_platform/core/services/session_service.dart';
@@ -52,6 +52,6 @@ class SessionExpiredHandler implements SessionExpiredListener {
   void _announceSessionExpired() {
     final context = _navigatorKey.currentContext;
     if (context == null) return;
-    AppSnackbar.info(context, SessionStringsConstants.expired.tr());
+    AppSnackbar.info(context, LocaleKeys.session_expired.tr());
   }
 }

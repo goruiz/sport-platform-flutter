@@ -1,8 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
-import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_matches_repository.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_teams_repository.dart';
@@ -111,13 +112,13 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
         isScrollable: true,
         tabAlignment: TabAlignment.start,
         tabs: [
-          Tab(text: 'leagues.detail_tab_info'.tr()),
-          Tab(text: 'leagues.detail_tab_teams'.tr()),
-          Tab(text: 'leagues.detail_tab_matches'.tr()),
+          Tab(text: LocaleKeys.leagues_detail_tab_info.tr()),
+          Tab(text: LocaleKeys.leagues_detail_tab_teams.tr()),
+          Tab(text: LocaleKeys.leagues_detail_tab_matches.tr()),
           Tab(
             text: _event.hasChampionship
-                ? 'championship.tab_title'.tr()
-                : 'leagues.detail_tab_standings'.tr(),
+                ? LocaleKeys.championship_tab_title.tr()
+                : LocaleKeys.leagues_detail_tab_standings.tr(),
           ),
         ],
       ),
@@ -126,11 +127,11 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
 
   Widget _buildInfoTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         children: [
           LeagueInfoCard(event: _event),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           EventRulesCard(event: _event),
         ],
       ),
@@ -163,7 +164,7 @@ class _LeagueDetailPageState extends State<LeagueDetailPage>
   Widget _buildStandingsTab() {
     if (_notifier.loadingTeams || _notifier.loadingMatches) {
       return const Center(
-        child: CircularProgressIndicator(color: AppColors.primaryLight),
+        child: CircularProgressIndicator(),
       );
     }
     if (_event.hasChampionship) {

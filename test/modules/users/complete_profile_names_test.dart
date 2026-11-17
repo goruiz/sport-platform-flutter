@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
+import 'package:sport_platform/core/models/gender.dart';
 import 'package:sport_platform/modules/users/presentation/widgets/complete_profile_body.dart';
 
 import '../../support/real_translations.dart';

@@ -1,12 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/profile_strings_constants.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/services/user_session.dart';
-import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
-import 'package:sport_platform/modules/users/domain/name_rules.dart';
-import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
+import 'package:sport_platform/core/routes/app_pages.dart';
+import 'package:sport_platform/core/models/gender.dart';
+import 'package:sport_platform/core/utils/name_rules.dart';
+import 'package:sport_platform/core/models/user_entity.dart';
 import 'package:sport_platform/modules/users/domain/entities/user_profile_update.dart';
 import 'package:sport_platform/modules/users/domain/profile_field_errors.dart';
 import 'package:sport_platform/modules/users/domain/repositories/i_user_profile_repository.dart';
@@ -59,7 +60,8 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     final UserEntity account;
     try {
       account = await _profileRepository.getCurrentAccount();
-    } catch (_) {
+    } catch (error) {
+      AppLogger.warning('_CompleteProfilePageState._fillMissingPersonalData', error);
       return;
     }
     if (!mounted) return;
@@ -92,7 +94,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
         Navigator.of(context).pop(updatedUser);
         return;
       }
-      AppSnackbar.success(context, ProfileStringsConstants.saveSuccess.tr());
+      AppSnackbar.success(context, LocaleKeys.profile_save_success.tr());
       _navigateToHome();
     } catch (error) {
       if (!mounted) return;
@@ -106,7 +108,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   void _showSaveFailure(Object error) {
     final fieldErrors = ProfileFieldErrors.fromException(error);
     if (fieldErrors.isEmpty) {
-      AppSnackbar.error(context, ProfileStringsConstants.saveError.tr());
+      AppSnackbar.error(context, LocaleKeys.profile_save_error.tr());
       return;
     }
     setState(() => _fieldErrors = fieldErrors);
@@ -128,13 +130,13 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   }
 
   void _onSkip() {
-    AppSnackbar.info(context, ProfileStringsConstants.skipInfo.tr());
+    AppSnackbar.info(context, LocaleKeys.profile_skip_info.tr());
     _navigateToHome();
   }
 
   void _navigateToHome() {
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const HomePage()),
+      MaterialPageRoute(builder: (_) => AppPages.home()),
       (route) => false,
     );
   }

@@ -51,7 +51,7 @@ class SummaryTile extends StatelessWidget {
                   style: AppTextStyles.cardTitle,
                 ),
                 if (subtitle.isNotEmpty) ...[
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppSpacing.hairline),
                   Text(
                     subtitle,
                     maxLines: 2,

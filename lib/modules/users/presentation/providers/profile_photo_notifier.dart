@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/network/api_error_codes.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/users/data/datasource/player_photo_service.dart';
 import 'package:sport_platform/modules/users/domain/profile_photo_picker.dart';
 import 'package:sport_platform/modules/users/domain/profile_photo_rules.dart';
@@ -23,11 +25,11 @@ class ProfilePhotoOutcome {
 
 /// Cambiar y quitar la foto de perfil: elegirla, revisarla antes de subirla, subirla y explicar cómo terminó.
 class ProfilePhotoNotifier extends ChangeNotifier {
-  static const _updatedKey = 'mobile.profile.photo.updated';
-  static const _removedKey = 'mobile.profile.photo.removed';
-  static const _saveErrorKey = 'mobile.profile.photo.error_save';
-  static const _removeErrorKey = 'mobile.profile.photo.error_remove';
-  static const _noPlayerKey = 'mobile.profile.photo.error_no_player';
+  static const _updatedKey = LocaleKeys.mobile_profile_photo_updated;
+  static const _removedKey = LocaleKeys.mobile_profile_photo_removed;
+  static const _saveErrorKey = LocaleKeys.mobile_profile_photo_error_save;
+  static const _removeErrorKey = LocaleKeys.mobile_profile_photo_error_remove;
+  static const _noPlayerKey = LocaleKeys.mobile_profile_photo_error_no_player;
 
   final PlayerPhotoService _service;
   final ProfilePhotoPicker _picker;
@@ -50,7 +52,8 @@ class ProfilePhotoNotifier extends ChangeNotifier {
     final PickedPhoto? photo;
     try {
       photo = await _picker.pick(source);
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('ProfilePhotoNotifier.choose', error, stackTrace);
       // El selector falla, por ejemplo, si la persona negó el permiso de la cámara o de la galería.
       return const ProfilePhotoOutcome(messageKey: _saveErrorKey);
     }

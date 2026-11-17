@@ -1,8 +1,8 @@
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
-import 'package:sport_platform/modules/users/domain/birth_date_rules.dart';
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
+import 'package:sport_platform/core/utils/birth_date_rules.dart';
+import 'package:sport_platform/core/models/gender.dart';
 
 class PlayersAuthService {
   final DioClient _client = DioClient();

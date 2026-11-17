@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
-import 'package:sport_platform/modules/users/domain/birth_date_rules.dart';
+import 'package:sport_platform/core/utils/birth_date_rules.dart';
 
 void main() {
   final today = DateTime(2026, 11, 10);

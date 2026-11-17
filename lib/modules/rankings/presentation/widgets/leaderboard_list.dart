@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 import 'package:sport_platform/modules/rankings/domain/leaderboards.dart';
@@ -23,7 +26,7 @@ class LeaderboardList extends StatelessWidget {
     required this.kind,
     required this.onRefresh,
     this.highlightPlayerId,
-    this.emptySubtitleKey = 'rankings.empty_subtitle',
+    this.emptySubtitleKey = LocaleKeys.rankings_empty_subtitle,
   });
 
   @override
@@ -40,7 +43,7 @@ class LeaderboardList extends StatelessWidget {
                   height: MediaQuery.sizeOf(context).height * 0.5,
                   child: EmptyState(
                     icon: Icons.leaderboard_outlined,
-                    title: 'rankings.empty_title'.tr(),
+                    title: LocaleKeys.rankings_empty_title.tr(),
                     subtitle: emptySubtitleKey.tr(),
                   ),
                 ),
@@ -48,7 +51,7 @@ class LeaderboardList extends StatelessWidget {
             )
           : ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xxxl),
               itemCount: leaders.length,
               itemBuilder: (context, index) => _LeaderTile(
                 rank: index + 1,
@@ -77,11 +80,11 @@ class _LeaderTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: AppSpacing.md),
       decoration: BoxDecoration(
         color: isCurrentPlayer ? AppColors.primaryLight.withValues(alpha: 0.12) : AppColors.inputFill,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.compact),
         border: Border.all(color: isCurrentPlayer ? AppColors.primaryLight : AppColors.inputBorder),
       ),
       child: Row(
@@ -111,7 +114,7 @@ class _LeaderTile extends StatelessWidget {
                 if (player.teamName != null)
                   Text(
                     player.teamName!,
-                    style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+                    style: AppTextStyles.footnote,
                   ),
               ],
             ),
@@ -124,8 +127,8 @@ class _LeaderTile extends StatelessWidget {
 
   /// El nombre del jugador y, si es quien mira, «(Tú)» para encontrarse sin leer toda la lista.
   String get _displayName {
-    final name = player.playerName ?? 'match_detail.unknown_player'.tr();
-    return isCurrentPlayer ? '$name (${'rankings.you'.tr()})' : name;
+    final name = player.playerName ?? LocaleKeys.match_detail_unknown_player.tr();
+    return isCurrentPlayer ? '$name (${LocaleKeys.rankings_you.tr()})' : name;
   }
 
   Color get _rankColor => switch (rank) {
@@ -137,14 +140,14 @@ class _LeaderTile extends StatelessWidget {
 
   List<Widget> _cardCounters() => [
         _cardCounter(player.yellowCards, AppColors.cardYellow),
-        const SizedBox(width: 10),
+        const SizedBox(width: AppSpacing.snug),
         _cardCounter(player.redCards, AppColors.cardRed),
       ];
 
   Widget _cardCounter(int count, Color color) => Row(
         children: [
           Icon(Icons.square_rounded, color: color, size: 16),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.xs),
           Text(
             '$count',
             style: const TextStyle(

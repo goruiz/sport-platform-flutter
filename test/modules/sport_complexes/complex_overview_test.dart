@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
+import 'package:sport_platform/modules/courts/data/models/court_model.dart';
 import 'package:sport_platform/modules/sport_complexes/data/models/sport_complex_model.dart';
 import 'package:sport_platform/modules/sport_complexes/domain/complex_overview.dart';
 

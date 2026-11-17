@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/network/json_reader.dart';
 
 class MenuItemModel {
   final String id;
@@ -46,27 +47,25 @@ class MenuItemModel {
   }
 
   factory MenuItemModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'opción del menú');
     // Handles both nested (submenus/children arrays) and flat (id_parent_menu) responses
-    final rawChildren = (json['submenus'] as List<dynamic>?)
-        ?? (json['children'] as List<dynamic>?)
-        ?? [];
-
-    final children = rawChildren
-        .map((e) => MenuItemModel.fromJson(e as Map<String, dynamic>))
-        .toList()
+    final submenus = reader.list('submenus', MenuItemModel.fromJson);
+    final children = [...(submenus.isNotEmpty ? submenus : reader.list('children', MenuItemModel.fromJson))]
       ..sort((a, b) => a.order.compareTo(b.order));
 
     return MenuItemModel(
-      id: json['id'] as String,
-      name: json['name'] as String? ?? '',
-      translationKey: json['translationKey'] as String?,
-      description: json['description'] as String?,
-      descriptionTranslationKey: json['descriptionTranslationKey'] as String?,
-      icon: json['icon'] as String?,
-      url: json['url'] as String?,
-      order: (json['order'] as num?)?.toInt() ?? 0,
-      navOrder: (json['navOrder'] as num?)?.toInt(),
-      idParentMenu: json['idParentMenu'] as String?,
+      id: reader.requiredString('id'),
+      // El nombre propio puede faltar en una opción que solo trae su clave de traducción.
+      name: reader.textOrEmpty('name'),
+      translationKey: reader.optionalString('translationKey'),
+      description: reader.optionalString('description'),
+      descriptionTranslationKey: reader.optionalString('descriptionTranslationKey'),
+      icon: reader.optionalString('icon'),
+      url: reader.optionalString('url'),
+      // Una opción sin posición va al principio: el backend las manda siempre, es solo por si falta.
+      order: reader.optionalInt('order') ?? 0,
+      navOrder: reader.optionalInt('navOrder'),
+      idParentMenu: reader.optionalString('idParentMenu'),
       children: children,
     );
   }

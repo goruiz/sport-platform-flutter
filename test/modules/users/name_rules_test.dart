@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_platform/modules/users/domain/name_rules.dart';
-import 'package:sport_platform/modules/users/presentation/utils/person_name_input.dart';
+import 'package:sport_platform/core/utils/name_rules.dart';
+import 'package:sport_platform/shared/widgets/person_name_input.dart';
 
 void main() {
   group('checkPersonName: lo que sí sirve', () {

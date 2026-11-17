@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/matches/data/models/match_event_model.dart';
 
@@ -12,11 +15,11 @@ class MatchEventTile extends StatelessWidget {
 
   /// El jugador de la línea; en un cambio, «Entra X · Sale Y».
   String _headline() {
-    final player = event.playerName ?? 'match_detail.unknown_player'.tr();
+    final player = event.playerName ?? LocaleKeys.match_detail_unknown_player.tr();
     if (!event.isSubstitution) return player;
-    return 'match_events.substitution_line'.tr(namedArgs: {
+    return LocaleKeys.match_events_substitution_line.tr(namedArgs: {
       'player_in': player,
-      'player_out': event.replacedPlayerName ?? 'match_detail.unknown_player'.tr(),
+      'player_out': event.replacedPlayerName ?? LocaleKeys.match_detail_unknown_player.tr(),
     });
   }
 
@@ -25,11 +28,11 @@ class MatchEventTile extends StatelessWidget {
     final type = event.type;
     final color = type?.color ?? AppColors.whiteSubtle;
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.snug),
       decoration: BoxDecoration(
         color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.compact),
         border: Border.all(color: AppColors.inputBorder),
       ),
       child: Row(
@@ -45,7 +48,7 @@ class MatchEventTile extends StatelessWidget {
             ),
           ),
           Icon(type?.icon ?? Icons.help_outline, color: color, size: 22),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,10 +60,10 @@ class MatchEventTile extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppSpacing.hairline),
                 Text(
                   '${type == null ? '' : '${type.translationKey.tr()} · '}$teamName',
-                  style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+                  style: AppTextStyles.footnote,
                 ),
               ],
             ),

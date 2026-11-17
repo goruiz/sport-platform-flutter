@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sport_platform/core/network/json_reader.dart';
 import 'package:sport_platform/modules/matches/data/models/match_event_model.dart';
 import 'package:sport_platform/modules/matches/domain/enums/match_event_type.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
@@ -24,6 +25,9 @@ void main() {
     test('un tipo que la app no conoce queda sin tipo en vez de romper', () {
       final event = MatchEventModel.fromJson({
         'id': 'e1',
+        'matchId': 'm1',
+        'playerId': 'p1',
+        'teamId': 't1',
         'eventType': 'PENALTY_SHOOTOUT',
       });
 
@@ -33,6 +37,9 @@ void main() {
     test('un evento sin minuto ni jugador (borrado) se lee igual', () {
       final event = MatchEventModel.fromJson({
         'id': 'e1',
+        'matchId': 'm1',
+        'playerId': 'p1',
+        'teamId': 't1',
         'eventType': 'FOUL',
         'minute': null,
       });
@@ -40,6 +47,13 @@ void main() {
       expect(event.minute, isNull);
       expect(event.playerName, isNull);
     });
+  });
+
+  test('un evento sin su partido es una respuesta mal formada, no un evento de un partido vacío', () {
+    expect(
+      () => MatchEventModel.fromJson({'id': 'e1', 'playerId': 'p1', 'teamId': 't1', 'eventType': 'GOAL'}),
+      throwsA(isA<MalformedResponseException>().having((e) => e.field, 'campo', 'matchId')),
+    );
   });
 
   test('cada tipo se reconoce por el valor del backend', () {

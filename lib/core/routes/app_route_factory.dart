@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_platform/core/modules/module_registry.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 
 class AppRouteFactory {
   /// Scaffold-free content widget for use inside HomePage's bottom nav body.

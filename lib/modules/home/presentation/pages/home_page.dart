@@ -1,11 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
-import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
-import 'package:sport_platform/core/constants/strings_constants/logout_strings_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/home/data/datasource/menu_service.dart';
 import 'package:sport_platform/modules/home/presentation/enums/menu_style.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/home_tab.dart';
@@ -58,8 +60,8 @@ class _HomePageState extends State<HomePage> {
         _navItems = result.navItems;
         _menuItems = result.menuItems;
       });
-    } catch (e, st) {
-      debugPrint('MenuService error: $e\n$st');
+    } catch (error, stackTrace) {
+      AppLogger.error('_HomePageState._loadMenu', error, stackTrace);
       if (!mounted) return;
       setState(() => _menuError = true);
     } finally {
@@ -94,12 +96,12 @@ class _HomePageState extends State<HomePage> {
   Widget _buildTabBody() {
     if (_navItems.isEmpty && _isLoadingMenu) {
       return const Center(
-        child: CircularProgressIndicator(color: AppColors.primaryLight),
+        child: CircularProgressIndicator(),
       );
     }
     if (_navItems.isEmpty && _menuError) {
       return ErrorRetry(
-        message: HomeStringsConstants.menuError.tr(),
+        message: LocaleKeys.home_menu_error.tr(),
         onRetry: _loadMenu,
       );
     }
@@ -153,7 +155,7 @@ class _HomePageState extends State<HomePage> {
           ? Builder(
               builder: (ctx) => IconButton(
                 icon: const Icon(Icons.menu),
-                tooltip: HomeStringsConstants.openSideMenu.tr(),
+                tooltip: LocaleKeys.home_open_side_menu.tr(),
                 onPressed: () => Scaffold.of(ctx).openDrawer(),
               ),
             )
@@ -162,14 +164,14 @@ class _HomePageState extends State<HomePage> {
       actions: [
         const NotificationBell(),
         _buildAccountMenu(),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.xs),
       ],
     );
   }
 
   Widget _buildAccountMenu() {
     return PopupMenuButton<_AccountMenuAction>(
-      tooltip: 'common.more_options'.tr(),
+      tooltip: LocaleKeys.common_more_options.tr(),
       icon: const Icon(Icons.more_vert),
       onSelected: (action) => switch (action) {
         _AccountMenuAction.language => showLanguageSheet(context),
@@ -178,11 +180,11 @@ class _HomePageState extends State<HomePage> {
       itemBuilder: (_) => [
         PopupMenuItem(
           value: _AccountMenuAction.language,
-          child: _AccountMenuRow(icon: Icons.language, label: 'mobile.profile.language'.tr()),
+          child: _AccountMenuRow(icon: Icons.language, label: LocaleKeys.mobile_profile_language.tr()),
         ),
         PopupMenuItem(
           value: _AccountMenuAction.logout,
-          child: _AccountMenuRow(icon: Icons.logout, label: LogoutStringsConstants.button.tr()),
+          child: _AccountMenuRow(icon: Icons.logout, label: LocaleKeys.logout_button.tr()),
         ),
       ],
     );
@@ -220,8 +222,8 @@ class _AccountMenuRow extends StatelessWidget {
     return Row(
       children: [
         Icon(icon, color: AppColors.whiteSubtle, size: 20),
-        const SizedBox(width: 12),
-        Text(label, style: const TextStyle(color: AppColors.white, fontSize: 15)),
+        const SizedBox(width: AppSpacing.md),
+        Text(label, style: AppTextStyles.bodyLarge),
       ],
     );
   }

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/players/presentation/pages/invitations_page.dart';
@@ -15,7 +16,7 @@ class NotificationBell extends StatelessWidget {
     return ListenableBuilder(
       listenable: notifier,
       builder: (context, _) => IconButton(
-        tooltip: 'invitations.title'.tr(),
+        tooltip: LocaleKeys.invitations_title.tr(),
         onPressed: () => Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (_) => const InvitationsPage())),

@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/logout_strings_constants.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/services/user_session.dart';
@@ -10,13 +11,13 @@ import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/users/data/datasource/image_picker_photo_picker.dart';
 import 'package:sport_platform/modules/users/data/datasource/player_photo_service.dart';
 import 'package:sport_platform/modules/users/domain/profile_photo_picker.dart';
-import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
+import 'package:sport_platform/core/models/user_entity.dart';
 import 'package:sport_platform/modules/users/domain/repositories/i_user_profile_repository.dart';
 import 'package:sport_platform/modules/users/presentation/pages/change_password_page.dart';
 import 'package:sport_platform/modules/users/presentation/pages/complete_profile_page.dart';
@@ -80,7 +81,9 @@ class _ProfilePageState extends State<ProfilePage> {
       final account = await getIt<IUserProfileRepository>().getCurrentAccount();
       await UserSession.mergePersonalData(account);
       if (mounted) setState(() {});
-    } catch (_) {}
+    } catch (error) {
+      AppLogger.warning('_ProfilePageState._readPersonalData', error);
+    }
   }
 
   /// Pregunta qué hacer con la foto (tomarla, elegirla o quitarla), lo hace y avisa cómo terminó.
@@ -113,7 +116,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     if (!mounted || updated == null) return;
     setState(() {});
-    AppSnackbar.success(context, 'profile.save_success'.tr());
+    AppSnackbar.success(context, LocaleKeys.profile_save_success.tr());
   }
 
   /// El aviso de un equipo donde no puede jugar por faltarle datos abre el formulario del perfil; si guardó, se vuelve a leer
@@ -141,7 +144,7 @@ class _ProfilePageState extends State<ProfilePage> {
           final user = UserSession.current;
           if (user == null) {
             return Center(
-              child: Text('mobile.profile.load_error'.tr(), style: AppTextStyles.bodyMuted),
+              child: Text(LocaleKeys.mobile_profile_load_error.tr(), style: AppTextStyles.bodyMuted),
             );
           }
           return RefreshIndicator(
@@ -216,16 +219,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildPersonalData(UserEntity user) {
     return ProfileSection(
-      title: 'mobile.profile.section_personal'.tr(),
+      title: LocaleKeys.mobile_profile_section_personal.tr(),
       children: [
-        ProfileInfoRow(label: 'mobile.profile.username'.tr(), value: user.username),
-        ProfileInfoRow(label: 'mobile.profile.first_name'.tr(), value: user.firstName),
-        ProfileInfoRow(label: 'mobile.profile.middle_name'.tr(), value: user.middleName),
-        ProfileInfoRow(label: 'mobile.profile.last_name'.tr(), value: user.lastName),
-        ProfileInfoRow(label: 'mobile.profile.second_last_name'.tr(), value: user.secondLastName),
-        ProfileInfoRow(label: 'mobile.profile.gender'.tr(), value: user.gender?.translationKey.tr()),
+        ProfileInfoRow(label: LocaleKeys.mobile_profile_username.tr(), value: user.username),
+        ProfileInfoRow(label: LocaleKeys.mobile_profile_first_name.tr(), value: user.firstName),
+        ProfileInfoRow(label: LocaleKeys.mobile_profile_middle_name.tr(), value: user.middleName),
+        ProfileInfoRow(label: LocaleKeys.mobile_profile_last_name.tr(), value: user.lastName),
+        ProfileInfoRow(label: LocaleKeys.mobile_profile_second_last_name.tr(), value: user.secondLastName),
+        ProfileInfoRow(label: LocaleKeys.mobile_profile_gender.tr(), value: user.gender?.translationKey.tr()),
         ProfileInfoRow(
-          label: 'mobile.profile.birth_date'.tr(),
+          label: LocaleKeys.mobile_profile_birth_date.tr(),
           value: user.birthDate == null ? null : DateFormatters.date(user.birthDate!),
         ),
       ],
@@ -235,11 +238,11 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildPreferences() {
     final language = AppLanguage.fromCode(context.locale.languageCode);
     return ProfileSection(
-      title: 'mobile.profile.section_preferences'.tr(),
+      title: LocaleKeys.mobile_profile_section_preferences.tr(),
       children: [
         _ActionRow(
           icon: Icons.language,
-          label: 'mobile.profile.language'.tr(),
+          label: LocaleKeys.mobile_profile_language.tr(),
           value: '${language.flag}  ${language.nativeName}',
           onTap: () => showLanguageSheet(context),
         ),
@@ -249,21 +252,21 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildAccount() {
     return ProfileSection(
-      title: 'mobile.profile.section_account'.tr(),
+      title: LocaleKeys.mobile_profile_section_account.tr(),
       children: [
         _ActionRow(
           icon: Icons.lock_reset_outlined,
-          label: 'account.change_password.title'.tr(),
+          label: LocaleKeys.account_change_password_title.tr(),
           onTap: () => _open(const ChangePasswordPage()),
         ),
         _ActionRow(
           icon: Icons.logout,
-          label: LogoutStringsConstants.button.tr(),
+          label: LocaleKeys.logout_button.tr(),
           onTap: () => confirmAndLogOut(context),
         ),
         _ActionRow(
           icon: Icons.delete_outline,
-          label: 'account.delete.title'.tr(),
+          label: LocaleKeys.account_delete_title.tr(),
           color: AppColors.error,
           onTap: () => _open(const DeleteAccountPage()),
         ),
@@ -338,7 +341,7 @@ class _ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = user.fullName.isEmpty
-        ? 'mobile.profile.incomplete'.tr()
+        ? LocaleKeys.mobile_profile_incomplete.tr()
         : user.fullName;
     return AppCard(
       padding: const EdgeInsets.all(AppSpacing.xl),
@@ -360,7 +363,7 @@ class _ProfileHeader extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onEdit,
             icon: const Icon(Icons.edit_outlined, size: 18),
-            label: Text('mobile.profile.edit'.tr()),
+            label: Text(LocaleKeys.mobile_profile_edit.tr()),
           ),
         ],
       ),

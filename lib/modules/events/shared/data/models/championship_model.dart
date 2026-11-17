@@ -1,3 +1,4 @@
+import 'package:sport_platform/core/network/json_reader.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/championship_action.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/championship_phase.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_format_structure.dart';
@@ -58,21 +59,22 @@ class ChampionshipModel {
   }
 
   factory ChampionshipModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'campeonato');
     return ChampionshipModel(
-      eventId: json['eventId']?.toString() ?? '',
-      formatName: json['formatName']?.toString(),
-      structure: EventFormatStructure.fromApi(json['structure']?.toString()),
-      scheduleConfigured: json['scheduleConfigured'] == true,
-      groupsDrawn: json['groupsDrawn'] == true,
-      teamsAdvancingPerTable: _asInt(json['teamsAdvancingPerTable']),
-      championTeamId: json['championTeamId']?.toString(),
+      eventId: reader.requiredString('eventId'),
+      formatName: reader.optionalString('formatName'),
+      structure: EventFormatStructure.fromApi(reader.optionalString('structure')),
+      scheduleConfigured: reader.flag('scheduleConfigured'),
+      groupsDrawn: reader.flag('groupsDrawn'),
+      teamsAdvancingPerTable: reader.optionalInt('teamsAdvancingPerTable'),
+      championTeamId: reader.optionalString('championTeamId'),
       nextStep: json['nextStep'] is Map<String, dynamic>
           ? NextStepModel.fromJson(json['nextStep'] as Map<String, dynamic>)
           : null,
-      phases: _asList(json['phases'], PhaseModel.tryParse),
-      teams: _asList(json['teams'], ChampionshipTeamModel.fromJson),
-      tables: _asList(json['tables'], ChampionshipTableModel.fromJson),
-      rounds: _asList(json['rounds'], ChampionshipRoundModel.fromJson),
+      phases: reader.list('phases', PhaseModel.tryParse),
+      teams: reader.list('teams', ChampionshipTeamModel.fromJson),
+      tables: reader.list('tables', ChampionshipTableModel.tryParse),
+      rounds: reader.list('rounds', ChampionshipRoundModel.tryParse),
     );
   }
 }
@@ -83,13 +85,14 @@ class PhaseModel {
 
   const PhaseModel({required this.phase, required this.status});
 
-  /// Null si la etapa es una que esta versión de la app no conoce: [_asList] la descarta.
+  /// Null si la etapa es una que esta versión de la app no conoce: `JsonReader.list` la descarta.
   static PhaseModel? tryParse(Map<String, dynamic> json) {
-    final phase = ChampionshipPhase.fromApi(json['phase']?.toString());
+    final reader = JsonReader(json, resource: 'etapa');
+    final phase = ChampionshipPhase.fromApi(reader.optionalString('phase'));
     if (phase == null) return null;
     return PhaseModel(
       phase: phase,
-      status: PhaseStatus.fromApi(json['status']?.toString()),
+      status: PhaseStatus.fromApi(reader.optionalString('status')),
     );
   }
 }
@@ -107,12 +110,16 @@ class NextStepModel {
     this.requiredTeams = 0,
   });
 
-  factory NextStepModel.fromJson(Map<String, dynamic> json) => NextStepModel(
-        action: ChampionshipAction.fromApi(json['action']?.toString()),
-        pendingMatches: _asInt(json['pendingMatches']) ?? 0,
-        registeredTeams: _asInt(json['registeredTeams']) ?? 0,
-        requiredTeams: _asInt(json['requiredTeams']) ?? 0,
-      );
+  factory NextStepModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'siguiente paso');
+    return NextStepModel(
+      action: ChampionshipAction.fromApi(reader.optionalString('action')),
+      // Una cuenta que no llega es que no hay nada que contar: cero.
+      pendingMatches: reader.optionalInt('pendingMatches') ?? 0,
+      registeredTeams: reader.optionalInt('registeredTeams') ?? 0,
+      requiredTeams: reader.optionalInt('requiredTeams') ?? 0,
+    );
+  }
 }
 
 class ChampionshipTeamModel {
@@ -128,13 +135,15 @@ class ChampionshipTeamModel {
     this.seed,
   });
 
-  factory ChampionshipTeamModel.fromJson(Map<String, dynamic> json) =>
-      ChampionshipTeamModel(
-        teamId: json['teamId']?.toString() ?? '',
-        teamName: json['teamName']?.toString() ?? '',
-        groupNumber: _asInt(json['groupNumber']),
-        seed: _asInt(json['seed']),
-      );
+  factory ChampionshipTeamModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'equipo del campeonato');
+    return ChampionshipTeamModel(
+      teamId: reader.requiredString('teamId'),
+      teamName: reader.requiredString('teamName'),
+      groupNumber: reader.optionalInt('groupNumber'),
+      seed: reader.optionalInt('seed'),
+    );
+  }
 }
 
 /// La tabla de puntos de una etapa; en la fase de grupos hay una por grupo.
@@ -149,13 +158,17 @@ class ChampionshipTableModel {
     required this.entries,
   });
 
-  factory ChampionshipTableModel.fromJson(Map<String, dynamic> json) =>
-      ChampionshipTableModel(
-        phase: ChampionshipPhase.fromApi(json['phase']?.toString()) ??
-            ChampionshipPhase.league,
-        groupNumber: _asInt(json['groupNumber']),
-        entries: _asList(json['entries'], ChampionshipTableEntryModel.fromJson),
-      );
+  /// Null si la tabla es de una etapa que esta versión de la app no conoce: se descarta en vez de pintarla como otra.
+  static ChampionshipTableModel? tryParse(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'tabla del campeonato');
+    final phase = ChampionshipPhase.fromApi(reader.optionalString('phase'));
+    if (phase == null) return null;
+    return ChampionshipTableModel(
+      phase: phase,
+      groupNumber: reader.optionalInt('groupNumber'),
+      entries: reader.list('entries', ChampionshipTableEntryModel.fromJson),
+    );
+  }
 }
 
 class ChampionshipTableEntryModel {
@@ -185,20 +198,22 @@ class ChampionshipTableEntryModel {
     required this.points,
   });
 
-  factory ChampionshipTableEntryModel.fromJson(Map<String, dynamic> json) =>
-      ChampionshipTableEntryModel(
-        position: _asInt(json['position']) ?? 0,
-        teamId: json['teamId']?.toString() ?? '',
-        teamName: json['teamName']?.toString() ?? '',
-        played: _asInt(json['played']) ?? 0,
-        won: _asInt(json['won']) ?? 0,
-        drawn: _asInt(json['drawn']) ?? 0,
-        lost: _asInt(json['lost']) ?? 0,
-        goalsFor: _asInt(json['goalsFor']) ?? 0,
-        goalsAgainst: _asInt(json['goalsAgainst']) ?? 0,
-        goalDifference: _asInt(json['goalDifference']) ?? 0,
-        points: _asInt(json['points']) ?? 0,
-      );
+  factory ChampionshipTableEntryModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'fila de la tabla');
+    return ChampionshipTableEntryModel(
+      position: reader.requiredInt('position'),
+      teamId: reader.requiredString('teamId'),
+      teamName: reader.requiredString('teamName'),
+      played: reader.requiredInt('played'),
+      won: reader.requiredInt('won'),
+      drawn: reader.requiredInt('drawn'),
+      lost: reader.requiredInt('lost'),
+      goalsFor: reader.requiredInt('goalsFor'),
+      goalsAgainst: reader.requiredInt('goalsAgainst'),
+      goalDifference: reader.requiredInt('goalDifference'),
+      points: reader.requiredInt('points'),
+    );
+  }
 }
 
 class ChampionshipRoundModel {
@@ -214,14 +229,18 @@ class ChampionshipRoundModel {
     required this.ties,
   });
 
-  factory ChampionshipRoundModel.fromJson(Map<String, dynamic> json) =>
-      ChampionshipRoundModel(
-        phase: ChampionshipPhase.fromApi(json['phase']?.toString()) ??
-            ChampionshipPhase.knockout,
-        roundNumber: _asInt(json['roundNumber']) ?? 0,
-        groupNumber: _asInt(json['groupNumber']),
-        ties: _asList(json['ties'], TieModel.fromJson),
-      );
+  /// Null si la ronda es de una etapa que esta versión de la app no conoce: se descarta en vez de pintarla como otra.
+  static ChampionshipRoundModel? tryParse(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'ronda del campeonato');
+    final phase = ChampionshipPhase.fromApi(reader.optionalString('phase'));
+    if (phase == null) return null;
+    return ChampionshipRoundModel(
+      phase: phase,
+      roundNumber: reader.requiredInt('roundNumber'),
+      groupNumber: reader.optionalInt('groupNumber'),
+      ties: reader.list('ties', TieModel.fromJson),
+    );
+  }
 }
 
 /// Un partido, o los dos partidos de ida y vuelta, entre dos equipos.
@@ -257,18 +276,22 @@ class TieModel {
   /// El cruce tiene al menos un partido con resultado.
   bool get hasResult => legs.any((leg) => leg.homeScore != null && leg.awayScore != null);
 
-  factory TieModel.fromJson(Map<String, dynamic> json) => TieModel(
-        tieNumber: _asInt(json['tieNumber']) ?? 0,
-        stage: MatchStage.fromApi(json['stage']?.toString()),
-        teamAId: json['teamAId']?.toString(),
-        teamBId: json['teamBId']?.toString(),
-        bye: json['bye'] == true,
-        teamAGoals: _asInt(json['teamAGoals']) ?? 0,
-        teamBGoals: _asInt(json['teamBGoals']) ?? 0,
-        winnerTeamId: json['winnerTeamId']?.toString(),
-        needsTiebreak: json['needsTiebreak'] == true,
-        legs: _asList(json['legs'], LegModel.fromJson),
-      );
+  factory TieModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'cruce');
+    return TieModel(
+      tieNumber: reader.requiredInt('tieNumber'),
+      stage: MatchStage.fromApi(reader.optionalString('stage')),
+      teamAId: reader.optionalString('teamAId'),
+      teamBId: reader.optionalString('teamBId'),
+      bye: reader.flag('bye'),
+      // Un cruce que aún no se juega no manda goles: cero.
+      teamAGoals: reader.optionalInt('teamAGoals') ?? 0,
+      teamBGoals: reader.optionalInt('teamBGoals') ?? 0,
+      winnerTeamId: reader.optionalString('winnerTeamId'),
+      needsTiebreak: reader.flag('needsTiebreak'),
+      legs: reader.list('legs', LegModel.fromJson),
+    );
+  }
 }
 
 class LegModel {
@@ -290,24 +313,16 @@ class LegModel {
     this.matchDate,
   });
 
-  factory LegModel.fromJson(Map<String, dynamic> json) => LegModel(
-        matchId: json['matchId']?.toString() ?? '',
-        homeTeamId: json['homeTeamId']?.toString(),
-        awayTeamId: json['awayTeamId']?.toString(),
-        homeScore: _asInt(json['homeScore']),
-        awayScore: _asInt(json['awayScore']),
-        legNumber: _asInt(json['legNumber']),
-        matchDate: json['matchDate'] != null
-            ? DateTime.tryParse(json['matchDate'].toString())
-            : null,
-      );
-}
-
-int? _asInt(dynamic value) => value is num ? value.toInt() : null;
-
-/// Lee una lista del JSON; lo que no sea una lista de objetos se toma como vacío y lo que [parse]
-/// no sepa leer (devuelve null) se descarta.
-List<T> _asList<T>(dynamic value, T? Function(Map<String, dynamic>) parse) {
-  if (value is! List) return const [];
-  return value.whereType<Map<String, dynamic>>().map(parse).whereType<T>().toList();
+  factory LegModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'partido del cruce');
+    return LegModel(
+      matchId: reader.requiredString('matchId'),
+      homeTeamId: reader.optionalString('homeTeamId'),
+      awayTeamId: reader.optionalString('awayTeamId'),
+      homeScore: reader.optionalInt('homeScore'),
+      awayScore: reader.optionalInt('awayScore'),
+      legNumber: reader.optionalInt('legNumber'),
+      matchDate: reader.optionalDateTime('matchDate'),
+    );
+  }
 }

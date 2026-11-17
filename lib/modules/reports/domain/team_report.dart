@@ -1,4 +1,4 @@
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 
 /// Cómo terminó un partido para un equipo.
@@ -88,7 +88,8 @@ Map<String, TeamRecord> buildRecordsByEvent(
 ) {
   final matchesByEvent = <String, List<MatchModel>>{};
   for (final match in matches) {
-    matchesByEvent.putIfAbsent(match.eventId, () => []).add(match);
+    final eventId = match.eventId;
+    if (eventId != null) matchesByEvent.putIfAbsent(eventId, () => []).add(match);
   }
   return {
     for (final entry in matchesByEvent.entries)
@@ -113,7 +114,7 @@ List<MatchResult> buildRecentForm(
 
 /// Cuántos eventos distintos jugó el equipo: aquellos en los que tiene al menos un partido.
 int countEventsPlayed(Iterable<MatchModel> matches) =>
-    {for (final match in matches) if (match.eventId.isNotEmpty) match.eventId}.length;
+    {for (final match in matches) ?match.eventId}.length;
 
 /// Suma las tarjetas y faltas de los jugadores de [teamId] en cada evento (cada lista es lo de un evento). El backend
 /// pone en cada línea el equipo con el que el jugador jugó ese evento, así que un jugador que cambió de equipo suma

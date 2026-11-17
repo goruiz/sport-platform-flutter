@@ -1,18 +1,29 @@
 ﻿import 'package:sport_platform/core/modules/module_registry.dart';
 import 'package:sport_platform/core/modules/module_urls.dart';
+import 'package:sport_platform/core/routes/app_pages.dart';
+import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
 import 'package:sport_platform/modules/events/presentation/pages/events_page.dart';
+import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/pages/leagues_page.dart';
 import 'package:sport_platform/modules/matches/presentation/pages/matches_page.dart';
 import 'package:sport_platform/modules/rankings/presentation/pages/rankings_page.dart';
 import 'package:sport_platform/modules/reports/presentation/pages/reports_page.dart';
 import 'package:sport_platform/modules/sport_complexes/presentation/pages/sport_complexes_page.dart';
 import 'package:sport_platform/modules/teams/presentation/pages/teams_page.dart';
+import 'package:sport_platform/modules/users/presentation/pages/complete_profile_page.dart';
 import 'package:sport_platform/modules/users/presentation/pages/profile_page.dart';
 
 /// Registers every application module in one place.
 /// To add a new module: import its page and add one ModuleRegistry.register() line.
 /// The URL must match the value stored in the menu.url column in the database.
 void registerModules() {
+  // Las pantallas a las que otros módulos navegan sin importarse entre sí (ver AppPages).
+  AppPages.register(
+    login: () => const LoginPage(),
+    home: () => const HomePage(),
+    completeProfile: ({required editing}) => CompleteProfilePage(editing: editing),
+  );
+
   ModuleRegistry.register(ModuleUrls.teams,    (item) => TeamsPage(item: item));
   ModuleRegistry.register(ModuleUrls.events,   (item) => EventsPage(item: item));
   ModuleRegistry.register(ModuleUrls.rankings, (item) => RankingsPage(item: item));

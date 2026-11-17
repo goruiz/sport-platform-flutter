@@ -1,10 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/services/external_launcher.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/utils/external_links.dart';
 import 'package:sport_platform/modules/courts/presentation/pages/court_detail_page.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
+import 'package:sport_platform/modules/courts/data/models/court_model.dart';
 import 'package:sport_platform/modules/sport_complexes/domain/complex_overview.dart';
 import 'package:sport_platform/modules/sport_complexes/presentation/widgets/complex_map.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
@@ -34,27 +37,27 @@ class SportComplexDetailPage extends StatelessWidget {
         iconTheme: const IconThemeData(color: AppColors.white),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
-          _SectionTitle('mobile.complexes.location_title'.tr()),
+          _SectionTitle(LocaleKeys.mobile_complexes_location_title.tr()),
           if (complex.hasMapPosition) ...[
             ComplexMap(latitude: complex.latitude!, longitude: complex.longitude!),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppSpacing.snug),
             _DirectionsButton(latitude: complex.latitude!, longitude: complex.longitude!),
           ] else
-            _Hint('mobile.complexes.no_location_detail'.tr()),
+            _Hint(LocaleKeys.mobile_complexes_no_location_detail.tr()),
           if (complex.location?.isNotEmpty ?? false) ...[
-            const SizedBox(height: 10),
+            const SizedBox(height: AppSpacing.snug),
             _Line(icon: Icons.place_outlined, text: complex.location!),
           ],
           if (complex.description?.isNotEmpty ?? false) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: AppSpacing.tight),
             _Line(icon: Icons.info_outline, text: complex.description!),
           ],
-          const SizedBox(height: 24),
-          _SectionTitle('mobile.complexes.courts_title'.tr()),
+          const SizedBox(height: AppSpacing.xxl),
+          _SectionTitle(LocaleKeys.mobile_complexes_courts_title.tr()),
           if (overview.courts.isEmpty)
-            _Hint('mobile.complexes.no_courts'.tr())
+            _Hint(LocaleKeys.mobile_complexes_no_courts.tr())
           else
             for (final court in overview.courts)
               _Line(
@@ -81,7 +84,7 @@ class _DirectionsButton extends StatelessWidget {
       ExternalLinks.directionsTo(latitude: latitude, longitude: longitude),
     );
     if (!opened && context.mounted) {
-      AppSnackbar.error(context, 'mobile.complexes.directions_error'.tr());
+      AppSnackbar.error(context, LocaleKeys.mobile_complexes_directions_error.tr());
     }
   }
 
@@ -92,7 +95,7 @@ class _DirectionsButton extends StatelessWidget {
       child: FilledButton.icon(
         onPressed: () => _open(context),
         icon: const Icon(Icons.directions_outlined),
-        label: Text('mobile.complexes.directions'.tr()),
+        label: Text(LocaleKeys.mobile_complexes_directions.tr()),
       ),
     );
   }
@@ -106,7 +109,7 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.only(bottom: AppSpacing.snug),
       child: Text(
         text,
         style: const TextStyle(
@@ -126,7 +129,7 @@ class _Hint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13));
+    return Text(text, style: AppTextStyles.secondary);
   }
 }
 
@@ -145,21 +148,21 @@ class _Line extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.tight),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, color: AppColors.primaryLight, size: 20),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSpacing.snug),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(text, style: const TextStyle(color: AppColors.white, fontSize: 14)),
+                  Text(text, style: AppTextStyles.body),
                   if (detail?.isNotEmpty ?? false)
                     Text(
                       detail!,
-                      style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+                      style: AppTextStyles.footnote,
                     ),
                 ],
               ),

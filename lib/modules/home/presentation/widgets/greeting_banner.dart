@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
@@ -9,16 +11,16 @@ class GreetingBanner extends StatelessWidget {
 
   String _greeting() {
     final h = DateTime.now().hour;
-    if (h < 12) return HomeStringsConstants.greetingMorning.tr();
-    if (h < 18) return HomeStringsConstants.greetingAfternoon.tr();
-    return HomeStringsConstants.greetingEvening.tr();
+    if (h < 12) return LocaleKeys.home_greeting_morning.tr();
+    if (h < 18) return LocaleKeys.home_greeting_afternoon.tr();
+    return LocaleKeys.home_greeting_evening.tr();
   }
 
   @override
   Widget build(BuildContext context) {
     final user = UserSession.current;
     final name = user == null || user.fullName.isEmpty
-        ? HomeStringsConstants.guestName.tr()
+        ? LocaleKeys.home_guest_name.tr()
         : user.fullName;
     final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
@@ -50,9 +52,9 @@ class GreetingBanner extends StatelessWidget {
             children: [
               Text(
                 _greeting(),
-                style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+                style: AppTextStyles.secondary,
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: AppSpacing.hairline),
               Text(
                 name,
                 style: const TextStyle(

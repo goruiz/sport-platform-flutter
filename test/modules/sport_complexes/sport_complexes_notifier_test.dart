@@ -1,15 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/courts_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/courts/data/datasource/courts_service.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/courts/data/models/court_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/team_events_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/sport_complexes/data/datasource/sport_complexes_service.dart';
 import 'package:sport_platform/modules/sport_complexes/data/models/sport_complex_model.dart';
 import 'package:sport_platform/modules/sport_complexes/presentation/providers/sport_complexes_notifier.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 
 import '../../support/builders.dart';
 

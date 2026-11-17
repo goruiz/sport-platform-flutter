@@ -1,5 +1,5 @@
 import 'package:sport_platform/core/network/api_error_codes.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/data/models/match_dispute_model.dart';
 
 /// Lo más largo que puede ser lo que el equipo cuenta (el mismo límite que el backend: `REASON_MAX_LENGTH`).

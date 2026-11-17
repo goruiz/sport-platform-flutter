@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 enum SnackbarType { success, error, warning, info }
@@ -41,21 +42,21 @@ class AppSnackbar {
         SnackBar(
           duration: const Duration(seconds: 3),
           behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(16),
+          margin: const EdgeInsets.all(AppSpacing.lg),
           padding: EdgeInsets.zero,
           backgroundColor: Colors.transparent,
           elevation: 0,
           content: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 14),
             decoration: BoxDecoration(
               color: config.backgroundColor,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.compact),
               border: Border.all(color: config.borderColor, width: 1),
             ),
             child: Row(
               children: [
                 Icon(config.icon, color: AppColors.white, size: 22),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
                     message,

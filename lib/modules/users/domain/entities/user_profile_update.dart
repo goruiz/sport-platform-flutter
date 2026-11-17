@@ -1,4 +1,4 @@
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
+import 'package:sport_platform/core/models/gender.dart';
 
 /// Datos que el usuario completa en su perfil. Los opcionales sin valor son `null`.
 class UserProfileUpdate {

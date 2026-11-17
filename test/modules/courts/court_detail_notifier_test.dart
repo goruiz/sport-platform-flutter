@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sport_platform/modules/courts/data/datasource/court_availability_service.dart';
 import 'package:sport_platform/modules/courts/data/models/court_availability_model.dart';
 import 'package:sport_platform/modules/courts/presentation/providers/court_detail_notifier.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
 import 'package:sport_platform/shared/enums/summary_status.dart';
 

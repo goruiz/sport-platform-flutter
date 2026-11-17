@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/shared/enums/match_status.dart';
 import 'package:sport_platform/modules/matches/domain/match_rules.dart';
 
 import '../../support/builders.dart';
@@ -42,7 +42,7 @@ void main() {
     });
 
     test('un partido sin evento no cuenta', () {
-      final matches = [matchOf(homeTeamId: 'tigres', awayTeamId: 'x', date: DateTime(2026, 11, 1), eventId: '')];
+      final matches = [matchOf(homeTeamId: 'tigres', awayTeamId: 'x', date: DateTime(2026, 11, 1), eventId: null)];
 
       expect(eventIdsOfTeam(matches, 'tigres'), isEmpty);
     });

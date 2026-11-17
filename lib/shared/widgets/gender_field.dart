@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/profile_strings_constants.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
+import 'package:sport_platform/core/models/gender.dart';
 
 /// El género en un formulario: una ficha por opción y una sola elegida. Es obligatorio porque la categoría de un equipo
 /// puede pedirlo.
@@ -23,17 +25,17 @@ class GenderField extends StatelessWidget {
     return FormField<Gender>(
       key: ValueKey('gender-${value?.apiValue}-$serverError'),
       initialValue: value,
-      validator: (selected) => selected == null ? ProfileStringsConstants.required.tr() : null,
+      validator: (selected) => selected == null ? LocaleKeys.profile_required.tr() : null,
       builder: (state) {
         final error = state.errorText ?? serverError;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              padding: const EdgeInsets.only(left: AppSpacing.xs, bottom: AppSpacing.sm),
               child: Text(
-                ProfileStringsConstants.gender.tr(),
-                style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+                LocaleKeys.profile_gender.tr(),
+                style: AppTextStyles.secondary,
               ),
             ),
             Wrap(
@@ -49,7 +51,7 @@ class GenderField extends StatelessWidget {
             ),
             if (error != null)
               Padding(
-                padding: const EdgeInsets.only(left: 12, top: 6),
+                padding: const EdgeInsets.only(left: AppSpacing.md, top: AppSpacing.tight),
                 child: Text(error, style: const TextStyle(color: AppColors.error, fontSize: 12.5)),
               ),
           ],

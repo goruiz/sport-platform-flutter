@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/services/session_service.dart';
@@ -8,7 +9,7 @@ import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/modules/players/data/datasource/join_team_service.dart';
-import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
+import 'package:sport_platform/shared/enums/category_eligibility_issue.dart';
 import 'package:sport_platform/modules/players/domain/enums/join_team_error.dart';
 import 'package:sport_platform/modules/players/presentation/utils/category_refusal.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
@@ -43,7 +44,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
   Future<void> _join() async {
     final code = _codeController.text.trim();
     if (code.isEmpty) {
-      AppSnackbar.error(context, 'join_team.code_required'.tr());
+      AppSnackbar.error(context, LocaleKeys.join_team_code_required.tr());
       return;
     }
     setState(() => _joining = true);
@@ -52,7 +53,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
       // Entrar cambia el equipo y, con él, la organización de la cuenta: se renueva la sesión para verla.
       if (newToken != null) await getIt<SessionService>().replaceToken(newToken);
       if (!mounted) return;
-      AppSnackbar.success(context, 'join_team.success'.tr());
+      AppSnackbar.success(context, LocaleKeys.join_team_success.tr());
       Navigator.of(context).pop(true);
     } catch (error) {
       if (!mounted) return;
@@ -64,7 +65,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
         return;
       }
       final reason = JoinTeamError.fromException(error);
-      AppSnackbar.error(context, (reason?.translationKey ?? 'join_team.errors.generic').tr());
+      AppSnackbar.error(context, (reason?.translationKey ?? LocaleKeys.join_team_errors_generic).tr());
     }
   }
 
@@ -72,15 +73,15 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
   Widget build(BuildContext context) {
     context.locale;
     return Scaffold(
-      appBar: AppBar(title: Text('join_team.title'.tr())),
+      appBar: AppBar(title: Text(LocaleKeys.join_team_title.tr())),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.xl),
         children: [
-          Text('join_team.hint'.tr(), style: AppTextStyles.bodyMuted.copyWith(height: 1.4)),
+          Text(LocaleKeys.join_team_hint.tr(), style: AppTextStyles.bodyMuted.copyWith(height: 1.4)),
           const SizedBox(height: AppSpacing.xl),
           SportTextField(
             controller: _codeController,
-            hint: 'join_team.field'.tr(),
+            hint: LocaleKeys.join_team_field.tr(),
             icon: Icons.vpn_key_outlined,
             textInputAction: TextInputAction.done,
             // Enter en el teclado entra al equipo: es el único campo de la pantalla.
@@ -106,7 +107,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                       height: 22,
                       child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2.5),
                     )
-                  : Text('join_team.submit'.tr()),
+                  : Text(LocaleKeys.join_team_submit.tr()),
             ),
           ),
         ],

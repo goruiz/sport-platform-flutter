@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
@@ -44,7 +45,7 @@ class MatchAttendanceCard extends StatelessWidget {
               const Icon(Icons.how_to_reg_outlined, color: AppColors.primaryLight, size: 22),
               const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: Text('match_detail.attendance.title'.tr(), style: AppTextStyles.cardTitle),
+                child: Text(LocaleKeys.match_detail_attendance_title.tr(), style: AppTextStyles.cardTitle),
               ),
             ],
           ),
@@ -69,7 +70,7 @@ class MatchAttendanceCard extends StatelessWidget {
             Expanded(
               child: _answerButton(
                 status: AttendanceStatus.confirmed,
-                label: 'match_detail.attendance.confirm'.tr(),
+                label: LocaleKeys.match_detail_attendance_confirm.tr(),
                 icon: Icons.check_circle_outline,
                 isSelected: mine == AttendanceStatus.confirmed,
               ),
@@ -78,7 +79,7 @@ class MatchAttendanceCard extends StatelessWidget {
             Expanded(
               child: _answerButton(
                 status: AttendanceStatus.declined,
-                label: 'match_detail.attendance.decline'.tr(),
+                label: LocaleKeys.match_detail_attendance_decline.tr(),
                 icon: Icons.cancel_outlined,
                 isSelected: mine == AttendanceStatus.declined,
               ),
@@ -88,7 +89,7 @@ class MatchAttendanceCard extends StatelessWidget {
         if (mine != null)
           TextButton(
             onPressed: isSaving ? null : onClearAnswer,
-            child: Text('match_detail.attendance.clear'.tr()),
+            child: Text(LocaleKeys.match_detail_attendance_clear.tr()),
           ),
       ],
     );
@@ -110,9 +111,9 @@ class MatchAttendanceCard extends StatelessWidget {
   /// Cuando ya no se puede responder: lo que dijo el jugador, o por qué no hay botones.
   Widget _buildClosedNote() {
     final text = switch (attendance.myStatus) {
-      AttendanceStatus.confirmed => 'match_detail.attendance.answered_confirmed'.tr(),
-      AttendanceStatus.declined => 'match_detail.attendance.answered_declined'.tr(),
-      null => 'match_detail.attendance.closed'.tr(),
+      AttendanceStatus.confirmed => LocaleKeys.match_detail_attendance_answered_confirmed.tr(),
+      AttendanceStatus.declined => LocaleKeys.match_detail_attendance_answered_declined.tr(),
+      null => LocaleKeys.match_detail_attendance_closed.tr(),
     };
     return Text(text, style: AppTextStyles.bodyMuted);
   }
@@ -122,7 +123,7 @@ class MatchAttendanceCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'match_detail.attendance.summary'.tr(
+          LocaleKeys.match_detail_attendance_summary.tr(
             namedArgs: {'confirmed': '${team.confirmed.length}', 'declined': '${team.declined.length}'},
           ),
           style: AppTextStyles.caption,
@@ -153,7 +154,7 @@ class _AttendeeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.tight),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -163,9 +164,9 @@ class _AttendeeChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: color),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.xs),
           Text(
-            attendee.playerName ?? 'match_detail.unknown_player'.tr(),
+            attendee.playerName ?? LocaleKeys.match_detail_unknown_player.tr(),
             style: AppTextStyles.caption.copyWith(color: AppColors.white),
           ),
         ],

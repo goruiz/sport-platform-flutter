@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
+import 'package:sport_platform/core/models/gender.dart';
 import 'package:sport_platform/modules/users/domain/profile_field_errors.dart';
 
 import '../../support/real_translations.dart';

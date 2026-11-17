@@ -3,16 +3,16 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sport_platform/core/network/api_error_codes.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_disputes_service.dart';
 import 'package:sport_platform/modules/matches/data/models/match_dispute_model.dart';
 import 'package:sport_platform/modules/matches/domain/match_dispute_rules.dart';
 import 'package:sport_platform/modules/matches/presentation/providers/match_result_dispute_notifier.dart';
 import 'package:sport_platform/modules/users/data/datasource/account_service.dart';
 import 'package:sport_platform/modules/users/domain/enums/account_capability.dart';
-import 'package:sport_platform/modules/users/presentation/providers/account_capabilities_notifier.dart';
+import 'package:sport_platform/modules/users/data/providers/account_capabilities_notifier.dart';
 import 'package:sport_platform/shared/enums/summary_status.dart';
 
 import '../../support/builders.dart';
@@ -229,6 +229,7 @@ void main() {
     test('un aviso sin marcador propuesto ni respuesta se lee igual', () {
       final dispute = MatchDisputeModel.fromJson({
         'id': 'd1',
+        'matchId': 'm1',
         'status': 'OPEN',
         'teamId': 'home',
         'reason': 'Falta un gol',

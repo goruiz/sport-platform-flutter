@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/config/app_config.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
@@ -19,7 +20,7 @@ class ComplexMap extends StatelessWidget {
   Widget build(BuildContext context) {
     final position = LatLng(latitude, longitude);
     return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       child: SizedBox(
         height: _height,
         child: FlutterMap(

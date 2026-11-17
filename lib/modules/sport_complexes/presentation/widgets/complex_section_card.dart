@@ -1,9 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
+import 'package:sport_platform/modules/courts/data/models/court_model.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
 
 /// Un complejo con sus canchas dentro, de un vistazo: el encabezado dice cuál es y dónde queda (y, si se toca, abre el
@@ -37,7 +38,7 @@ class ComplexSectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppCard(
       padding: EdgeInsets.zero,
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.page, vertical: AppSpacing.sm - 2),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.page, vertical: AppSpacing.sm - AppSpacing.hairline),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -65,16 +66,16 @@ class ComplexSectionCard extends StatelessWidget {
                 children: [
                   Text(title, style: AppTextStyles.cardTitle.copyWith(fontSize: 16)),
                   if (location?.isNotEmpty ?? false) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(location!, style: AppTextStyles.caption),
                   ],
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'mobile.complexes.courts_count'.tr(namedArgs: {'count': '${courts.length}'}),
+                    LocaleKeys.mobile_complexes_courts_count.tr(namedArgs: {'count': '${courts.length}'}),
                     style: AppTextStyles.caption.copyWith(color: AppColors.primaryLight),
                   ),
                   if (note?.isNotEmpty ?? false) ...[
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppSpacing.hairline),
                     Text(note!, style: AppTextStyles.caption),
                   ],
                 ],
@@ -90,7 +91,7 @@ class ComplexSectionCard extends StatelessWidget {
   Widget _buildNoCourts() {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Text('mobile.complexes.no_courts'.tr(), style: AppTextStyles.caption),
+      child: Text(LocaleKeys.mobile_complexes_no_courts.tr(), style: AppTextStyles.caption),
     );
   }
 }

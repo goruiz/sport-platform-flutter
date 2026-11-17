@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
@@ -72,13 +73,13 @@ class CourtScheduleSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'mobile.courts.opening_hours'.tr(args: [loaded.opensAt, loaded.closesAt]),
+          LocaleKeys.mobile_courts_opening_hours.tr(args: [loaded.opensAt, loaded.closesAt]),
           style: AppTextStyles.caption,
         ),
         const SizedBox(height: AppSpacing.sm),
         for (final entry in timeline) _TimelineRow(entry: entry),
         const SizedBox(height: AppSpacing.xs),
-        Text('mobile.courts.schedule_note'.tr(), style: AppTextStyles.caption),
+        Text(LocaleKeys.mobile_courts_schedule_note.tr(), style: AppTextStyles.caption),
       ],
     );
   }
@@ -87,9 +88,9 @@ class CourtScheduleSection extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: Text('mobile.courts.schedule_error'.tr(), style: AppTextStyles.bodyMuted),
+              child: Text(LocaleKeys.mobile_courts_schedule_error.tr(), style: AppTextStyles.bodyMuted),
             ),
-            TextButton(onPressed: onRetry, child: Text('common.retry'.tr())),
+            TextButton(onPressed: onRetry, child: Text(LocaleKeys.common_retry.tr())),
           ],
         ),
       );
@@ -134,8 +135,8 @@ class _TimelineRow extends StatelessWidget {
 
   String _subtitle() {
     if (entry.kind == DayTimelineKind.free) {
-      return '${'mobile.courts.slot_free'.tr()} · ${formatSlotDuration(entry.duration)}';
+      return '${LocaleKeys.mobile_courts_slot_free.tr()} · ${formatSlotDuration(entry.duration)}';
     }
-    return entry.matchTitle ?? 'mobile.courts.slot_busy'.tr();
+    return entry.matchTitle ?? LocaleKeys.mobile_courts_slot_busy.tr();
   }
 }

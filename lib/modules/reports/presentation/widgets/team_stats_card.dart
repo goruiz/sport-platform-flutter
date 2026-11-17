@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
@@ -40,21 +41,21 @@ class TeamStatsCard extends StatelessWidget {
             children: [
               if (eventsPlayed != null)
                 _Counter(
-                  label: 'reports.events_played'.tr(),
+                  label: LocaleKeys.reports_events_played.tr(),
                   value: '$eventsPlayed',
                 ),
               _Counter(
-                label: 'reports.yellow_cards'.tr(),
+                label: LocaleKeys.reports_yellow_cards.tr(),
                 value: _disciplineValue(discipline.yellowCards),
                 color: AppColors.cardYellow,
               ),
               _Counter(
-                label: 'reports.red_cards'.tr(),
+                label: LocaleKeys.reports_red_cards.tr(),
                 value: _disciplineValue(discipline.redCards),
                 color: AppColors.cardRed,
               ),
               _Counter(
-                label: 'reports.fouls'.tr(),
+                label: LocaleKeys.reports_fouls.tr(),
                 value: _disciplineValue(discipline.fouls),
               ),
             ],
@@ -71,10 +72,10 @@ class TeamStatsCard extends StatelessWidget {
   Widget _buildRetryRow() => Row(
     children: [
       Expanded(
-        child: Text('reports.team_stats_error'.tr(), style: AppTextStyles.caption),
+        child: Text(LocaleKeys.reports_team_stats_error.tr(), style: AppTextStyles.caption),
       ),
       if (onRetry != null)
-        TextButton(onPressed: onRetry, child: Text('common.retry'.tr())),
+        TextButton(onPressed: onRetry, child: Text(LocaleKeys.common_retry.tr())),
     ],
   );
 }
@@ -97,7 +98,7 @@ class _Counter extends StatelessWidget {
         value,
         style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.bold),
       ),
-      const SizedBox(height: 2),
+      const SizedBox(height: AppSpacing.hairline),
       Text(label, style: AppTextStyles.caption),
     ],
   );

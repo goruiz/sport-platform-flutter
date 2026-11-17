@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/home/presentation/constants/menu_colors.dart';
 
 class QuickActionsDrawer extends StatelessWidget {
@@ -37,7 +39,7 @@ class QuickActionsDrawer extends StatelessWidget {
             child: Align(
               alignment: Alignment.bottomLeft,
               child: Text(
-                HomeStringsConstants.sectionQuickActions.tr(),
+                LocaleKeys.home_section_quick_actions.tr(),
                 style: const TextStyle(
                   color: AppColors.white,
                   fontSize: 22,
@@ -55,7 +57,7 @@ class QuickActionsDrawer extends StatelessWidget {
   Widget _buildBody(BuildContext context) {
     if (isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppColors.primaryLight),
+        child: CircularProgressIndicator(),
       );
     }
     if (hasError) {
@@ -66,10 +68,10 @@ class QuickActionsDrawer extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.refresh, color: AppColors.primaryLight, size: 32),
-              SizedBox(height: 8),
+              SizedBox(height: AppSpacing.sm),
               Text(
                 'Error al cargar. Toca para reintentar.',
-                style: TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+                style: AppTextStyles.secondary,
               ),
             ],
           ),
@@ -80,7 +82,7 @@ class QuickActionsDrawer extends StatelessWidget {
       return const Center(
         child: Text(
           'Sin acciones disponibles',
-          style: TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+          style: AppTextStyles.secondary,
         ),
       );
     }
@@ -119,21 +121,20 @@ class QuickActionsDrawer extends StatelessWidget {
               subtitle: item.localizedDescription != null
                   ? Text(
                       item.localizedDescription!,
-                      style: const TextStyle(
-                          color: AppColors.whiteSubtle, fontSize: 12),
+                      style: AppTextStyles.footnote,
                     )
                   : null,
               iconColor: color,
               collapsedIconColor: AppColors.whiteSubtle,
               tilePadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+                  const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.hairline),
               childrenPadding: EdgeInsets.zero,
               children: item.children.asMap().entries.map((entry) {
                 final childColor = kMenuColors[entry.key % kMenuColors.length];
                 final child = entry.value;
                 return ListTile(
                   contentPadding: const EdgeInsets.only(
-                      left: 80, right: 20, top: 2, bottom: 2),
+                      left: 80, right: AppSpacing.xl, top: AppSpacing.hairline, bottom: AppSpacing.hairline),
                   leading: Container(
                     width: 32,
                     height: 32,
@@ -154,8 +155,7 @@ class QuickActionsDrawer extends StatelessWidget {
                   subtitle: child.localizedDescription != null
                       ? Text(
                           child.localizedDescription!,
-                          style: const TextStyle(
-                              color: AppColors.whiteSubtle, fontSize: 11),
+                          style: AppTextStyles.micro,
                         )
                       : null,
                   onTap: () {
@@ -170,7 +170,7 @@ class QuickActionsDrawer extends StatelessWidget {
 
         return ListTile(
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.xs),
           leading: leading,
           title: Text(
             item.localizedName,
@@ -183,8 +183,7 @@ class QuickActionsDrawer extends StatelessWidget {
           subtitle: item.localizedDescription != null
               ? Text(
                   item.localizedDescription!,
-                  style: const TextStyle(
-                      color: AppColors.whiteSubtle, fontSize: 12),
+                  style: AppTextStyles.footnote,
                 )
               : null,
           onTap: () {

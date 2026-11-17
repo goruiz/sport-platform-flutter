@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/login_strings_constants.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/main.dart';
 
 void main() {
@@ -29,7 +29,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text(LoginStringsConstants.welcomeBack.tr()), findsOneWidget);
-    expect(find.text(LoginStringsConstants.signIn.tr()), findsOneWidget);
+    expect(find.text(LocaleKeys.login_welcome_back.tr()), findsOneWidget);
+    expect(find.text(LocaleKeys.login_sign_in.tr()), findsOneWidget);
   });
 }

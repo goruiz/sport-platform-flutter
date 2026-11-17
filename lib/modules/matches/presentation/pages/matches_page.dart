@@ -1,12 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/matches/domain/match_day_groups.dart';
 import 'package:sport_platform/modules/matches/domain/match_rules.dart';
 import 'package:sport_platform/modules/matches/presentation/pages/match_detail_page.dart';
@@ -74,16 +75,16 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
         actions: [
           IconButton(
             onPressed: _notifier.load,
-            tooltip: 'common.retry'.tr(),
+            tooltip: LocaleKeys.common_retry.tr(),
             icon: const Icon(Icons.refresh),
           ),
         ],
         bottom: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(text: 'mobile.matches.upcoming'.tr()),
-            Tab(text: 'mobile.matches.results'.tr()),
-            Tab(text: 'mobile.matches.all'.tr()),
+            Tab(text: LocaleKeys.mobile_matches_upcoming.tr()),
+            Tab(text: LocaleKeys.mobile_matches_results.tr()),
+            Tab(text: LocaleKeys.mobile_matches_all.tr()),
           ],
         ),
       ),
@@ -104,12 +105,12 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
         _buildScopeSelector(),
         // «Mi equipo» es el equipo activo: se dice cuál es (con varios equipos) y se puede cambiar desde aquí.
         if (_notifier.scope == MatchesScope.mine)
-          const ActiveTeamPill(margin: EdgeInsets.fromLTRB(16, 12, 16, 0)),
+          const ActiveTeamPill(margin: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0)),
         if (_notifier.scope == MatchesScope.all) _buildEventPicker(),
         Expanded(
           child: _notifier.loadingAll
               ? const Center(
-                  child: CircularProgressIndicator(color: AppColors.primaryLight),
+                  child: CircularProgressIndicator(),
                 )
               : _buildTabs(),
         ),
@@ -119,18 +120,18 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
 
   Widget _buildScopeSelector() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
       child: SegmentedButton<MatchesScope>(
         segments: [
           ButtonSegment(
             value: MatchesScope.mine,
             icon: const Icon(Icons.shield_outlined),
-            label: Text('mobile.matches.scope_mine'.tr()),
+            label: Text(LocaleKeys.mobile_matches_scope_mine.tr()),
           ),
           ButtonSegment(
             value: MatchesScope.all,
             icon: const Icon(Icons.public),
-            label: Text('mobile.matches.scope_all'.tr()),
+            label: Text(LocaleKeys.mobile_matches_scope_all.tr()),
           ),
         ],
         selected: {_notifier.scope},
@@ -145,13 +146,13 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
     final events = _notifier.eventOptions;
     if (events.isEmpty) return const SizedBox.shrink();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, 0),
       child: DropdownButtonFormField<String>(
         initialValue: _notifier.selectedEventId,
         isExpanded: true,
         dropdownColor: AppColors.sheetBackground,
         style: const TextStyle(color: AppColors.white),
-        decoration: InputDecoration(labelText: 'mobile.matches.pick_event'.tr()),
+        decoration: InputDecoration(labelText: LocaleKeys.mobile_matches_pick_event.tr()),
         items: [
           for (final event in events)
             DropdownMenuItem(
@@ -191,10 +192,10 @@ class _MatchesPageState extends State<MatchesPage> with SingleTickerProviderStat
               height: MediaQuery.sizeOf(context).height * 0.55,
               child: EmptyState(
                 icon: Icons.sports_soccer_outlined,
-                title: 'mobile.matches.empty_title'.tr(),
+                title: LocaleKeys.mobile_matches_empty_title.tr(),
                 subtitle: _notifier.scope == MatchesScope.mine
-                    ? 'mobile.matches.empty_mine_subtitle'.tr()
-                    : 'mobile.matches.empty_subtitle'.tr(),
+                    ? LocaleKeys.mobile_matches_empty_mine_subtitle.tr()
+                    : LocaleKeys.mobile_matches_empty_subtitle.tr(),
               ),
             ),
           ],

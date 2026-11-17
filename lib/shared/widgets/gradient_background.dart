@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 class GradientBackground extends StatelessWidget {
@@ -18,7 +19,7 @@ class GradientBackground extends StatelessWidget {
       ),
       child: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 28),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.section),
           child: child,
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
@@ -57,7 +58,7 @@ class EmptyState extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onAdd,
                 icon: Icon(actionIcon),
-                label: Text(actionLabel ?? 'common.create'.tr()),
+                label: Text(actionLabel ?? LocaleKeys.common_create.tr()),
               ),
             ],
           ],

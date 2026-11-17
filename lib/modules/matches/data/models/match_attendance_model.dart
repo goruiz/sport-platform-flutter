@@ -1,3 +1,5 @@
+import 'package:sport_platform/core/network/json_reader.dart';
+
 /// La respuesta de un jugador a «¿vas a ir al partido?». El backend la guarda por nombre.
 enum AttendanceStatus {
   confirmed('CONFIRMED'),
@@ -36,10 +38,11 @@ class MatchAttendee {
   static MatchAttendee? fromJson(Map<String, dynamic> json) {
     final status = AttendanceStatus.fromApi(json['status']);
     if (status == null) return null;
+    final reader = JsonReader(json, resource: 'asistente');
     return MatchAttendee(
-      playerId: json['playerId']?.toString() ?? '',
-      playerName: json['playerName']?.toString(),
-      teamId: json['teamId']?.toString() ?? '',
+      playerId: reader.requiredString('playerId'),
+      playerName: reader.optionalString('playerName'),
+      teamId: reader.requiredString('teamId'),
       status: status,
     );
   }
@@ -67,20 +70,13 @@ class MatchAttendanceModel {
   int get answeredCount => confirmedCount + declinedCount;
 
   factory MatchAttendanceModel.fromJson(Map<String, dynamic> json) {
-    final rawAttendees = json['attendees'];
+    final reader = JsonReader(json, resource: 'asistencia al partido');
     return MatchAttendanceModel(
-      matchId: json['matchId']?.toString() ?? '',
-      confirmedCount: _asInt(json['confirmedCount']),
-      declinedCount: _asInt(json['declinedCount']),
+      matchId: reader.requiredString('matchId'),
+      confirmedCount: reader.requiredInt('confirmedCount'),
+      declinedCount: reader.requiredInt('declinedCount'),
       myStatus: AttendanceStatus.fromApi(json['myStatus']),
-      attendees: rawAttendees is List
-          ? [
-              for (final item in rawAttendees)
-                ?MatchAttendee.fromJson(item as Map<String, dynamic>),
-            ]
-          : const [],
+      attendees: reader.list('attendees', MatchAttendee.fromJson),
     );
   }
-
-  static int _asInt(dynamic value) => value is num ? value.toInt() : 0;
 }

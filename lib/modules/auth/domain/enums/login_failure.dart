@@ -1,43 +1,44 @@
 import 'package:dio/dio.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 
 /// Por qué no se pudo iniciar sesión. Un 403 trae en `message` el código del backend (`LoginError`) para que la
 /// app explique el motivo en su idioma; el resto se distingue por el estado de la respuesta o por el tipo de fallo.
 enum LoginFailure {
   /// El correo o la contraseña no son correctos (401).
-  invalidCredentials('login.errors.invalid_credentials'),
+  invalidCredentials(LocaleKeys.login_errors_invalid_credentials),
 
   /// Las cuentas de administrador entran por el panel web, no por la app.
   administratorAccount(
-    'login.errors.administrator_account',
+    LocaleKeys.login_errors_administrator_account,
     backendCode: 'ADMIN_CANNOT_USE_MOBILE_APP',
   ),
 
   /// La organización de la cuenta está suspendida.
   organizationSuspended(
-    'login.errors.organization_suspended',
+    LocaleKeys.login_errors_organization_suspended,
     backendCode: 'ORGANIZATION_SUSPENDED',
   ),
 
   /// La organización de la cuenta ya no existe.
   organizationNotFound(
-    'login.errors.organization_not_found',
+    LocaleKeys.login_errors_organization_not_found,
     backendCode: 'ORGANIZATION_NOT_FOUND',
   ),
 
   /// Un administrador suspendió la cuenta: las credenciales son correctas, pero no puede entrar hasta que la reactive.
   accountSuspended(
-    'login.errors.account_suspended',
+    LocaleKeys.login_errors_account_suspended,
     backendCode: 'ACCOUNT_SUSPENDED',
   ),
 
   /// Otro 403: el backend rechazó la entrada con un motivo que esta versión de la app no conoce.
-  accessDenied('login.errors.access_denied'),
+  accessDenied(LocaleKeys.login_errors_access_denied),
 
   /// La petición no llegó al servidor: sin red o sin respuesta a tiempo.
-  noConnection('login.errors.no_connection'),
+  noConnection(LocaleKeys.login_errors_no_connection),
 
   /// Cualquier otro fallo (un 500, una respuesta inesperada...).
-  unexpected('login.errors.unexpected');
+  unexpected(LocaleKeys.login_errors_unexpected);
 
   const LoginFailure(this.translationKey, {this.backendCode});
 

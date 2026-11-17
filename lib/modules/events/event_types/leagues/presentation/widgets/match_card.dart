@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_scoreboard.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_summary_card.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
@@ -38,7 +38,7 @@ class MatchCard extends StatelessWidget {
       onTap: onTap,
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.page,
-        vertical: AppSpacing.xs + 2,
+        vertical: AppSpacing.xs + AppSpacing.hairline,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

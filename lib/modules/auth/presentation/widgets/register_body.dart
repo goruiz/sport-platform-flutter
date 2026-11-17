@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
-import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/register_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/auth_logo.dart';
@@ -47,15 +48,15 @@ class RegisterBody extends StatelessWidget {
         _buildHeader(),
         const SizedBox(height: 36),
         _buildForm(),
-        const SizedBox(height: 28),
+        const SizedBox(height: AppSpacing.section),
         _buildRegisterButton(),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.xxl),
         _buildDivider(),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.xxl),
         _buildSocialButtons(),
-        const SizedBox(height: 32),
+        const SizedBox(height: AppSpacing.xxxl),
         _buildSignIn(),
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.xxl),
       ],
     );
   }
@@ -64,7 +65,7 @@ class RegisterBody extends StatelessWidget {
     return Column(
       children: [
         Text(
-          RegisterStringsConstants.createAccount.tr(),
+          LocaleKeys.register_create_account.tr(),
           style: const TextStyle(
             color: AppColors.white,
             fontSize: 28,
@@ -72,10 +73,10 @@ class RegisterBody extends StatelessWidget {
             letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         Text(
-          RegisterStringsConstants.signUpSubtitle.tr(),
-          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+          LocaleKeys.register_sign_up_subtitle.tr(),
+          style: AppTextStyles.bodyMuted,
         ),
       ],
     );
@@ -88,27 +89,27 @@ class RegisterBody extends StatelessWidget {
         children: [
           SportTextField(
             controller: emailController,
-            hint: RegisterStringsConstants.emailHint.tr(),
+            hint: LocaleKeys.register_email_hint.tr(),
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.email],
             validator: (v) {
-              if (v == null || v.isEmpty) return RegisterStringsConstants.emailRequired.tr();
-              if (!v.contains('@')) return RegisterStringsConstants.emailInvalid.tr();
+              if (v == null || v.isEmpty) return LocaleKeys.register_email_required.tr();
+              if (!v.contains('@')) return LocaleKeys.register_email_invalid.tr();
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           SportTextField(
             controller: passwordController,
-            hint: RegisterStringsConstants.passwordHint.tr(),
+            hint: LocaleKeys.register_password_hint.tr(),
             icon: Icons.lock_outline,
             obscureText: showPassword,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.newPassword],
             // Las reglas se dicen antes de teclear, no solo cuando la contraseña ya fue rechazada.
-            helperText: RegisterStringsConstants.passwordRules.tr(args: [AppConstants.minPasswordLength.asText]),
+            helperText: LocaleKeys.register_password_rules.tr(args: [AppConstants.minPasswordLength.asText]),
             suffixIcon: IconButton(
               icon: Icon(
                 showPassword
@@ -120,24 +121,24 @@ class RegisterBody extends StatelessWidget {
               onPressed: onTogglePassword,
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return RegisterStringsConstants.passwordRequired.tr();
+              if (v == null || v.isEmpty) return LocaleKeys.register_password_required.tr();
               if (v.length < AppConstants.minPasswordLength.value) {
-                return RegisterStringsConstants.passwordTooShort.tr(args: [AppConstants.minPasswordLength.asText]);
+                return LocaleKeys.register_password_too_short.tr(args: [AppConstants.minPasswordLength.asText]);
               }
               final hasUpper = RegExp(r'[A-Z]').hasMatch(v);
               final hasLower = RegExp(r'[a-z]').hasMatch(v);
               final hasDigit = RegExp(r'\d').hasMatch(v);
               final hasSpecial = RegExp(r'[!@#$%^&*(),.?":{}|<>\-_=+\[\]\\;`~]').hasMatch(v);
               if (!hasUpper || !hasLower || !hasDigit || !hasSpecial) {
-                return RegisterStringsConstants.passwordWeak.tr();
+                return LocaleKeys.register_password_weak.tr();
               }
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           SportTextField(
             controller: confirmPasswordController,
-            hint: RegisterStringsConstants.confirmPasswordHint.tr(),
+            hint: LocaleKeys.register_confirm_password_hint.tr(),
             icon: Icons.lock_outline,
             obscureText: showConfirmPassword,
             textInputAction: TextInputAction.done,
@@ -155,8 +156,8 @@ class RegisterBody extends StatelessWidget {
               onPressed: onToggleConfirmPassword,
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return RegisterStringsConstants.confirmPasswordRequired.tr();
-              if (v != passwordController.text) return RegisterStringsConstants.passwordsDoNotMatch.tr();
+              if (v == null || v.isEmpty) return LocaleKeys.register_confirm_password_required.tr();
+              if (v != passwordController.text) return LocaleKeys.register_passwords_do_not_match.tr();
               return null;
             },
           ),
@@ -180,7 +181,7 @@ class RegisterBody extends StatelessWidget {
                   strokeWidth: 2.5,
                 ),
               )
-            : Text(RegisterStringsConstants.signUpButton.tr()),
+            : Text(LocaleKeys.register_sign_up_button.tr()),
       ),
     );
   }
@@ -190,10 +191,10 @@ class RegisterBody extends StatelessWidget {
       children: [
         const Expanded(child: Divider(color: AppColors.inputBorder, thickness: 1)),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           child: Text(
-            RegisterStringsConstants.orContinueWith.tr(),
-            style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+            LocaleKeys.register_or_continue_with.tr(),
+            style: AppTextStyles.footnote,
           ),
         ),
         const Expanded(child: Divider(color: AppColors.inputBorder, thickness: 1)),
@@ -206,14 +207,14 @@ class RegisterBody extends StatelessWidget {
       children: [
         Expanded(
           child: SocialButton(
-            label: RegisterStringsConstants.google.tr(),
+            label: LocaleKeys.register_google.tr(),
             icon: Icons.g_mobiledata,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: SocialButton(
-            label: RegisterStringsConstants.apple.tr(),
+            label: LocaleKeys.register_apple.tr(),
             icon: Icons.apple,
           ),
         ),
@@ -227,13 +228,13 @@ class RegisterBody extends StatelessWidget {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
-          RegisterStringsConstants.alreadyHaveAccount.tr(),
-          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+          LocaleKeys.register_already_have_account.tr(),
+          style: AppTextStyles.bodyMuted,
         ),
         TextButton(
           onPressed: onSignIn,
           child: Text(
-            RegisterStringsConstants.signInLink.tr(),
+            LocaleKeys.register_sign_in_link.tr(),
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
         ),

@@ -1,8 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
-import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
-import 'package:sport_platform/modules/users/presentation/pages/complete_profile_page.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/shared/enums/category_eligibility_issue.dart';
+import 'package:sport_platform/core/models/user_entity.dart';
+import 'package:sport_platform/core/routes/app_pages.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
 
@@ -10,7 +11,7 @@ import 'package:sport_platform/shared/widgets/confirmation_dialog.dart';
 /// elegibilidad con los datos nuevos, así que quien la abrió debería volver a leer lo suyo).
 Future<bool> openProfileEditor(BuildContext context) async {
   final updated = await Navigator.of(context).push<UserEntity>(
-    MaterialPageRoute(builder: (_) => const CompleteProfilePage(editing: true)),
+    MaterialPageRoute(builder: (_) => AppPages.completeProfile(editing: true)),
   );
   return updated != null;
 }
@@ -28,10 +29,10 @@ Future<bool> showCategoryRefusal(BuildContext context, CategoryEligibilityIssue 
   }
   final wantsToComplete = await showConfirmationDialog(
     context,
-    title: 'category_eligibility.refused_title'.tr(),
+    title: LocaleKeys.category_eligibility_refused_title.tr(),
     content: issue.refusalKey.tr(),
-    confirmLabel: 'category_eligibility.complete_profile'.tr(),
-    cancelLabel: 'category_eligibility.not_now'.tr(),
+    confirmLabel: LocaleKeys.category_eligibility_complete_profile.tr(),
+    cancelLabel: LocaleKeys.category_eligibility_not_now.tr(),
     destructive: false,
   );
   if (!wantsToComplete || !context.mounted) return false;

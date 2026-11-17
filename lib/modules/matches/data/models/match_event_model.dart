@@ -1,3 +1,4 @@
+import 'package:sport_platform/core/network/json_reader.dart';
 import 'package:sport_platform/modules/matches/domain/enums/match_event_type.dart';
 
 /// Una línea de la cronología de un partido: un gol, una asistencia, una tarjeta, una falta o un cambio.
@@ -36,17 +37,18 @@ class MatchEventModel {
   });
 
   factory MatchEventModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'evento de partido');
     return MatchEventModel(
-      id: json['id']?.toString() ?? '',
-      matchId: json['matchId']?.toString() ?? '',
-      playerId: json['playerId']?.toString() ?? '',
-      playerName: json['playerName']?.toString(),
-      replacedPlayerId: json['replacedPlayerId']?.toString(),
-      replacedPlayerName: json['replacedPlayerName']?.toString(),
-      teamId: json['teamId']?.toString() ?? '',
-      type: MatchEventType.fromApi(json['eventType']?.toString()),
-      minute: json['minute'] is num ? (json['minute'] as num).toInt() : null,
-      notes: json['notes']?.toString(),
+      id: reader.requiredString('id'),
+      matchId: reader.requiredString('matchId'),
+      playerId: reader.requiredString('playerId'),
+      playerName: reader.optionalString('playerName'),
+      replacedPlayerId: reader.optionalString('replacedPlayerId'),
+      replacedPlayerName: reader.optionalString('replacedPlayerName'),
+      teamId: reader.requiredString('teamId'),
+      type: MatchEventType.fromApi(reader.optionalString('eventType')),
+      minute: reader.optionalInt('minute'),
+      notes: reader.optionalString('notes'),
     );
   }
 }

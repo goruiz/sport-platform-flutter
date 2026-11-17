@@ -1,3 +1,5 @@
+import 'package:sport_platform/core/network/json_reader.dart';
+
 class TeamEventModel {
   final String id;
   final String teamId;
@@ -14,14 +16,13 @@ class TeamEventModel {
   });
 
   factory TeamEventModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'inscripción de equipo');
     return TeamEventModel(
-      id: json['id']?.toString() ?? '',
-      teamId: json['teamId']?.toString() ?? '',
-      teamName: json['teamName']?.toString() ?? '',
-      eventId: json['eventId']?.toString() ?? '',
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'].toString())
-          : DateTime.now(),
+      id: reader.requiredString('id'),
+      teamId: reader.requiredString('teamId'),
+      teamName: reader.requiredString('teamName'),
+      eventId: reader.requiredString('eventId'),
+      createdAt: reader.requiredDateTime('createdAt'),
     );
   }
 

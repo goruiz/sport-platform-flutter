@@ -1,11 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 import 'package:sport_platform/shared/widgets/initials_avatar.dart';
 import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
@@ -53,7 +54,7 @@ class _Pill extends StatelessWidget {
     final crestColor = InitialsAvatar.colorOf(team.teamName);
     return Semantics(
       button: true,
-      label: '${'mobile.teams.active_team_label'.tr()}: ${team.teamName}',
+      label: '${LocaleKeys.mobile_teams_active_team_label.tr()}: ${team.teamName}',
       child: ExcludeSemantics(
         child: Material(
           color: crestColor.withValues(alpha: 0.22),
@@ -117,7 +118,7 @@ class _TeamPickerSheet extends StatelessWidget {
             const SheetHandle(),
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.sm),
-              child: Text('mobile.teams.switch_title'.tr(), style: AppTextStyles.sectionTitle),
+              child: Text(LocaleKeys.mobile_teams_switch_title.tr(), style: AppTextStyles.sectionTitle),
             ),
             Flexible(
               child: ListView(
@@ -130,7 +131,7 @@ class _TeamPickerSheet extends StatelessWidget {
                       leading: InitialsAvatar(name: team.teamName, size: 44),
                       title: Text(team.teamName, style: AppTextStyles.body.copyWith(fontSize: 16)),
                       subtitle: team.isCaptain
-                          ? Text('mobile.teams.captain'.tr(), style: AppTextStyles.caption)
+                          ? Text(LocaleKeys.mobile_teams_captain.tr(), style: AppTextStyles.caption)
                           : null,
                       trailing: team.teamId == notifier.activeTeamId
                           ? const Icon(Icons.check_circle, color: AppColors.primaryLight)

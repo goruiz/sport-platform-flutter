@@ -1,3 +1,5 @@
+import 'package:sport_platform/core/network/json_reader.dart';
+
 /// Un tramo de tiempo de una cancha, con su hora de inicio y de fin.
 class CourtTimeSlot {
   final DateTime startsAt;
@@ -7,10 +9,13 @@ class CourtTimeSlot {
 
   Duration get duration => endsAt.difference(startsAt);
 
-  factory CourtTimeSlot.fromJson(Map<String, dynamic> json) => CourtTimeSlot(
-        startsAt: DateTime.parse(json['startsAt'].toString()),
-        endsAt: DateTime.parse(json['endsAt'].toString()),
-      );
+  factory CourtTimeSlot.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'tramo de cancha');
+    return CourtTimeSlot(
+      startsAt: reader.requiredDateTime('startsAt'),
+      endsAt: reader.requiredDateTime('endsAt'),
+    );
+  }
 }
 
 /// Un tramo que ocupa un partido. Los nombres de los equipos son null si el jugador no ve alguno de ellos.
@@ -27,13 +32,16 @@ class CourtBusySlot extends CourtTimeSlot {
     this.awayTeamName,
   });
 
-  factory CourtBusySlot.fromJson(Map<String, dynamic> json) => CourtBusySlot(
-        startsAt: DateTime.parse(json['startsAt'].toString()),
-        endsAt: DateTime.parse(json['endsAt'].toString()),
-        matchId: json['matchId']?.toString() ?? '',
-        homeTeamName: json['homeTeamName']?.toString(),
-        awayTeamName: json['awayTeamName']?.toString(),
-      );
+  factory CourtBusySlot.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'tramo ocupado de cancha');
+    return CourtBusySlot(
+      startsAt: reader.requiredDateTime('startsAt'),
+      endsAt: reader.requiredDateTime('endsAt'),
+      matchId: reader.requiredString('matchId'),
+      homeTeamName: reader.optionalString('homeTeamName'),
+      awayTeamName: reader.optionalString('awayTeamName'),
+    );
+  }
 }
 
 /// Cómo está un día de una cancha: de qué hora a qué hora abre, qué tramos ocupan los partidos y cuáles quedan libres.
@@ -59,22 +67,17 @@ class CourtAvailabilityModel {
   });
 
   factory CourtAvailabilityModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'disponibilidad de cancha');
     return CourtAvailabilityModel(
-      courtId: json['courtId']?.toString() ?? '',
-      date: DateTime.parse(json['date'].toString()),
-      opensAt: _hourAndMinute(json['opensAt']),
-      closesAt: _hourAndMinute(json['closesAt']),
-      busySlots: _readList(json['busySlots'], CourtBusySlot.fromJson),
-      freeSlots: _readList(json['freeSlots'], CourtTimeSlot.fromJson),
+      courtId: reader.requiredString('courtId'),
+      date: reader.requiredDateTime('date'),
+      opensAt: _hourAndMinute(reader.requiredString('opensAt')),
+      closesAt: _hourAndMinute(reader.requiredString('closesAt')),
+      busySlots: reader.list('busySlots', CourtBusySlot.fromJson),
+      freeSlots: reader.list('freeSlots', CourtTimeSlot.fromJson),
     );
   }
 
-  static List<T> _readList<T>(dynamic raw, T Function(Map<String, dynamic>) read) =>
-      raw is List ? [for (final item in raw) read(item as Map<String, dynamic>)] : <T>[];
-
   /// El backend manda la hora como «08:00:00»: se muestra «08:00».
-  static String _hourAndMinute(dynamic raw) {
-    final text = raw?.toString() ?? '';
-    return text.length >= 5 ? text.substring(0, 5) : text;
-  }
+  static String _hourAndMinute(String text) => text.length >= 5 ? text.substring(0, 5) : text;
 }

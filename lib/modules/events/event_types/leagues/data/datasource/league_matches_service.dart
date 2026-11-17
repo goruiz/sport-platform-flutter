@@ -2,7 +2,7 @@ import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/network/response_parser.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_matches_repository.dart';
-import '../models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 
 class LeagueMatchesService implements ILeagueMatchesRepository {
   final DioClient _client = DioClient();

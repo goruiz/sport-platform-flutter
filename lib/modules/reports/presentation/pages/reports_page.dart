@@ -1,8 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/reports/domain/team_report.dart';
 import 'package:sport_platform/modules/reports/presentation/providers/reports_notifier.dart';
 import 'package:sport_platform/modules/reports/presentation/widgets/recent_form_chips.dart';
@@ -55,7 +58,7 @@ class _ReportsPageState extends State<ReportsPage> {
         actions: [
           IconButton(
             onPressed: _notifier.load,
-            tooltip: 'common.retry'.tr(),
+            tooltip: LocaleKeys.common_retry.tr(),
             icon: const Icon(Icons.refresh, color: AppColors.white),
           ),
         ],
@@ -67,7 +70,7 @@ class _ReportsPageState extends State<ReportsPage> {
   Widget _buildBody() {
     if (_notifier.loading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppColors.primaryLight),
+        child: CircularProgressIndicator(),
       );
     }
     final error = _notifier.error;
@@ -75,19 +78,19 @@ class _ReportsPageState extends State<ReportsPage> {
     if (!_notifier.hasTeam) {
       return EmptyState(
         icon: Icons.groups_outlined,
-        title: 'reports.no_team_title'.tr(),
-        subtitle: 'reports.no_team_subtitle'.tr(),
+        title: LocaleKeys.reports_no_team_title.tr(),
+        subtitle: LocaleKeys.reports_no_team_subtitle.tr(),
       );
     }
     if (_notifier.record.isEmpty) {
       return Column(
         children: [
-          const ActiveTeamPill(margin: EdgeInsets.fromLTRB(16, 16, 16, 0)),
+          const ActiveTeamPill(margin: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, 0)),
           Expanded(
             child: EmptyState(
               icon: Icons.bar_chart_outlined,
-              title: 'reports.no_results_title'.tr(),
-              subtitle: 'reports.no_results_subtitle'.tr(),
+              title: LocaleKeys.reports_no_results_title.tr(),
+              subtitle: LocaleKeys.reports_no_results_subtitle.tr(),
             ),
           ),
         ],
@@ -98,28 +101,28 @@ class _ReportsPageState extends State<ReportsPage> {
       color: AppColors.primaryLight,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
-          const ActiveTeamPill(margin: EdgeInsets.only(bottom: 20)),
+          const ActiveTeamPill(margin: EdgeInsets.only(bottom: AppSpacing.xl)),
           _title(_notifier.teamName ?? ''),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           TeamRecordCard(record: _notifier.record),
-          const SizedBox(height: 24),
-          _title('reports.participation_and_discipline'.tr()),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.xxl),
+          _title(LocaleKeys.reports_participation_and_discipline.tr()),
+          const SizedBox(height: AppSpacing.snug),
           TeamStatsCard(
             eventsPlayed: _notifier.eventsPlayed,
             disciplineStatus: _notifier.disciplineStatus,
             discipline: _notifier.discipline,
             onRetry: _notifier.load,
           ),
-          const SizedBox(height: 24),
-          _title('reports.recent_form'.tr()),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.xxl),
+          _title(LocaleKeys.reports_recent_form.tr()),
+          const SizedBox(height: AppSpacing.snug),
           RecentFormChips(form: _notifier.recentForm),
-          const SizedBox(height: 24),
-          _title('reports.by_event'.tr()),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.xxl),
+          _title(LocaleKeys.reports_by_event.tr()),
+          const SizedBox(height: AppSpacing.snug),
           ..._notifier.byEvent.map((entry) => _EventRecordTile(
                 eventName: entry.eventName,
                 record: entry.record,
@@ -148,11 +151,11 @@ class _EventRecordTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.compact),
         border: Border.all(color: AppColors.inputBorder),
       ),
       child: Row(
@@ -166,12 +169,12 @@ class _EventRecordTile extends StatelessWidget {
             ),
           ),
           Text(
-            'reports.event_summary'.tr(namedArgs: {
+            LocaleKeys.reports_event_summary.tr(namedArgs: {
               'won': '${record.won}',
               'drawn': '${record.drawn}',
               'lost': '${record.lost}',
             }),
-            style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+            style: AppTextStyles.secondary,
           ),
         ],
       ),

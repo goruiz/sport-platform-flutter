@@ -1,4 +1,4 @@
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
+import 'package:sport_platform/core/models/gender.dart';
 
 class UserEntity {
   final String id;

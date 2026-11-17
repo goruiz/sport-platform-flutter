@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 import 'package:sport_platform/modules/teams/presentation/widgets/active_team_pill.dart';
 
 import '../../support/real_translations.dart';

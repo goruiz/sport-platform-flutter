@@ -1,3 +1,5 @@
+import 'package:sport_platform/core/network/json_reader.dart';
+
 class TeamModel {
   final String id;
   final String name;
@@ -14,12 +16,13 @@ class TeamModel {
   });
 
   factory TeamModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'equipo');
     return TeamModel(
-      id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      logoUrl: json['logoUrl']?.toString(),
-      categoryId: json['categoryId']?.toString(),
-      status: json['status']?.toString(),
+      id: reader.requiredString('id'),
+      name: reader.requiredString('name'),
+      logoUrl: reader.optionalString('logoUrl'),
+      categoryId: reader.optionalString('categoryId'),
+      status: reader.optionalString('status'),
     );
   }
 

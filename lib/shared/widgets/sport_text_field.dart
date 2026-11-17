@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 
 /// El campo de texto de los formularios: icono a la izquierda y el aspecto que define el tema.
 /// Pensado para formularios rápidos: [textInputAction] y [onSubmitted] permiten avanzar de campo o enviar
@@ -50,7 +51,7 @@ class SportTextField extends StatelessWidget {
       onFieldSubmitted: onSubmitted,
       autofillHints: autofillHints,
       textCapitalization: textCapitalization,
-      style: const TextStyle(color: AppColors.white, fontSize: 15),
+      style: AppTextStyles.bodyLarge,
       validator: validator,
       decoration: InputDecoration(
         hintText: hint,
@@ -59,8 +60,8 @@ class SportTextField extends StatelessWidget {
         helperText: helperText,
         helperMaxLines: 3,
         errorMaxLines: 3,
-        helperStyle: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12.5),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        helperStyle: AppTextStyles.caption,
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.lg),
       ),
     );
   }

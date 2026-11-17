@@ -1,12 +1,13 @@
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/network/api_error_codes.dart';
 
 /// Por qué una foto de perfil no sirve. El backend rechaza lo mismo con un código (`PlayerPhotoError`); la app lo
 /// revisa antes de enviarla para no subir un archivo que se va a rechazar.
 enum ProfilePhotoProblem {
-  empty('EMPTY_FILE', 'mobile.profile.photo.error_empty'),
-  unsupportedType('UNSUPPORTED_TYPE', 'mobile.profile.photo.error_type'),
-  tooLarge('FILE_TOO_LARGE', 'mobile.profile.photo.error_too_large');
+  empty('EMPTY_FILE', LocaleKeys.mobile_profile_photo_error_empty),
+  unsupportedType('UNSUPPORTED_TYPE', LocaleKeys.mobile_profile_photo_error_type),
+  tooLarge('FILE_TOO_LARGE', LocaleKeys.mobile_profile_photo_error_too_large);
 
   const ProfilePhotoProblem(this.backendCode, this.translationKey);
 

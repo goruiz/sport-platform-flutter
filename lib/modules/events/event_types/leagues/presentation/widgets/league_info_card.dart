@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
@@ -17,7 +20,7 @@ class LeagueInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: AppColors.inputFill,
         borderRadius: BorderRadius.circular(16),
@@ -34,19 +37,19 @@ class LeagueInfoCard extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Align(alignment: Alignment.centerLeft, child: StatusBadge.forEvent(event.status)),
           if (event.description != null && event.description!.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               event.description!,
-              style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+              style: AppTextStyles.bodyMuted,
             ),
           ],
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           InfoRow(
             icon: Icons.calendar_today,
-            title: 'leagues.info_dates'.tr(),
+            title: LocaleKeys.leagues_info_dates.tr(),
             label: DateFormatters.shortRange(
               event.startDate,
               event.endDate,
@@ -54,18 +57,18 @@ class LeagueInfoCard extends StatelessWidget {
             ),
           ),
           if (event.format.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             InfoRow(
               icon: Icons.format_list_bulleted,
-              title: 'leagues.info_format'.tr(),
+              title: LocaleKeys.leagues_info_format.tr(),
               label: event.format,
             ),
           ],
           if (event.eventTypeName != null && event.eventTypeName!.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             InfoRow(
               icon: Icons.military_tech,
-              title: 'leagues.info_type'.tr(),
+              title: LocaleKeys.leagues_info_type.tr(),
               label: event.eventTypeName!,
             ),
           ],

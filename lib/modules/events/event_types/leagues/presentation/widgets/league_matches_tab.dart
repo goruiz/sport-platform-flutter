@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_day_section.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
@@ -28,7 +30,7 @@ class LeagueMatchesTab extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Center(
-          child: CircularProgressIndicator(color: AppColors.primaryLight));
+          child: CircularProgressIndicator());
     }
     if (error != null) {
       return ErrorRetry(message: error!, onRetry: onRetry);
@@ -36,15 +38,15 @@ class LeagueMatchesTab extends StatelessWidget {
     if (groupedMatches.isEmpty) {
       return EmptyState(
         icon: Icons.sports_score_outlined,
-        title: 'leagues.matches_empty'.tr(),
-        subtitle: 'leagues.matches_empty_subtitle'.tr(),
+        title: LocaleKeys.leagues_matches_empty.tr(),
+        subtitle: LocaleKeys.leagues_matches_empty_subtitle.tr(),
       );
     }
     return RefreshIndicator(
       onRefresh: () async => onRetry(),
       color: AppColors.primaryLight,
       child: ListView.builder(
-        padding: const EdgeInsets.only(top: 4, bottom: 100),
+        padding: const EdgeInsets.only(top: AppSpacing.xs, bottom: AppSpacing.listBottom),
         itemCount: groupedMatches.length,
         itemBuilder: (_, i) {
           final (date, dayMatches) = groupedMatches[i];

@@ -1,9 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
-import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
+import 'package:sport_platform/shared/enums/category_eligibility_issue.dart';
 
 /// El aviso de que el jugador sigue en un equipo pero la categoría no lo deja jugar (por su género o su edad, o porque aún
 /// no completó su perfil). Es un aviso y no una alarma: no pasa nada con su plantilla ni con sus datos, solo que mientras
@@ -21,7 +22,7 @@ class CategoryEligibilityNotice extends StatelessWidget {
   const CategoryEligibilityNotice({super.key, required this.issue, this.onCompleteProfile});
 
   /// La clave del texto cuando el motivo no se conoce.
-  static const unknownReasonKey = 'category_eligibility.notice.UNKNOWN';
+  static const unknownReasonKey = LocaleKeys.category_eligibility_notice_UNKNOWN;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class CategoryEligibilityNotice extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('category_eligibility.notice_title'.tr(), style: AppTextStyles.cardTitle),
+                    Text(LocaleKeys.category_eligibility_notice_title.tr(), style: AppTextStyles.cardTitle),
                     const SizedBox(height: AppSpacing.xs),
                     Text((issue?.noticeKey ?? unknownReasonKey).tr(), style: AppTextStyles.bodyMuted),
                   ],
@@ -65,7 +66,7 @@ class CategoryEligibilityNotice extends StatelessWidget {
                   foregroundColor: AppColors.warningLight,
                   side: const BorderSide(color: AppColors.warning),
                 ),
-                child: Text('category_eligibility.complete_profile'.tr()),
+                child: Text(LocaleKeys.category_eligibility_complete_profile.tr()),
               ),
             ),
           ],

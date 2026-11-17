@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
@@ -133,8 +134,8 @@ class _Texts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final count = 'mobile.teams.players_count'.tr(namedArgs: {'count': '${item.playerCount}'});
-    final caption = item.isCaptain ? '$count · ${'mobile.teams.captain'.tr()}' : count;
+    final count = LocaleKeys.mobile_teams_players_count.tr(namedArgs: {'count': '${item.playerCount}'});
+    final caption = item.isCaptain ? '$count · ${LocaleKeys.mobile_teams_captain.tr()}' : count;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,

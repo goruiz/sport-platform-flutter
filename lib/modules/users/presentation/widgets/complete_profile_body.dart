@@ -1,12 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/profile_strings_constants.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
-import 'package:sport_platform/modules/users/domain/name_rules.dart';
-import 'package:sport_platform/modules/users/presentation/utils/person_name_input.dart';
-import 'package:sport_platform/modules/users/presentation/widgets/birth_date_field.dart';
-import 'package:sport_platform/modules/users/presentation/widgets/gender_field.dart';
+import 'package:sport_platform/core/models/gender.dart';
+import 'package:sport_platform/core/utils/name_rules.dart';
+import 'package:sport_platform/shared/widgets/person_name_input.dart';
+import 'package:sport_platform/shared/widgets/birth_date_field.dart';
+import 'package:sport_platform/shared/widgets/gender_field.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
 
 class CompleteProfileBody extends StatelessWidget {
@@ -60,19 +62,19 @@ class CompleteProfileBody extends StatelessWidget {
         const SizedBox(height: 48),
         _buildHeader(),
         if (!editing) ...[
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xxxl),
           _buildProgressIndicator(),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppSpacing.xxxl),
         ] else
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.xxl),
         _buildForm(),
-        const SizedBox(height: 28),
+        const SizedBox(height: AppSpacing.section),
         _buildSubmitButton(),
         if (onSkip != null) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           _buildSkipButton(),
         ],
-        const SizedBox(height: 24),
+        const SizedBox(height: AppSpacing.xxl),
       ],
     );
   }
@@ -83,8 +85,8 @@ class CompleteProfileBody extends StatelessWidget {
       children: [
         Text(
           (editing
-                  ? ProfileStringsConstants.editTitle
-                  : ProfileStringsConstants.title)
+                  ? LocaleKeys.profile_edit_title
+                  : LocaleKeys.profile_title)
               .tr(),
           style: const TextStyle(
             color: AppColors.white,
@@ -93,13 +95,13 @@ class CompleteProfileBody extends StatelessWidget {
             letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         Text(
           (editing
-                  ? ProfileStringsConstants.editSubtitle
-                  : ProfileStringsConstants.subtitle)
+                  ? LocaleKeys.profile_edit_subtitle
+                  : LocaleKeys.profile_subtitle)
               .tr(),
-          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+          style: AppTextStyles.bodyMuted,
         ),
       ],
     );
@@ -108,11 +110,11 @@ class CompleteProfileBody extends StatelessWidget {
   Widget _buildProgressIndicator() {
     return Row(
       children: [
-        _buildStep(label: ProfileStringsConstants.stepAccount.tr(), isCompleted: true),
+        _buildStep(label: LocaleKeys.profile_step_account.tr(), isCompleted: true),
         _buildStepConnector(isCompleted: true),
-        _buildStep(label: ProfileStringsConstants.stepProfile.tr(), isActive: true),
+        _buildStep(label: LocaleKeys.profile_step_profile.tr(), isActive: true),
         _buildStepConnector(isCompleted: false),
-        _buildStep(label: ProfileStringsConstants.stepDone.tr()),
+        _buildStep(label: LocaleKeys.profile_step_done.tr()),
       ],
     );
   }
@@ -151,7 +153,7 @@ class CompleteProfileBody extends StatelessWidget {
                     )
                   : null,
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           label,
           style: TextStyle(
@@ -186,59 +188,59 @@ class CompleteProfileBody extends StatelessWidget {
               Expanded(
                 child: _buildNameField(
                   controller: firstNameController,
-                  hint: ProfileStringsConstants.firstName.tr(),
+                  hint: LocaleKeys.profile_first_name.tr(),
                   icon: Icons.person_outline,
                   isRequired: true,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: _buildNameField(
                   controller: middleNameController,
-                  hint: ProfileStringsConstants.middleName.tr(),
+                  hint: LocaleKeys.profile_middle_name.tr(),
                   icon: Icons.person_outline,
                   isRequired: false,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Row(
             children: [
               Expanded(
                 child: _buildNameField(
                   controller: lastNameController,
-                  hint: ProfileStringsConstants.lastName.tr(),
+                  hint: LocaleKeys.profile_last_name.tr(),
                   icon: Icons.badge_outlined,
                   isRequired: true,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: _buildNameField(
                   controller: secondLastNameController,
-                  hint: ProfileStringsConstants.secondLastName.tr(),
+                  hint: LocaleKeys.profile_second_last_name.tr(),
                   icon: Icons.badge_outlined,
                   isRequired: false,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           SportTextField(
             controller: usernameController,
-            hint: ProfileStringsConstants.username.tr(),
+            hint: LocaleKeys.profile_username.tr(),
             icon: Icons.alternate_email,
             validator: (v) {
-              if (v == null || v.trim().isEmpty) return ProfileStringsConstants.required.tr();
-              if (v.trim().length < 3) return ProfileStringsConstants.usernameTooShort.tr();
-              if (v.contains(' ')) return ProfileStringsConstants.usernameNoSpaces.tr();
+              if (v == null || v.trim().isEmpty) return LocaleKeys.profile_required.tr();
+              if (v.trim().length < 3) return LocaleKeys.profile_username_too_short.tr();
+              if (v.contains(' ')) return LocaleKeys.profile_username_no_spaces.tr();
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           GenderField(value: gender, onChanged: onGenderChanged, serverError: genderServerError),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           BirthDateField(value: birthDate, onChanged: onBirthDateChanged, serverError: birthDateServerError),
         ],
       ),
@@ -264,7 +266,7 @@ class CompleteProfileBody extends StatelessWidget {
 
   String? _nameErrorText(PersonNameIssue? issue) => switch (issue) {
         null => null,
-        PersonNameIssue.empty => ProfileStringsConstants.required.tr(),
+        PersonNameIssue.empty => LocaleKeys.profile_required.tr(),
         PersonNameIssue.invalidCharacters => PersonNameIssue.invalidCharacters.translationKey!.tr(),
       };
 
@@ -285,8 +287,8 @@ class CompleteProfileBody extends StatelessWidget {
               )
             : Text(
                 (editing
-                        ? ProfileStringsConstants.updateButton
-                        : ProfileStringsConstants.saveButton)
+                        ? LocaleKeys.profile_update_button
+                        : LocaleKeys.profile_save_button)
                     .tr(),
                 style: const TextStyle(
                   fontSize: 16,
@@ -303,8 +305,8 @@ class CompleteProfileBody extends StatelessWidget {
       child: TextButton(
         onPressed: onSkip,
         child: Text(
-          ProfileStringsConstants.skipButton.tr(),
-          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+          LocaleKeys.profile_skip_button.tr(),
+          style: AppTextStyles.bodyMuted,
         ),
       ),
     );

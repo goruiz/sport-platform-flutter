@@ -1,13 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/auth_strings_constants/register_strings_constants.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
 import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/modules/auth/presentation/widgets/register_body.dart';
-import 'package:sport_platform/modules/users/presentation/pages/complete_profile_page.dart';
+import 'package:sport_platform/core/routes/app_pages.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
 
@@ -57,20 +58,21 @@ class _RegisterPageState extends State<RegisterPage> {
         await UserSession.loadFromToken(token);
       }
       if (!mounted) return;
-      AppSnackbar.success(context, RegisterStringsConstants.successMessage.tr());
+      AppSnackbar.success(context, LocaleKeys.register_success.tr());
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const CompleteProfilePage()),
+        MaterialPageRoute(builder: (_) => AppPages.completeProfile()),
       );
     } on DioException catch (e) {
       if (!mounted) return;
       if (e.response?.statusCode == 409) {
-        AppSnackbar.error(context, RegisterStringsConstants.emailAlreadyExists.tr());
+        AppSnackbar.error(context, LocaleKeys.register_email_already_exists.tr());
       } else {
-        AppSnackbar.error(context, RegisterStringsConstants.errorMessage.tr());
+        AppSnackbar.error(context, LocaleKeys.register_error.tr());
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('_RegisterPageState._onRegister', error, stackTrace);
       if (!mounted) return;
-      AppSnackbar.error(context, RegisterStringsConstants.errorMessage.tr());
+      AppSnackbar.error(context, LocaleKeys.register_error.tr());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
@@ -11,7 +13,7 @@ import 'package:sport_platform/modules/events/shared/data/models/event_model.dar
 import 'package:sport_platform/modules/events/shared/data/providers/events_explorer_notifier.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/event_card.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/teams/presentation/widgets/active_team_pill.dart';
 import 'package:sport_platform/shared/widgets/app_search_field.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
@@ -83,10 +85,10 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   String _statusLabel(EventStatus status) => switch (status) {
-        EventStatus.active => 'mobile.events.status_active'.tr(),
-        EventStatus.upcoming => 'mobile.events.status_upcoming'.tr(),
-        EventStatus.finished => 'mobile.events.status_finished'.tr(),
-        EventStatus.cancelled => 'mobile.events.status_cancelled'.tr(),
+        EventStatus.active => LocaleKeys.mobile_events_status_active.tr(),
+        EventStatus.upcoming => LocaleKeys.mobile_events_status_upcoming.tr(),
+        EventStatus.finished => LocaleKeys.mobile_events_status_finished.tr(),
+        EventStatus.cancelled => LocaleKeys.mobile_events_status_cancelled.tr(),
       };
 
   @override
@@ -99,7 +101,7 @@ class _EventsPageState extends State<EventsPage> {
           IconButton(
             onPressed: _explorer.load,
             icon: const Icon(Icons.refresh),
-            tooltip: 'common.retry'.tr(),
+            tooltip: LocaleKeys.common_retry.tr(),
           ),
         ],
       ),
@@ -147,12 +149,12 @@ class _EventsPageState extends State<EventsPage> {
           ButtonSegment(
             value: EventsScope.myTeam,
             icon: const Icon(Icons.shield_outlined),
-            label: Text('mobile.events.scope_mine'.tr()),
+            label: Text(LocaleKeys.mobile_events_scope_mine.tr()),
           ),
           ButtonSegment(
             value: EventsScope.all,
             icon: const Icon(Icons.public),
-            label: Text('mobile.events.scope_all'.tr()),
+            label: Text(LocaleKeys.mobile_events_scope_all.tr()),
           ),
         ],
         selected: {_explorer.scope},
@@ -167,7 +169,7 @@ class _EventsPageState extends State<EventsPage> {
       padding: const EdgeInsets.fromLTRB(AppSpacing.page, AppSpacing.md, AppSpacing.page, 0),
       child: AppSearchField(
         controller: _searchController,
-        hint: 'mobile.events.search_hint'.tr(),
+        hint: LocaleKeys.mobile_events_search_hint.tr(),
         onChanged: _onSearchChanged,
       ),
     );
@@ -182,7 +184,7 @@ class _EventsPageState extends State<EventsPage> {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.page, vertical: AppSpacing.md),
           scrollDirection: Axis.horizontal,
           children: [
-            _buildStatusChip('mobile.events.all'.tr(), null),
+            _buildStatusChip(LocaleKeys.mobile_events_all.tr(), null),
             ..._filterableStatuses.map((status) => _buildStatusChip(_statusLabel(status), status)),
           ],
         ),
@@ -203,7 +205,7 @@ class _EventsPageState extends State<EventsPage> {
 
   Widget _buildResults() {
     if (_explorer.loading && _explorer.events.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: AppColors.primaryLight));
+      return const Center(child: CircularProgressIndicator());
     }
     if (_explorer.error != null && _explorer.events.isEmpty) {
       return ErrorRetry(message: _explorer.error!.tr(), onRetry: _explorer.load);
@@ -235,22 +237,22 @@ class _EventsPageState extends State<EventsPage> {
   Widget _buildListFooter() {
     if (_explorer.loadingMore) {
       return const Padding(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(AppSpacing.lg),
         child: Center(child: CircularProgressIndicator(color: AppColors.primaryLight, strokeWidth: 2.5)),
       );
     }
     if (_explorer.hasMore) {
       return TextButton(
         onPressed: _explorer.loadMore,
-        child: Text('mobile.events.load_more'.tr()),
+        child: Text(LocaleKeys.mobile_events_load_more.tr()),
       );
     }
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       child: Center(
         child: Text(
-          'mobile.events.results_count'.tr(namedArgs: {'count': '${_explorer.totalElements}'}),
-          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+          LocaleKeys.mobile_events_results_count.tr(namedArgs: {'count': '${_explorer.totalElements}'}),
+          style: AppTextStyles.footnote,
         ),
       ),
     );
@@ -264,14 +266,14 @@ class _EventsPageState extends State<EventsPage> {
     final String titleKey;
     final String subtitleKey;
     if (isFiltering) {
-      titleKey = 'mobile.events.no_results_title';
-      subtitleKey = 'mobile.events.no_results_subtitle';
+      titleKey = LocaleKeys.mobile_events_no_results_title;
+      subtitleKey = LocaleKeys.mobile_events_no_results_subtitle;
     } else if (isTeamWithoutEvents) {
-      titleKey = 'mobile.events.empty_mine_title';
-      subtitleKey = 'mobile.events.empty_mine_subtitle';
+      titleKey = LocaleKeys.mobile_events_empty_mine_title;
+      subtitleKey = LocaleKeys.mobile_events_empty_mine_subtitle;
     } else {
-      titleKey = 'mobile.events.empty_title';
-      subtitleKey = 'mobile.events.empty_subtitle';
+      titleKey = LocaleKeys.mobile_events_empty_title;
+      subtitleKey = LocaleKeys.mobile_events_empty_subtitle;
     }
     return RefreshIndicator(
       onRefresh: _explorer.load,
@@ -288,7 +290,7 @@ class _EventsPageState extends State<EventsPage> {
               title: titleKey.tr(),
               subtitle: subtitleKey.tr(),
               onAdd: isTeamWithoutEvents ? () => _explorer.selectScope(EventsScope.all) : null,
-              actionLabel: 'mobile.events.see_all'.tr(),
+              actionLabel: LocaleKeys.mobile_events_see_all.tr(),
               actionIcon: Icons.public,
             ),
           ),

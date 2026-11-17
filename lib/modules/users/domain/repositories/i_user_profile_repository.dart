@@ -1,4 +1,4 @@
-import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
+import 'package:sport_platform/core/models/user_entity.dart';
 import 'package:sport_platform/modules/users/domain/entities/user_profile_update.dart';
 
 abstract interface class IUserProfileRepository {

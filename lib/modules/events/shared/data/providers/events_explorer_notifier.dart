@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/team_events_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
 import 'package:sport_platform/modules/events/shared/domain/event_rules.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 
 /// De qué eventos se habla: los del equipo activo del jugador o todos los que ve.
 enum EventsScope { myTeam, all }
@@ -18,7 +20,7 @@ enum EventsScope { myTeam, all }
 /// buscar y filtrar por estado trabajan sobre ellos sin volver a pedir nada. Descarta la respuesta de una lectura que ya no
 /// es la actual, para que una respuesta lenta nunca pise a una más nueva.
 class EventsExplorerNotifier extends ChangeNotifier {
-  static const _loadErrorKey = 'mobile.events.load_error';
+  static const _loadErrorKey = LocaleKeys.mobile_events_load_error;
 
   final EventsSearchService _searchService;
   final TeamEventsService _teamEventsService;
@@ -119,7 +121,8 @@ class EventsExplorerNotifier extends ChangeNotifier {
   Future<void> _syncActiveTeam() async {
     try {
       await _activeTeam.sync(await _playersService.getCurrent());
-    } catch (_) {
+    } catch (error) {
+      AppLogger.warning('EventsExplorerNotifier._syncActiveTeam', error);
       // Sin el jugador no se sabe más: se queda con lo que hay.
     }
     _watchedTeamId = _activeTeam.activeTeamId;
@@ -149,7 +152,8 @@ class EventsExplorerNotifier extends ChangeNotifier {
       _loadedPages = 1;
       _totalElements = page.totalElements;
       _hasMore = page.hasMore;
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('EventsExplorerNotifier._reload', error, stackTrace);
       if (generation != _searchGeneration) return;
       _events = [];
       _hasMore = false;
@@ -186,7 +190,8 @@ class EventsExplorerNotifier extends ChangeNotifier {
       _loadedPages += 1;
       _totalElements = page.totalElements;
       _hasMore = page.hasMore;
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('EventsExplorerNotifier.loadMore', error, stackTrace);
       if (generation != _searchGeneration) return;
       _error = _loadErrorKey;
     } finally {

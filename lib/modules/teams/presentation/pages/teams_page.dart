@@ -1,20 +1,22 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/teams_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
-import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/teams/data/datasource/teams_service.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
+import 'package:sport_platform/modules/teams/data/models/team_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
+import 'package:sport_platform/shared/enums/category_eligibility_issue.dart';
 import 'package:sport_platform/modules/players/presentation/pages/join_team_page.dart';
 import 'package:sport_platform/modules/players/presentation/utils/category_refusal.dart';
-import 'package:sport_platform/modules/players/presentation/widgets/category_eligibility_notice.dart';
+import 'package:sport_platform/shared/widgets/category_eligibility_notice.dart';
 import 'package:sport_platform/modules/teams/domain/team_members.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 import 'package:sport_platform/modules/teams/presentation/widgets/team_switcher.dart';
 import 'package:sport_platform/modules/teams/presentation/widgets/team_switcher_card.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
@@ -114,32 +116,33 @@ class _TeamsPageState extends State<TeamsPage> {
   Future<void> _leaveTeam(PlayerModel player, _TeamSection section) async {
     final confirmed = await showConfirmationDialog(
       context,
-      title: 'mobile.teams.leave_title'.tr(args: [section.team.name]),
+      title: LocaleKeys.mobile_teams_leave_title.tr(args: [section.team.name]),
       content: _leaveMessage(isCaptain: section.isCaptain),
-      confirmLabel: 'mobile.teams.leave_confirm'.tr(),
-      cancelLabel: 'common.cancel'.tr(),
+      confirmLabel: LocaleKeys.mobile_teams_leave_confirm.tr(),
+      cancelLabel: LocaleKeys.common_cancel.tr(),
     );
     if (!confirmed || !mounted) return;
     setState(() => _isLeaving = true);
     try {
       await getIt<PlayersService>().removeFromTeam(player.id, teamId: section.team.id);
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('_TeamsPageState._leaveTeam', error, stackTrace);
       if (mounted) {
         setState(() => _isLeaving = false);
-        AppSnackbar.error(context, 'mobile.teams.leave_error'.tr());
+        AppSnackbar.error(context, LocaleKeys.mobile_teams_leave_error.tr());
       }
       return;
     }
     if (!mounted) return;
     setState(() => _isLeaving = false);
-    AppSnackbar.success(context, 'mobile.teams.leave_success'.tr());
+    AppSnackbar.success(context, LocaleKeys.mobile_teams_leave_success.tr());
     await _reload();
   }
 
   /// Quien es capitán de ese equipo además pierde la capitanía al salir, y lo debe saber antes de confirmar.
   String _leaveMessage({required bool isCaptain}) {
-    final message = 'mobile.teams.leave_message'.tr();
-    return isCaptain ? '$message\n\n${'mobile.teams.leave_captain_note'.tr()}' : message;
+    final message = LocaleKeys.mobile_teams_leave_message.tr();
+    return isCaptain ? '$message\n\n${LocaleKeys.mobile_teams_leave_captain_note.tr()}' : message;
   }
 
   @override
@@ -151,7 +154,7 @@ class _TeamsPageState extends State<TeamsPage> {
         actions: [
           IconButton(
             onPressed: _reload,
-            tooltip: 'common.retry'.tr(),
+            tooltip: LocaleKeys.common_retry.tr(),
             icon: const Icon(Icons.refresh),
           ),
         ],
@@ -164,7 +167,7 @@ class _TeamsPageState extends State<TeamsPage> {
           }
           if (snapshot.hasError) {
             return ErrorRetry(
-              message: 'mobile.teams.load_error'.tr(),
+              message: LocaleKeys.mobile_teams_load_error.tr(),
               onRetry: _reload,
             );
           }
@@ -172,11 +175,11 @@ class _TeamsPageState extends State<TeamsPage> {
           if (data == null) {
             return EmptyState(
               icon: Icons.groups_outlined,
-              title: 'mobile.teams.empty_title'.tr(),
-              subtitle: 'mobile.teams.no_membership'.tr(),
+              title: LocaleKeys.mobile_teams_empty_title.tr(),
+              subtitle: LocaleKeys.mobile_teams_no_membership.tr(),
               // Sin equipo: se puede entrar con el código que da su administrador, sin esperar una invitación.
               onAdd: _joinWithCode,
-              actionLabel: 'join_team.title'.tr(),
+              actionLabel: LocaleKeys.join_team_title.tr(),
               actionIcon: Icons.vpn_key_outlined,
             );
           }
@@ -206,7 +209,7 @@ class _TeamsPageState extends State<TeamsPage> {
                 // Con varios equipos, elegir uno cambia lo que ve toda la app: se dice aquí, donde se elige.
                 if (data.sections.length > 1) ...[
                   const SizedBox(height: AppSpacing.xs),
-                  Text('mobile.teams.active_hint'.tr(), style: AppTextStyles.caption),
+                  Text(LocaleKeys.mobile_teams_active_hint.tr(), style: AppTextStyles.caption),
                 ],
               ],
             ),
@@ -236,8 +239,8 @@ class _TeamsPageState extends State<TeamsPage> {
   }
 
   String _title(_TeamsData data) => data.sections.length > 1
-      ? 'mobile.teams.your_teams'.tr(namedArgs: {'count': '${data.sections.length}'})
-      : 'mobile.teams.your_team'.tr();
+      ? LocaleKeys.mobile_teams_your_teams.tr(namedArgs: {'count': '${data.sections.length}'})
+      : LocaleKeys.mobile_teams_your_team.tr();
 }
 
 /// Lo que muestra la pantalla: el jugador de la cuenta y cada uno de sus equipos, del último al que entró al más antiguo.
@@ -347,12 +350,12 @@ class _TeamDetail extends StatelessWidget {
         ],
         Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.md),
-          child: Text('mobile.teams.players'.tr(), style: AppTextStyles.sectionTitle),
+          child: Text(LocaleKeys.mobile_teams_players.tr(), style: AppTextStyles.sectionTitle),
         ),
         if (section.members.isEmpty)
           EmptyState(
             icon: Icons.person_search_outlined,
-            title: 'mobile.teams.players_empty'.tr(),
+            title: LocaleKeys.mobile_teams_players_empty.tr(),
             subtitle: '',
           )
         else
@@ -387,7 +390,7 @@ class _PlayerTile extends StatelessWidget {
               children: [
                 Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.cardTitle),
                 if (player.email.isNotEmpty && player.email != name) ...[
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppSpacing.hairline),
                   Text(player.email, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.caption),
                 ],
               ],
@@ -416,7 +419,7 @@ class _LeaveTeamButton extends StatelessWidget {
     return OutlinedButton.icon(
       onPressed: isBusy ? null : onPressed,
       icon: const Icon(Icons.logout, size: 18),
-      label: Text('mobile.teams.leave'.tr()),
+      label: Text(LocaleKeys.mobile_teams_leave.tr()),
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.error,
         side: const BorderSide(color: AppColors.error),
@@ -432,14 +435,14 @@ class _CaptainBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.snug, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         color: AppColors.warning.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColors.warning),
       ),
       child: Text(
-        'mobile.teams.captain'.tr(),
+        LocaleKeys.mobile_teams_captain.tr(),
         style: const TextStyle(
           color: AppColors.warningLight,
           fontSize: 12,

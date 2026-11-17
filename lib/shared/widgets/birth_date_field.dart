@@ -1,9 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/profile_strings_constants.dart';
-import 'package:sport_platform/core/theme/app_colors.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
-import 'package:sport_platform/modules/users/domain/birth_date_rules.dart';
+import 'package:sport_platform/core/utils/birth_date_rules.dart';
 
 /// La fecha de nacimiento en un formulario: un campo que abre el selector de fechas. Es obligatoria porque la categoría de
 /// un equipo puede pedir una edad.
@@ -36,21 +37,21 @@ class BirthDateField extends StatelessWidget {
       builder: (state) {
         final error = state.errorText ?? serverError;
         return InkWell(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           onTap: () => _pick(context),
           child: InputDecorator(
             isEmpty: value == null,
             decoration: InputDecoration(
-              hintText: ProfileStringsConstants.birthDate.tr(),
+              hintText: LocaleKeys.profile_birth_date.tr(),
               prefixIcon: const Icon(Icons.cake_outlined, size: 20),
               suffixIcon: const Icon(Icons.calendar_today_outlined, size: 18),
               errorText: error,
               errorMaxLines: 3,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.lg),
             ),
             child: Text(
               value == null ? '' : DateFormatters.date(value!),
-              style: const TextStyle(color: AppColors.white, fontSize: 15),
+              style: AppTextStyles.bodyLarge,
             ),
           ),
         );
@@ -61,7 +62,7 @@ class BirthDateField extends StatelessWidget {
   String? _validate(DateTime? selected) {
     final issue = checkBirthDate(selected, today: _today);
     if (issue == null) return null;
-    return issue.translationKey?.tr() ?? ProfileStringsConstants.required.tr();
+    return issue.translationKey?.tr() ?? LocaleKeys.profile_required.tr();
   }
 
   Future<void> _pick(BuildContext context) async {
@@ -70,7 +71,7 @@ class BirthDateField extends StatelessWidget {
       initialDate: value ?? initialBirthDateForPicker(_today),
       firstDate: oldestBirthDate(_today),
       lastDate: _today,
-      helpText: ProfileStringsConstants.birthDate.tr(),
+      helpText: LocaleKeys.profile_birth_date.tr(),
     );
     if (picked != null) onChanged(dateOnly(picked));
   }

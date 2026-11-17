@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/modules/courts/data/datasource/court_availability_service.dart';
 import 'package:sport_platform/modules/courts/data/models/court_availability_model.dart';
 import 'package:sport_platform/modules/courts/domain/court_agenda.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
 import 'package:sport_platform/shared/enums/summary_status.dart';
 
@@ -67,7 +68,8 @@ class CourtDetailNotifier extends ChangeNotifier {
     var status = SummaryStatus.ready;
     try {
       availability = await _availabilityService.getByDay(courtId, _selectedDay);
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('CourtDetailNotifier.loadAvailability', error, stackTrace);
       status = SummaryStatus.failed;
     }
     if (request != _availabilityRequest) return;
@@ -84,7 +86,8 @@ class CourtDetailNotifier extends ChangeNotifier {
     var status = SummaryStatus.ready;
     try {
       matches = await _matchesService.getByCourt(courtId, from: _clock());
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('CourtDetailNotifier._loadMatches', error, stackTrace);
       status = SummaryStatus.failed;
     }
     if (request != _matchesRequest) return;

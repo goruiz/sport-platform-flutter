@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
@@ -28,7 +29,7 @@ class InvitationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final expiresAt = invitation.expiresAt;
-    final teamName = invitation.teamName ?? 'invitations.unknown_team'.tr();
+    final teamName = invitation.teamName ?? LocaleKeys.invitations_unknown_team.tr();
     return AppCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Column(
@@ -43,8 +44,8 @@ class InvitationTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(teamName, style: AppTextStyles.cardTitle.copyWith(fontSize: 16)),
-                    const SizedBox(height: 2),
-                    Text('invitations.invited_you'.tr(), style: AppTextStyles.caption),
+                    const SizedBox(height: AppSpacing.hairline),
+                    Text(LocaleKeys.invitations_invited_you.tr(), style: AppTextStyles.caption),
                   ],
                 ),
               ),
@@ -55,9 +56,9 @@ class InvitationTile extends StatelessWidget {
             Row(
               children: [
                 const Icon(Icons.schedule, size: 15, color: AppColors.whiteSubtle),
-                const SizedBox(width: 6),
+                const SizedBox(width: AppSpacing.tight),
                 Text(
-                  'invitations.expires'.tr(args: [DateFormatters.date(expiresAt)]),
+                  LocaleKeys.invitations_expires.tr(args: [DateFormatters.date(expiresAt)]),
                   style: AppTextStyles.caption,
                 ),
               ],
@@ -69,7 +70,7 @@ class InvitationTile extends StatelessWidget {
               Expanded(
                 child: OutlinedButton(
                   onPressed: busy ? null : onDecline,
-                  child: Text('invitations.decline'.tr()),
+                  child: Text(LocaleKeys.invitations_decline.tr()),
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -82,7 +83,7 @@ class InvitationTile extends StatelessWidget {
                           height: 18,
                           child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
                         )
-                      : Text('invitations.accept'.tr()),
+                      : Text(LocaleKeys.invitations_accept.tr()),
                 ),
               ),
             ],

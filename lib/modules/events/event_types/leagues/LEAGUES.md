@@ -26,11 +26,9 @@ LeaguesPage (`/ligas`, hoy sin entrada en el menú)      EventsPage (`/events`, 
 ```
 leagues/
 ├── data/
-│   ├── datasource/   league_service, league_teams_event_service, league_matches_service, standings_service,
-│   │                 players_service, teams_service, courts_service
-│   └── models/       match_model, team_model, team_event_model, player_model, court_model, standing_model
+│   ├── datasource/   league_service, league_teams_event_service, league_matches_service, standings_service
+│   └── models/       team_event_model, standing_model
 ├── domain/
-│   ├── enums/        match_status
 │   ├── repositories/ i_league_teams_repository, i_league_matches_repository   (solo `getByEvent`)
 │   └── team_in_event.dart   (reglas puras: partidos próximos y jugados de un equipo)
 └── presentation/
@@ -42,6 +40,11 @@ leagues/
 
 Lo que comparten todos los tipos de evento vive en `events/shared/` (`EventModel`, `EventService`, `EventsNotifier`,
 `EventTypePage`, `EventCard`, el campeonato y las reglas del formato).
+
+Los modelos de lo que un evento **contiene** viven en el módulo de cada cosa (así `matches`, `players` o `teams` no
+dependen de `events`): `MatchModel` en `matches/data/models`, `PlayerModel` y `PlayersService` en `players/data`,
+`TeamModel` y `TeamsService` en `teams/data`, `CourtModel` y `CourtsService` en `courts/data`, y `MatchStatus` en
+`shared/enums`. La regla (y el test que la vigila) está en el `CLAUDE.md`, «Quién puede importar a quién».
 
 ## Estado
 

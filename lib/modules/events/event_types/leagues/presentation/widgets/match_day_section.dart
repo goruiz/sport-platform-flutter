@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/match_card.dart';
 
 /// Los partidos de una jornada (un día), con su encabezado.
@@ -33,7 +35,7 @@ class MatchDaySection extends StatelessWidget {
               awayTeamName: teamMap[m.awayTeamId] ?? m.awayTeamId,
               onTap: onOpen == null ? null : () => onOpen!(m),
             )),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
       ],
     );
   }
@@ -53,18 +55,18 @@ class _DayHeader extends StatelessWidget {
     ).format(date);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 8, 4),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.sm, AppSpacing.xs),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 3),
             decoration: BoxDecoration(
               color: AppColors.primaryDark,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.4)),
             ),
             child: Text(
-              'leagues.match_day_label'
+              LocaleKeys.leagues_match_day_label
                   .tr(namedArgs: {'n': dayIndex.toString()}),
               style: const TextStyle(
                 color: AppColors.primaryLight,
@@ -74,7 +76,7 @@ class _DayHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppSpacing.snug),
           Expanded(
             child: Text(
               dayLabel,

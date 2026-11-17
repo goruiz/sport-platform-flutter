@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_events_service.dart';
 import 'package:sport_platform/modules/matches/data/models/match_event_model.dart';
 
@@ -26,8 +28,9 @@ class MatchDetailNotifier extends ChangeNotifier {
     notifyListeners();
     try {
       _events = await _service.getByMatch(matchId);
-    } catch (_) {
-      _error = 'match_detail.error_load';
+    } catch (error, stackTrace) {
+      AppLogger.error('MatchDetailNotifier.load', error, stackTrace);
+      _error = LocaleKeys.match_detail_error_load;
     } finally {
       _loading = false;
       notifyListeners();

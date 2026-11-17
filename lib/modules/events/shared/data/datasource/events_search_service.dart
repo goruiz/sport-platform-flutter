@@ -1,3 +1,4 @@
+import 'package:sport_platform/core/network/json_reader.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
@@ -25,13 +26,12 @@ class EventsPage {
   bool get hasMore => page + 1 < totalPages;
 
   factory EventsPage.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'página de eventos');
     return EventsPage(
-      events: (json['content'] as List<dynamic>? ?? const [])
-          .map((item) => EventModel.fromJson(item as Map<String, dynamic>))
-          .toList(),
-      page: (json['page'] as num?)?.toInt() ?? 0,
-      totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
-      totalElements: (json['totalElements'] as num?)?.toInt() ?? 0,
+      events: reader.list('content', EventModel.fromJson),
+      page: reader.requiredInt('page'),
+      totalPages: reader.requiredInt('totalPages'),
+      totalElements: reader.requiredInt('totalElements'),
     );
   }
 }

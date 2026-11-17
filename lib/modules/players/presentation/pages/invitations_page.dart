@@ -1,9 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/players/data/models/team_invitation_model.dart';
-import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
+import 'package:sport_platform/shared/enums/category_eligibility_issue.dart';
 import 'package:sport_platform/modules/players/presentation/utils/category_refusal.dart';
 import 'package:sport_platform/modules/players/presentation/providers/invitations_notifier.dart';
 import 'package:sport_platform/modules/players/presentation/widgets/invitation_tile.dart';
@@ -44,8 +46,8 @@ class _InvitationsPageState extends State<InvitationsPage> with SnackMixin {
       return;
     }
     showSnack(accept
-        ? 'invitations.accepted'.tr(args: [invitation.teamName ?? ''])
-        : 'invitations.declined'.tr());
+        ? LocaleKeys.invitations_accepted.tr(args: [invitation.teamName ?? ''])
+        : LocaleKeys.invitations_declined.tr());
   }
 
   /// Un «no» de la categoría del equipo se explica con su propio aviso (y, si solo faltan datos del perfil, con el camino
@@ -66,7 +68,7 @@ class _InvitationsPageState extends State<InvitationsPage> with SnackMixin {
       backgroundColor: AppColors.backgroundEnd,
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
-        title: Text('invitations.title'.tr(),
+        title: Text(LocaleKeys.invitations_title.tr(),
             style: const TextStyle(color: AppColors.white)),
         iconTheme: const IconThemeData(color: AppColors.white),
       ),
@@ -77,7 +79,7 @@ class _InvitationsPageState extends State<InvitationsPage> with SnackMixin {
   Widget _buildBody() {
     if (_notifier.loading && !_notifier.loadedOnce) {
       return const Center(
-        child: CircularProgressIndicator(color: AppColors.primaryLight),
+        child: CircularProgressIndicator(),
       );
     }
     final error = _notifier.error;
@@ -95,15 +97,15 @@ class _InvitationsPageState extends State<InvitationsPage> with SnackMixin {
                   height: MediaQuery.sizeOf(context).height * 0.65,
                   child: EmptyState(
                     icon: Icons.mark_email_read_outlined,
-                    title: 'invitations.empty_title'.tr(),
-                    subtitle: 'invitations.empty_subtitle'.tr(),
+                    title: LocaleKeys.invitations_empty_title.tr(),
+                    subtitle: LocaleKeys.invitations_empty_subtitle.tr(),
                   ),
                 ),
               ],
             )
           : ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               children: _notifier.invitations
                   .map((invitation) => InvitationTile(
                         invitation: invitation,

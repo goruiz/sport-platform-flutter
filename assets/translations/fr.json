@@ -345,6 +345,7 @@
     "match_status_postponed": "Reporté",
     "match_status_suspended": "Suspendu",
     "match_status_rescheduled": "Reprogrammé",
+    "match_status_unknown": "Statut inconnu",
     "standings_col_gd": "DB",
     "match_day_label": "Journée {n}",
     "info_dates": "Dates",

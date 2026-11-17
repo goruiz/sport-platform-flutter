@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
@@ -84,7 +85,8 @@ class TeamInEventNotifier extends ChangeNotifier {
     var status = SummaryStatus.ready;
     try {
       value = await read();
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('TeamInEventNotifier._read', error, stackTrace);
       status = SummaryStatus.failed;
     }
     if (request != section.requests) return;

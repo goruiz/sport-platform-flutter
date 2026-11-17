@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/teams/domain/team_members.dart';
 
 PlayerModel _player(String id, {bool isCaptain = false}) => PlayerModel(
@@ -10,17 +10,20 @@ PlayerModel _player(String id, {bool isCaptain = false}) => PlayerModel(
       isCaptain: isCaptain,
     );
 
+/// Lo que el backend siempre manda de un jugador.
+const _playerJson = {'id': 'p1', 'firstName': 'Ana', 'lastName': 'Pérez', 'email': 'ana@email.com'};
+
 void main() {
   group('PlayerModel.fromJson', () {
     test('lee si es el capitán de su equipo', () {
-      final player = PlayerModel.fromJson({'id': 'p1', 'isCaptain': true});
+      final player = PlayerModel.fromJson({..._playerJson, 'isCaptain': true});
 
       expect(player.isCaptain, isTrue);
     });
 
     test('un backend que aún no manda el campo, o lo manda en falso, no lo hace capitán', () {
-      expect(PlayerModel.fromJson({'id': 'p1'}).isCaptain, isFalse);
-      expect(PlayerModel.fromJson({'id': 'p1', 'isCaptain': false}).isCaptain, isFalse);
+      expect(PlayerModel.fromJson(_playerJson).isCaptain, isFalse);
+      expect(PlayerModel.fromJson({..._playerJson, 'isCaptain': false}).isCaptain, isFalse);
     });
   });
 

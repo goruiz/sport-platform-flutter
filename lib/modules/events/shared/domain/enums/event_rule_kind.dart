@@ -1,17 +1,18 @@
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 /// Cada regla que la pantalla «Reglas del torneo» puede mostrar. Su clave es el rótulo de la fila.
 enum EventRuleKind {
-  structure('event_rules.kinds.structure'),
-  roundTrip('event_rules.kinds.round_trip'),
-  points('event_rules.kinds.points'),
-  tiebreakers('event_rules.kinds.tiebreakers'),
-  swissRounds('event_rules.kinds.swiss_rounds'),
-  groupCount('event_rules.kinds.group_count'),
-  teamsAdvancingPerGroup('event_rules.kinds.teams_advancing_per_group'),
-  playoffTeams('event_rules.kinds.playoff_teams'),
-  knockoutRoundTrip('event_rules.kinds.knockout_round_trip'),
-  thirdPlaceMatch('event_rules.kinds.third_place_match'),
-  grandFinalReset('event_rules.kinds.grand_final_reset'),
-  playersPerTeam('event_rules.kinds.players_per_team');
+  structure(LocaleKeys.event_rules_kinds_structure),
+  roundTrip(LocaleKeys.event_rules_kinds_round_trip),
+  points(LocaleKeys.event_rules_kinds_points),
+  tiebreakers(LocaleKeys.event_rules_kinds_tiebreakers),
+  swissRounds(LocaleKeys.event_rules_kinds_swiss_rounds),
+  groupCount(LocaleKeys.event_rules_kinds_group_count),
+  teamsAdvancingPerGroup(LocaleKeys.event_rules_kinds_teams_advancing_per_group),
+  playoffTeams(LocaleKeys.event_rules_kinds_playoff_teams),
+  knockoutRoundTrip(LocaleKeys.event_rules_kinds_knockout_round_trip),
+  thirdPlaceMatch(LocaleKeys.event_rules_kinds_third_place_match),
+  grandFinalReset(LocaleKeys.event_rules_kinds_grand_final_reset),
+  playersPerTeam(LocaleKeys.event_rules_kinds_players_per_team);
 
   const EventRuleKind(this.translationKey);
 

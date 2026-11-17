@@ -1,8 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_attendance_service.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_disputes_service.dart';
 import 'package:sport_platform/core/services/external_launcher.dart';
@@ -11,7 +12,7 @@ import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
 import 'package:sport_platform/core/utils/external_links.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_events_service.dart';
 import 'package:sport_platform/modules/matches/presentation/providers/match_attendance_notifier.dart';
 import 'package:sport_platform/modules/matches/presentation/providers/match_detail_notifier.dart';
@@ -21,7 +22,7 @@ import 'package:sport_platform/modules/matches/presentation/widgets/match_event_
 import 'package:sport_platform/modules/matches/presentation/widgets/match_result_dispute_card.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_result_dispute_sheet.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_scoreboard.dart';
-import 'package:sport_platform/modules/users/presentation/providers/account_capabilities_notifier.dart';
+import 'package:sport_platform/modules/users/data/providers/account_capabilities_notifier.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
@@ -99,7 +100,7 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
     context.locale;
     return Scaffold(
       backgroundColor: AppColors.backgroundEnd,
-      appBar: AppBar(title: Text('match_detail.title'.tr())),
+      appBar: AppBar(title: Text(LocaleKeys.match_detail_title.tr())),
       body: ListenableBuilder(
         listenable: Listenable.merge([_notifier, _attendance, _dispute]),
         builder: (context, _) => RefreshIndicator(
@@ -111,7 +112,7 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
           color: AppColors.primaryLight,
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+            padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xxxl),
             children: [
               _buildHeaderCard(),
               const SizedBox(height: AppSpacing.md),
@@ -166,7 +167,7 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(Icons.location_on_outlined, size: 16, color: AppColors.whiteSubtle),
-                  const SizedBox(width: 6),
+                  const SizedBox(width: AppSpacing.tight),
                   Flexible(child: Text(place, style: AppTextStyles.caption)),
                 ],
               ),
@@ -185,7 +186,7 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
           child: OutlinedButton.icon(
             onPressed: _share,
             icon: const Icon(Icons.share_outlined, size: 18),
-            label: Text('match_detail.share'.tr()),
+            label: Text(LocaleKeys.match_detail_share.tr()),
           ),
         ),
         if (!widget.match.hasScore) ...[
@@ -194,7 +195,7 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
             child: OutlinedButton.icon(
               onPressed: _addToCalendar,
               icon: const Icon(Icons.event_available_outlined, size: 18),
-              label: Text('match_detail.add_to_calendar'.tr()),
+              label: Text(LocaleKeys.match_detail_add_to_calendar.tr()),
             ),
           ),
         ],
@@ -215,11 +216,11 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
             children: [
               Expanded(
                 child: Text(
-                  (_attendance.loadErrorKey ?? 'match_detail.attendance.error_load').tr(),
+                  (_attendance.loadErrorKey ?? LocaleKeys.match_detail_attendance_error_load).tr(),
                   style: AppTextStyles.bodyMuted,
                 ),
               ),
-              TextButton(onPressed: _attendance.load, child: Text('common.retry'.tr())),
+              TextButton(onPressed: _attendance.load, child: Text(LocaleKeys.common_retry.tr())),
             ],
           ),
         ),
@@ -249,11 +250,11 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
             children: [
               Expanded(
                 child: Text(
-                  (_dispute.loadErrorKey ?? 'match_detail.dispute.error_load').tr(),
+                  (_dispute.loadErrorKey ?? LocaleKeys.match_detail_dispute_error_load).tr(),
                   style: AppTextStyles.bodyMuted,
                 ),
               ),
-              TextButton(onPressed: _dispute.load, child: Text('common.retry'.tr())),
+              TextButton(onPressed: _dispute.load, child: Text(LocaleKeys.common_retry.tr())),
             ],
           ),
         ),
@@ -282,16 +283,16 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
       onSend: _dispute.report,
     );
     if (!mounted || wasSent != true) return;
-    AppSnackbar.success(context, 'match_detail.dispute.sent'.tr());
+    AppSnackbar.success(context, LocaleKeys.match_detail_dispute_sent.tr());
   }
 
   /// El resultado si ya hay, y si no, quién juega con quién y cuándo.
   String _shareText() {
     final match = widget.match;
     final headline = match.hasScore
-        ? 'match_detail.share_result'.tr(
+        ? LocaleKeys.match_detail_share_result.tr(
             args: [widget.homeName, '${match.homeScore}', '${match.awayScore}', widget.awayName])
-        : 'match_detail.share_upcoming'.tr(args: [widget.homeName, widget.awayName]);
+        : LocaleKeys.match_detail_share_upcoming.tr(args: [widget.homeName, widget.awayName]);
     return [
       headline,
       if (widget.eventName.isNotEmpty) widget.eventName,
@@ -302,33 +303,33 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
 
   Future<void> _share() async {
     final shared = await ExternalLauncher.shareText(_shareText());
-    if (!shared && mounted) AppSnackbar.error(context, 'match_detail.action_error'.tr());
+    if (!shared && mounted) AppSnackbar.error(context, LocaleKeys.match_detail_action_error.tr());
   }
 
   Future<void> _addToCalendar() async {
     final match = widget.match;
     final uri = ExternalLinks.calendarEvent(
-      title: 'match_detail.calendar_title'.tr(args: [widget.homeName, widget.awayName]),
+      title: LocaleKeys.match_detail_calendar_title.tr(args: [widget.homeName, widget.awayName]),
       start: match.matchDate,
       end: match.endsAt ?? match.matchDate.add(AppConstants.defaultMatchDuration.value),
       location: widget.courtName ?? match.location,
       details: widget.eventName,
     );
     final opened = await ExternalLauncher.open(uri);
-    if (!opened && mounted) AppSnackbar.error(context, 'match_detail.action_error'.tr());
+    if (!opened && mounted) AppSnackbar.error(context, LocaleKeys.match_detail_action_error.tr());
   }
 
   Widget _buildTimelineTitle() => Padding(
         padding: const EdgeInsets.only(left: AppSpacing.xs, bottom: AppSpacing.md),
-        child: Text('match_detail.timeline'.tr(), style: AppTextStyles.sectionTitle),
+        child: Text(LocaleKeys.match_detail_timeline.tr(), style: AppTextStyles.sectionTitle),
       );
 
   List<Widget> _buildTimeline() {
     if (_notifier.loading && _notifier.events.isEmpty) {
       return const [
         Padding(
-          padding: EdgeInsets.symmetric(vertical: 32),
-          child: Center(child: CircularProgressIndicator(color: AppColors.primaryLight)),
+          padding: EdgeInsets.symmetric(vertical: AppSpacing.xxxl),
+          child: Center(child: CircularProgressIndicator()),
         ),
       ];
     }
@@ -347,8 +348,8 @@ class _MatchDetailPageState extends State<MatchDetailPage> {
           height: 260,
           child: EmptyState(
             icon: Icons.sports_soccer_outlined,
-            title: 'match_detail.empty_title'.tr(),
-            subtitle: 'match_detail.empty_subtitle'.tr(),
+            title: LocaleKeys.match_detail_empty_title.tr(),
+            subtitle: LocaleKeys.match_detail_empty_subtitle.tr(),
           ),
         ),
       ];

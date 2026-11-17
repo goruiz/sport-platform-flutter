@@ -1,7 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/presentation/widgets/match_summary_card.dart';
 import 'package:sport_platform/shared/enums/summary_status.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
@@ -27,8 +28,8 @@ class CourtUpcomingMatchesSection extends StatelessWidget {
     context.locale;
     return switch (status) {
       SummaryStatus.loading => const SkeletonBox(height: 110),
-      SummaryStatus.failed => _buildMessage('mobile.courts.upcoming_error'.tr(), withRetry: true),
-      SummaryStatus.ready when matches.isEmpty => _buildMessage('mobile.courts.upcoming_empty'.tr()),
+      SummaryStatus.failed => _buildMessage(LocaleKeys.mobile_courts_upcoming_error.tr(), withRetry: true),
+      SummaryStatus.ready when matches.isEmpty => _buildMessage(LocaleKeys.mobile_courts_upcoming_empty.tr()),
       SummaryStatus.ready => Column(
           children: [
             for (final match in matches)
@@ -49,7 +50,7 @@ class CourtUpcomingMatchesSection extends StatelessWidget {
           children: [
             Expanded(child: Text(message, style: AppTextStyles.bodyMuted)),
             if (withRetry)
-              TextButton(onPressed: onRetry, child: Text('common.retry'.tr())),
+              TextButton(onPressed: onRetry, child: Text(LocaleKeys.common_retry.tr())),
           ],
         ),
       );

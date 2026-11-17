@@ -345,6 +345,7 @@
     "match_status_postponed": "Verschoben",
     "match_status_suspended": "Suspendiert",
     "match_status_rescheduled": "Neu angesetzt",
+    "match_status_unknown": "Unbekannter Status",
     "standings_col_gd": "TD",
     "match_day_label": "Spieltag {n}",
     "info_dates": "Zeitraum",

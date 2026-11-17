@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/services/locale_storage.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/shared/enums/app_language.dart';
@@ -19,7 +21,7 @@ class LanguageSelector extends StatelessWidget {
     final current = AppLanguage.fromCode(context.locale.languageCode);
 
     return PopupMenuButton<AppLanguage>(
-      tooltip: 'settings.language_tooltip'.tr(),
+      tooltip: LocaleKeys.settings_language_tooltip.tr(),
       onSelected: (language) => applyAppLanguage(context, language),
       itemBuilder: (_) => AppLanguage.values.map((language) {
         return PopupMenuItem<AppLanguage>(
@@ -27,7 +29,7 @@ class LanguageSelector extends StatelessWidget {
           child: Row(
             children: [
               Text(language.flag, style: const TextStyle(fontSize: 20)),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Text(
                   language.nativeName,
@@ -39,7 +41,7 @@ class LanguageSelector extends StatelessWidget {
                 ),
               ),
               if (current == language) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 const Icon(Icons.check_circle, color: AppColors.primaryLight, size: 18),
               ],
             ],
@@ -47,10 +49,10 @@ class LanguageSelector extends StatelessWidget {
         );
       }).toList(),
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.xs),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.tight),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(
             color: AppColors.white.withValues(alpha: 0.35),
             width: 1.2,
@@ -60,7 +62,7 @@ class LanguageSelector extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(current.flag, style: const TextStyle(fontSize: 16)),
-            const SizedBox(width: 6),
+            const SizedBox(width: AppSpacing.tight),
             Text(
               current.code.toUpperCase(),
               style: const TextStyle(
@@ -70,7 +72,7 @@ class LanguageSelector extends StatelessWidget {
                 letterSpacing: 0.5,
               ),
             ),
-            const SizedBox(width: 2),
+            const SizedBox(width: AppSpacing.hairline),
             const Icon(Icons.keyboard_arrow_down, color: AppColors.white, size: 18),
           ],
         ),

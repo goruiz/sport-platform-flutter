@@ -1,8 +1,16 @@
 /// Separaciones de la interfaz: todo margen, relleno o espacio entre elementos sale de aquí
 /// para que todas las pantallas respiren igual.
 class AppSpacing {
+  /// Lo mínimo que separa dos líneas de un mismo bloque (un título y su subtítulo).
+  static const double hairline = 2;
   static const double xs = 4;
+
+  /// Entre un icono y su texto.
+  static const double tight = 6;
   static const double sm = 8;
+
+  /// Entre un avatar o un escudo y lo que lo acompaña.
+  static const double snug = 10;
   static const double md = 12;
   static const double lg = 16;
   static const double xl = 20;
@@ -10,6 +18,7 @@ class AppSpacing {
 
   /// Espacio entre los bloques grandes de una pantalla (las secciones del inicio).
   static const double section = 28;
+  static const double xxxl = 32;
 
   /// Margen lateral de casi todas las pantallas.
   static const double page = 16;
@@ -21,6 +30,9 @@ class AppSpacing {
 /// Esquinas redondeadas.
 class AppRadius {
   static const double sm = 10;
+
+  /// Las filas y fichas compactas de una lista.
+  static const double compact = 12;
   static const double md = 14;
   static const double lg = 20;
   static const double pill = 999;

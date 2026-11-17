@@ -1,9 +1,10 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sport_platform/modules/users/domain/birth_date_rules.dart';
-import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
+import 'package:sport_platform/core/utils/birth_date_rules.dart';
+import 'package:sport_platform/core/models/user_entity.dart';
+import 'package:sport_platform/core/models/gender.dart';
 
 /// Singleton que mantiene la sesión del usuario autenticado en memoria.
 ///
@@ -59,7 +60,9 @@ class UserSession {
     try {
       final map = jsonDecode(raw) as Map<String, dynamic>;
       _current = _fromMap(map);
-    } catch (_) {}
+    } catch (error, stackTrace) {
+      AppLogger.error('UserSession.loadFromStorage', error, stackTrace);
+    }
   }
 
   /// Limpia la sesión de memoria y disco.
@@ -85,8 +88,12 @@ class UserSession {
       final decoded = utf8.decode(base64Url.decode(payload));
       final claims = jsonDecode(decoded) as Map<String, dynamic>;
 
+      final id = claims['id'] ?? claims['sub'];
+      // Un token que no dice de quién es no sirve para armar la sesión.
+      if (id == null) return null;
+
       return _fromMap({
-        'id':  claims['id'] ?? claims['sub'] ?? '',
+        'id': id,
         'idRole': claims['idRole'] ?? claims['role'],
         'firstName': claims['firstName'],
         'middleName': claims['middleName'],
@@ -95,14 +102,15 @@ class UserSession {
         'username': claims['username'],
         'email': claims['email'],
       });
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('UserSession._decodeToken', error, stackTrace);
       return null;
     }
   }
 
   static UserEntity _fromMap(Map<String, dynamic> m) {
     return UserEntity(
-      id: m['id'] as String? ?? '',
+      id: m['id'] as String,
       idRole: m['idRole'] as String?,
       firstName: m['firstName'] as String?,
       middleName: m['middleName'] as String?,

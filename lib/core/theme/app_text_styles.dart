@@ -34,11 +34,23 @@ class AppTextStyles {
     fontSize: 14,
   );
 
+  /// Texto corrido algo más grande: lo que se lee primero en una fila.
+  static const TextStyle bodyLarge = TextStyle(color: AppColors.white, fontSize: 15);
+
   /// Datos secundarios: fechas, lugares, etiquetas pequeñas.
   static const TextStyle caption = TextStyle(
     color: AppColors.whiteSubtle,
     fontSize: 12.5,
   );
+
+  /// Lo secundario de una fila: subtítulos y descripciones cortas.
+  static const TextStyle secondary = TextStyle(color: AppColors.whiteSubtle, fontSize: 13);
+
+  /// Notas al pie y datos mínimos.
+  static const TextStyle footnote = TextStyle(color: AppColors.whiteSubtle, fontSize: 12);
+
+  /// Lo más pequeño que se lee: el contador de una insignia, una etiqueta de un gráfico.
+  static const TextStyle micro = TextStyle(color: AppColors.whiteSubtle, fontSize: 11);
 
   /// Rótulo en mayúsculas encima de un bloque (p. ej. «CRONOLOGÍA»).
   static const TextStyle overline = TextStyle(

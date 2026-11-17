@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 class TeamsCard extends StatelessWidget {
@@ -9,10 +11,10 @@ class TeamsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 14),
       decoration: BoxDecoration(
         color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.inputBorder),
       ),
       child: Row(
@@ -39,7 +41,7 @@ class TeamsCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  HomeStringsConstants.noTeamsTitle.tr(),
+                  LocaleKeys.home_no_teams_title.tr(),
                   style: const TextStyle(
                     color: AppColors.white,
                     fontSize: 13,
@@ -48,8 +50,8 @@ class TeamsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  HomeStringsConstants.noTeamsSubtitle.tr(),
-                  style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+                  LocaleKeys.home_no_teams_subtitle.tr(),
+                  style: AppTextStyles.footnote,
                 ),
               ],
             ),

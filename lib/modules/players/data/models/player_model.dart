@@ -1,6 +1,7 @@
-import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
-import 'package:sport_platform/modules/users/domain/birth_date_rules.dart';
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
+import 'package:sport_platform/core/network/json_reader.dart';
+import 'package:sport_platform/shared/enums/category_eligibility_issue.dart';
+import 'package:sport_platform/core/utils/birth_date_rules.dart';
+import 'package:sport_platform/core/models/gender.dart';
 
 /// Un equipo en el que juega el jugador. Un jugador puede jugar en varios, pero solo en uno por organización.
 class PlayerTeam {
@@ -33,14 +34,15 @@ class PlayerTeam {
   bool get cannotPlay => !eligibleForCategory;
 
   factory PlayerTeam.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'equipo del jugador');
     return PlayerTeam(
-      teamId: json['teamId']?.toString() ?? '',
-      teamName: json['teamName']?.toString() ?? '',
-      organizationId: json['organizationId']?.toString(),
-      isCaptain: json['isCaptain'] == true,
+      teamId: reader.requiredString('teamId'),
+      teamName: reader.requiredString('teamName'),
+      organizationId: reader.optionalString('organizationId'),
+      isCaptain: reader.flag('isCaptain'),
       // Un backend anterior no lo manda: sin dato, el jugador puede jugar.
       eligibleForCategory: json['eligibleForCategory'] != false,
-      categoryIneligibility: CategoryEligibilityIssue.fromCode(json['categoryIneligibility']?.toString()),
+      categoryIneligibility: CategoryEligibilityIssue.fromCode(reader.optionalString('categoryIneligibility')),
     );
   }
 
@@ -108,23 +110,21 @@ class PlayerModel {
   Set<String> get teamIds => {for (final team in allTeams) team.teamId};
 
   factory PlayerModel.fromJson(Map<String, dynamic> json) {
-    final rawTeams = json['teams'];
+    final reader = JsonReader(json, resource: 'jugador');
     return PlayerModel(
-      id: json['id']?.toString() ?? '',
-      firstName: json['firstName']?.toString() ?? '',
-      lastName: json['lastName']?.toString() ?? '',
-      email: json['email']?.toString() ?? '',
-      phone: json['phone']?.toString(),
-      profilePhotoUrl: json['profilePhotoUrl']?.toString(),
-      status: json['status']?.toString(),
-      gender: Gender.fromApi(json['gender']?.toString()),
+      id: reader.requiredString('id'),
+      firstName: reader.requiredString('firstName'),
+      lastName: reader.requiredString('lastName'),
+      email: reader.requiredString('email'),
+      phone: reader.optionalString('phone'),
+      profilePhotoUrl: reader.optionalString('profilePhotoUrl'),
+      status: reader.optionalString('status'),
+      gender: Gender.fromApi(reader.optionalString('gender')),
       birthDate: parseBirthDate(json['birthDate']),
-      teamId: json['teamId']?.toString(),
-      teamName: json['teamName']?.toString(),
-      isCaptain: json['isCaptain'] == true,
-      teams: rawTeams is List
-          ? rawTeams.whereType<Map<String, dynamic>>().map(PlayerTeam.fromJson).toList()
-          : const [],
+      teamId: reader.optionalString('teamId'),
+      teamName: reader.optionalString('teamName'),
+      isCaptain: reader.flag('isCaptain'),
+      teams: reader.list('teams', PlayerTeam.fromJson),
     );
   }
 

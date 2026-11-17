@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 
 /// Por qué el backend no dejó aceptar, rechazar o usar una invitación (`TeamInvitationError`). Llega como
 /// el `message` de la respuesta de error, para que cada app lo explique en su idioma.
@@ -45,13 +46,13 @@ enum TeamInvitationError {
 
   /// El texto en el registro con enlace, redactado para quien aún no tiene cuenta.
   String get registrationTranslationKey => switch (this) {
-    notPending => 'invite_register.error_token_used',
-    expired => 'invite_register.error_token_expired',
-    invitationNotFound => 'invite_register.error_token_invalid',
+    notPending => LocaleKeys.invite_register_error_token_used,
+    expired => LocaleKeys.invite_register_error_token_expired,
+    invitationNotFound => LocaleKeys.invite_register_error_token_invalid,
     teamNotFound => translationKey,
     // Registrarse crea al jugador: este motivo solo existe al aceptar una invitación.
-    playerNotFound => 'invite_register.error_generic',
+    playerNotFound => LocaleKeys.invite_register_error_generic,
     // El registro con enlace deja el correo confirmado: tampoco puede pasar ahí.
-    emailNotVerified => 'invite_register.error_generic',
+    emailNotVerified => LocaleKeys.invite_register_error_generic,
   };
 }

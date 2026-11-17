@@ -1,6 +1,7 @@
-import 'package:sport_platform/modules/users/domain/birth_date_rules.dart';
-import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
+import 'package:sport_platform/core/network/json_reader.dart';
+import 'package:sport_platform/core/utils/birth_date_rules.dart';
+import 'package:sport_platform/core/models/user_entity.dart';
+import 'package:sport_platform/core/models/gender.dart';
 
 class UserModel extends UserEntity {
   const UserModel({
@@ -15,15 +16,18 @@ class UserModel extends UserEntity {
     super.birthDate,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-        id: json['id'] as String? ?? '',
-        firstName: json['firstName'] as String?,
-        middleName: json['middleName'] as String?,
-        lastName: json['lastName'] as String?,
-        secondLastName: json['secondLastName'] as String?,
-        username: json['username'] as String?,
-        email: json['email'] as String?,
-        gender: Gender.fromApi(json['gender'] as String?),
-        birthDate: parseBirthDate(json['birthDate']),
-      );
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'cuenta');
+    return UserModel(
+      id: reader.requiredString('id'),
+      firstName: reader.optionalString('firstName'),
+      middleName: reader.optionalString('middleName'),
+      lastName: reader.optionalString('lastName'),
+      secondLastName: reader.optionalString('secondLastName'),
+      username: reader.optionalString('username'),
+      email: reader.optionalString('email'),
+      gender: Gender.fromApi(reader.optionalString('gender')),
+      birthDate: parseBirthDate(json['birthDate']),
+    );
+  }
 }

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:sport_platform/core/services/active_team_storage.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/teams/domain/team_members.dart';
 
 /// El equipo que el jugador está viendo. Quien juega en varios (uno por organización) elige uno y TODA la app (inicio,

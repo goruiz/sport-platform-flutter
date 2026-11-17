@@ -1,3 +1,4 @@
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 // Reglas de los nombres y apellidos de una persona. Funciones puras: las usan el formulario de perfil y el registro
 // por invitación.
 //
@@ -14,7 +15,7 @@ enum PersonNameIssue {
   /// La clave de traducción del motivo. Que esté vacío lo dice cada pantalla con su propio texto («Ingresa tu nombre»).
   String? get translationKey => switch (this) {
         PersonNameIssue.empty => null,
-        PersonNameIssue.invalidCharacters => 'profile.name_invalid',
+        PersonNameIssue.invalidCharacters => LocaleKeys.profile_name_invalid,
       };
 }
 

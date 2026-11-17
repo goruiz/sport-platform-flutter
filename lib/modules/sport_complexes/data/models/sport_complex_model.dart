@@ -1,3 +1,5 @@
+import 'package:sport_platform/core/network/json_reader.dart';
+
 /// Un complejo deportivo: dónde queda y, si el organizador la marcó, su ubicación exacta en el mapa.
 class SportComplexModel {
   final String id;
@@ -22,13 +24,14 @@ class SportComplexModel {
   bool get hasMapPosition => latitude != null && longitude != null;
 
   factory SportComplexModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'complejo');
     return SportComplexModel(
-      id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      description: json['description']?.toString(),
-      location: json['location']?.toString(),
-      latitude: (json['latitude'] as num?)?.toDouble(),
-      longitude: (json['longitude'] as num?)?.toDouble(),
+      id: reader.requiredString('id'),
+      name: reader.requiredString('name'),
+      description: reader.optionalString('description'),
+      location: reader.optionalString('location'),
+      latitude: reader.optionalDouble('latitude'),
+      longitude: reader.optionalDouble('longitude'),
     );
   }
 }

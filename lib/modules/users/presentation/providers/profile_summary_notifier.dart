@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 import 'package:sport_platform/shared/enums/summary_status.dart';
@@ -56,7 +57,8 @@ class ProfileSummaryNotifier extends ChangeNotifier {
     final PlayerModel? player;
     try {
       player = await _playersService.getCurrent();
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('ProfileSummaryNotifier.load', error, stackTrace);
       if (loadId == _loadCount) _failTeam();
       return;
     }
@@ -88,7 +90,8 @@ class ProfileSummaryNotifier extends ChangeNotifier {
     var status = SummaryStatus.ready;
     try {
       totals = await _readTotals();
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('ProfileSummaryNotifier._loadStats', error, stackTrace);
       status = SummaryStatus.failed;
     }
     if (loadId != _loadCount) return;

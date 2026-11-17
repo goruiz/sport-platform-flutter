@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
 
 /// Cliente que no sale a la red: anota la petición y responde con [responseBody].
 class _RecordingDioClient extends DioClient {

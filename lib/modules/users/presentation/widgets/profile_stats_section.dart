@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 import 'package:sport_platform/modules/rankings/presentation/widgets/my_stats_card.dart';
 import 'package:sport_platform/modules/users/presentation/providers/profile_summary_notifier.dart';
@@ -26,11 +27,11 @@ class ProfileStatsSection extends StatelessWidget {
     final totals = stats;
     return switch (status) {
       SummaryStatus.loading => const SkeletonBox(height: 110),
-      SummaryStatus.failed => _buildMessage('mobile.profile.stats_error'.tr(), onRetry: onRetry),
-      SummaryStatus.ready when totals == null => _buildMessage('mobile.profile.stats_empty'.tr()),
+      SummaryStatus.failed => _buildMessage(LocaleKeys.mobile_profile_stats_error.tr(), onRetry: onRetry),
+      SummaryStatus.ready when totals == null => _buildMessage(LocaleKeys.mobile_profile_stats_empty.tr()),
       SummaryStatus.ready => MyStatsCard(
         stats: totals!,
-        subtitle: 'mobile.profile.stats_caption'.tr(),
+        subtitle: LocaleKeys.mobile_profile_stats_caption.tr(),
         margin: EdgeInsets.zero,
       ),
     };
@@ -38,7 +39,7 @@ class ProfileStatsSection extends StatelessWidget {
 
   Widget _buildMessage(String message, {VoidCallback? onRetry}) {
     return ProfileSection(
-      title: 'rankings.my_stats.title'.tr(),
+      title: LocaleKeys.rankings_my_stats_title.tr(),
       children: [ProfileMessageRow(message: message, onRetry: onRetry)],
     );
   }

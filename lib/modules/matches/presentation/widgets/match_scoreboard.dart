@@ -1,11 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/utils/date_formatters.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/shared/enums/match_status.dart';
 import 'package:sport_platform/shared/widgets/initials_avatar.dart';
 
 /// El «marcador» de un partido: el escudo y el nombre de cada equipo y, en medio, lo que más importa en ese
@@ -60,12 +61,12 @@ class MatchScoreboard extends StatelessWidget {
     return SizedBox(
       height: crestHeight + (large ? 40 : 36),
       child: Padding(
-        padding: EdgeInsets.only(top: large ? 4 : 2),
+        padding: EdgeInsets.only(top: large ? AppSpacing.xs : AppSpacing.hairline),
         child: Column(
           children: [
             _buildMainLabel(),
             if (showDay && hasFirmSchedule(match.status)) ...[
-              const SizedBox(height: 2),
+              const SizedBox(height: AppSpacing.hairline),
               Text(
                 DateFormatters.friendlyDay(
                   match.matchDate,
@@ -77,7 +78,7 @@ class MatchScoreboard extends StatelessWidget {
               ),
             ],
             if (match.status == MatchStatus.inProgress) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               const _LiveDot(),
             ],
           ],
@@ -189,7 +190,7 @@ class _LiveDotState extends State<_LiveDot> with SingleTickerProviderStateMixin 
         ),
         const SizedBox(width: 5),
         Text(
-          'leagues.match_status_in_progress'.tr(),
+          LocaleKeys.leagues_match_status_in_progress.tr(),
           style: const TextStyle(
             color: AppColors.warning,
             fontSize: 12,

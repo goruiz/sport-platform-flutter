@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/modules/users/data/datasource/account_service.dart';
 import 'package:sport_platform/modules/users/domain/enums/account_error.dart';
 
@@ -7,7 +9,7 @@ import 'package:sport_platform/modules/users/domain/enums/account_error.dart';
 ///
 /// Mientras no esté confirmado, el jugador no puede unirse a equipos (ni aceptando una invitación ni con un código).
 class EmailVerificationNotifier extends ChangeNotifier {
-  static const _genericErrorKey = 'account.errors.generic';
+  static const _genericErrorKey = LocaleKeys.account_errors_generic;
 
   final AccountService _service;
 
@@ -21,7 +23,8 @@ class EmailVerificationNotifier extends ChangeNotifier {
   Future<void> load() async {
     try {
       _verified = await _service.isEmailVerified();
-    } catch (_) {
+    } catch (error) {
+      AppLogger.warning('EmailVerificationNotifier.load', error);
       // Sin conexión se deja lo que se sabía: el aviso no es lo bastante importante para un error.
     }
     notifyListeners();
@@ -31,7 +34,7 @@ class EmailVerificationNotifier extends ChangeNotifier {
   Future<String> resend() async {
     try {
       await _service.resendEmailVerification();
-      return 'verify_email.resent';
+      return LocaleKeys.verify_email_resent;
     } catch (error) {
       return AccountError.fromException(error)?.translationKey ?? _genericErrorKey;
     }
@@ -40,7 +43,7 @@ class EmailVerificationNotifier extends ChangeNotifier {
   /// El usuario dice que ya lo confirmó (quizá en el navegador): se vuelve a leer del backend.
   Future<String> checkAgain() async {
     await load();
-    return _verified == true ? 'verify_email.confirmed' : 'verify_email.still_pending';
+    return _verified == true ? LocaleKeys.verify_email_confirmed : LocaleKeys.verify_email_still_pending;
   }
 
   /// Confirma el correo con el token del enlace que se abrió en la app.
@@ -48,7 +51,7 @@ class EmailVerificationNotifier extends ChangeNotifier {
     try {
       await _service.verifyEmail(token);
       await load();
-      return 'verify_email.confirmed';
+      return LocaleKeys.verify_email_confirmed;
     } catch (error) {
       return AccountError.fromException(error)?.translationKey ?? _genericErrorKey;
     }

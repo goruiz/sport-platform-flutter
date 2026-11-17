@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
@@ -42,12 +43,12 @@ class MatchResultDisputeCard extends StatelessWidget {
             children: [
               const Icon(Icons.help_outline, color: AppColors.primaryLight, size: 22),
               const SizedBox(width: AppSpacing.md),
-              Expanded(child: Text('match_detail.dispute.title'.tr(), style: AppTextStyles.cardTitle)),
+              Expanded(child: Text(LocaleKeys.match_detail_dispute_title.tr(), style: AppTextStyles.cardTitle)),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
           if (latest == null)
-            Text('match_detail.dispute.hint'.tr(), style: AppTextStyles.bodyMuted)
+            Text(LocaleKeys.match_detail_dispute_hint.tr(), style: AppTextStyles.bodyMuted)
           else
             _buildLatestDispute(latest),
           if (state.canOpenNew) ...[
@@ -61,7 +62,7 @@ class MatchResultDisputeCard extends StatelessWidget {
 
   Widget _buildReportButton({required bool isFirst}) {
     final label = Text(
-      (isFirst ? 'match_detail.dispute.report' : 'match_detail.dispute.report_again').tr(),
+      (isFirst ? LocaleKeys.match_detail_dispute_report : LocaleKeys.match_detail_dispute_report_again).tr(),
       textAlign: TextAlign.center,
     );
     final icon = const Icon(Icons.campaign_outlined, size: 18);
@@ -83,13 +84,13 @@ class MatchResultDisputeCard extends StatelessWidget {
         _buildStatusBadge(dispute.status),
         const SizedBox(height: AppSpacing.md),
         Text(
-          'match_detail.dispute.your_reason'.tr(namedArgs: {'reason': dispute.reason}),
+          LocaleKeys.match_detail_dispute_your_reason.tr(namedArgs: {'reason': dispute.reason}),
           style: AppTextStyles.body,
         ),
         if (dispute.hasProposedScore) ...[
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'match_detail.dispute.proposed_score'.tr(
+            LocaleKeys.match_detail_dispute_proposed_score.tr(
               namedArgs: {
                 'home': homeName,
                 'homeScore': '${dispute.proposedHomeScore}',
@@ -103,7 +104,7 @@ class MatchResultDisputeCard extends StatelessWidget {
         if (note.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'match_detail.dispute.organizer_note'.tr(namedArgs: {'note': note}),
+            LocaleKeys.match_detail_dispute_organizer_note.tr(namedArgs: {'note': note}),
             style: AppTextStyles.bodyMuted,
           ),
         ],
@@ -113,9 +114,9 @@ class MatchResultDisputeCard extends StatelessWidget {
 
   Widget _buildStatusBadge(DisputeStatus status) {
     return switch (status) {
-      DisputeStatus.open => StatusBadge(label: 'match_detail.dispute.status_open'.tr(), color: AppColors.warning),
-      DisputeStatus.accepted => StatusBadge(label: 'match_detail.dispute.status_accepted'.tr(), color: AppColors.success),
-      DisputeStatus.rejected => StatusBadge(label: 'match_detail.dispute.status_rejected'.tr(), color: AppColors.info),
+      DisputeStatus.open => StatusBadge(label: LocaleKeys.match_detail_dispute_status_open.tr(), color: AppColors.warning),
+      DisputeStatus.accepted => StatusBadge(label: LocaleKeys.match_detail_dispute_status_accepted.tr(), color: AppColors.success),
+      DisputeStatus.rejected => StatusBadge(label: LocaleKeys.match_detail_dispute_status_rejected.tr(), color: AppColors.info),
     };
   }
 }

@@ -1,4 +1,4 @@
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 
 /// El capitán va primero; los demás conservan el orden en que los manda el backend.
 List<PlayerModel> sortCaptainFirst(List<PlayerModel> members) => [

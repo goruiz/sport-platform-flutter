@@ -1,3 +1,4 @@
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 
 // Reglas de la fecha de nacimiento. Funciones puras: las usan el formulario de perfil y el registro por invitación.
@@ -16,8 +17,8 @@ enum BirthDateIssue {
   /// La clave de traducción del motivo. Que esté vacía lo dice cada pantalla con su propio texto («Requerido»).
   String? get translationKey => switch (this) {
     BirthDateIssue.empty => null,
-    BirthDateIssue.inTheFuture => 'profile.birth_date_future',
-    BirthDateIssue.tooOld => 'profile.birth_date_too_old',
+    BirthDateIssue.inTheFuture => LocaleKeys.profile_birth_date_future,
+    BirthDateIssue.tooOld => LocaleKeys.profile_birth_date_too_old,
   };
 }
 

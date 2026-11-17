@@ -1,18 +1,18 @@
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/services/user_session.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/teams_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/teams/data/datasource/teams_service.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
+import 'package:sport_platform/modules/teams/data/models/team_model.dart';
+import 'package:sport_platform/shared/enums/match_status.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/team_events_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
 import 'package:sport_platform/modules/matches/domain/match_rules.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 
 /// Lo que muestra el inicio: los eventos y los partidos del equipo activo del usuario.
 class HomeDashboardData {
@@ -54,7 +54,7 @@ class HomeDashboardData {
     }).toList()
       ..sort((a, b) => a.startDate.compareTo(b.startDate));
 
-    final myEventIds = matches.map((match) => match.eventId).toSet();
+    final myEventIds = {for (final match in matches) ?match.eventId};
     for (final event in upcoming) {
       if (myEventIds.contains(event.id)) return event;
     }
@@ -92,7 +92,8 @@ class HomeDashboardData {
     return '—';
   }
 
-  String eventName(String eventId) {
+  String eventName(String? eventId) {
+    if (eventId == null) return '';
     for (final event in events) {
       if (event.id == eventId) return event.name;
     }

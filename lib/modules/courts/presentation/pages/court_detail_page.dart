@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
@@ -7,22 +8,20 @@ import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/modules/courts/presentation/providers/court_detail_notifier.dart';
 import 'package:sport_platform/modules/courts/presentation/widgets/court_schedule_section.dart';
 import 'package:sport_platform/modules/courts/presentation/widgets/court_upcoming_matches_section.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/courts/data/models/court_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/presentation/pages/match_detail_page.dart';
-import 'package:sport_platform/modules/sport_complexes/domain/complex_overview.dart';
-import 'package:sport_platform/modules/sport_complexes/presentation/pages/sport_complex_detail_page.dart';
 import 'package:sport_platform/shared/widgets/app_card.dart';
 
 /// Una cancha: dónde está, qué horarios tiene libres cada día y qué partidos se juegan en ella.
 ///
-/// [complex] es el complejo al que pertenece, con su mapa; si es null no se ofrece el enlace (por ejemplo, cuando se
-/// llegó a la cancha desde el propio complejo).
+/// [onOpenComplex] lleva al complejo de la cancha, con su mapa; si es null no se ofrece el enlace (por ejemplo, cuando
+/// se llegó a la cancha desde el propio complejo).
 class CourtDetailPage extends StatefulWidget {
   final CourtModel court;
-  final ComplexOverview? complex;
+  final VoidCallback? onOpenComplex;
 
-  const CourtDetailPage({super.key, required this.court, this.complex});
+  const CourtDetailPage({super.key, required this.court, this.onOpenComplex});
 
   @override
   State<CourtDetailPage> createState() => _CourtDetailPageState();
@@ -45,12 +44,6 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
   void dispose() {
     _notifier.dispose();
     super.dispose();
-  }
-
-  void _openComplex(ComplexOverview complex) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => SportComplexDetailPage(overview: complex)),
-    );
   }
 
   void _openMatch(MatchModel match) {
@@ -89,7 +82,7 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
             children: [
               _buildInfoCard(),
               const SizedBox(height: AppSpacing.section),
-              _buildSectionTitle('mobile.courts.schedule_title'.tr()),
+              _buildSectionTitle(LocaleKeys.mobile_courts_schedule_title.tr()),
               CourtScheduleSection(
                 days: _notifier.days,
                 selectedDay: _notifier.selectedDay,
@@ -99,7 +92,7 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
                 onRetry: _notifier.loadAvailability,
               ),
               const SizedBox(height: AppSpacing.section),
-              _buildSectionTitle('mobile.courts.upcoming_title'.tr()),
+              _buildSectionTitle(LocaleKeys.mobile_courts_upcoming_title.tr()),
               CourtUpcomingMatchesSection(
                 status: _notifier.matchesStatus,
                 matches: _notifier.upcomingMatches,
@@ -116,7 +109,7 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
   /// El complejo y la ubicación de la cancha, su descripción y, si se conoce el complejo, el paso a su mapa.
   Widget _buildInfoCard() {
     final court = widget.court;
-    final complex = widget.complex;
+    final onOpenComplex = widget.onOpenComplex;
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,14 +120,14 @@ class _CourtDetailPageState extends State<CourtDetailPage> {
             _InfoLine(icon: Icons.place_outlined, text: court.location!),
           if (court.description?.isNotEmpty ?? false)
             _InfoLine(icon: Icons.info_outline, text: court.description!),
-          if (complex != null) ...[
+          if (onOpenComplex != null) ...[
             const SizedBox(height: AppSpacing.md),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
-                onPressed: () => _openComplex(complex),
+                onPressed: onOpenComplex,
                 icon: const Icon(Icons.map_outlined, size: 18),
-                label: Text('mobile.courts.view_complex'.tr()),
+                label: Text(LocaleKeys.mobile_courts_view_complex.tr()),
               ),
             ),
           ],

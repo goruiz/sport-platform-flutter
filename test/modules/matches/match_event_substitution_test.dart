@@ -30,7 +30,14 @@ void main() {
     });
 
     test('las demás líneas no son cambios y no traen a nadie que salga', () {
-      final event = MatchEventModel.fromJson({'id': 'e1', 'eventType': 'GOAL', 'playerName': 'Ana Lopez'});
+      final event = MatchEventModel.fromJson({
+        'id': 'e1',
+        'matchId': 'm1',
+        'playerId': 'p1',
+        'teamId': 't1',
+        'eventType': 'GOAL',
+        'playerName': 'Ana Lopez',
+      });
 
       expect(event.isSubstitution, isFalse);
       expect(event.replacedPlayerName, isNull);
@@ -54,6 +61,8 @@ void main() {
         tester,
         MatchEventModel.fromJson({
           'id': 'e1',
+          'matchId': 'm1',
+          'playerId': 'p2',
           'playerName': 'Luis Mora',
           'replacedPlayerName': 'Ana Lopez',
           'teamId': 't1',
@@ -70,6 +79,8 @@ void main() {
         tester,
         MatchEventModel.fromJson({
           'id': 'e1',
+          'matchId': 'm1',
+          'playerId': 'p2',
           'playerName': 'Luis Mora',
           'teamId': 't1',
           'eventType': 'SUBSTITUTION',
@@ -82,7 +93,15 @@ void main() {
     testWidgets('un gol sigue mostrando solo a su jugador', (tester) async {
       await pumpTile(
         tester,
-        MatchEventModel.fromJson({'id': 'e1', 'playerName': 'Ana Lopez', 'teamId': 't1', 'eventType': 'GOAL', 'minute': 23}),
+        MatchEventModel.fromJson({
+          'id': 'e1',
+          'matchId': 'm1',
+          'playerId': 'p1',
+          'playerName': 'Ana Lopez',
+          'teamId': 't1',
+          'eventType': 'GOAL',
+          'minute': 23,
+        }),
       );
 
       expect(find.text('Ana Lopez'), findsOneWidget);

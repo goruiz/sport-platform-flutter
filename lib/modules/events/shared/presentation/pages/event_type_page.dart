@@ -1,8 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/event_card.dart';
@@ -91,11 +92,11 @@ class _EventTypePageState extends State<EventTypePage> {
   Widget _buildBody(EventsNotifier notifier) {
     if (notifier.loading) {
       return const Center(
-        child: CircularProgressIndicator(color: AppColors.primaryLight),
+        child: CircularProgressIndicator(),
       );
     }
 
-    if (notifier.error != null) {
+    if (notifier.hasError) {
       final errorMsg = '$_prefix.error_load'.tr();
       return ErrorRetry(message: errorMsg, onRetry: notifier.load);
     }
@@ -156,7 +157,7 @@ class _EventListView extends StatelessWidget {
       onRefresh: onRefresh,
       color: AppColors.primaryLight,
       child: ListView.builder(
-        padding: const EdgeInsets.only(top: 12, bottom: 100),
+        padding: const EdgeInsets.only(top: AppSpacing.md, bottom: AppSpacing.listBottom),
         itemCount: events.length,
         itemBuilder: (_, i) {
           final event = events[i];

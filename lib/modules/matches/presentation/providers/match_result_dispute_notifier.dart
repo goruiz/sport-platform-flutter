@@ -1,13 +1,15 @@
 import 'package:flutter/foundation.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/network/api_error_codes.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_disputes_service.dart';
 import 'package:sport_platform/modules/matches/data/models/match_dispute_model.dart';
 import 'package:sport_platform/modules/matches/domain/match_attendance_rules.dart';
 import 'package:sport_platform/modules/matches/domain/match_dispute_rules.dart';
 import 'package:sport_platform/modules/users/domain/enums/account_capability.dart';
-import 'package:sport_platform/modules/users/presentation/providers/account_capabilities_notifier.dart';
+import 'package:sport_platform/modules/users/data/providers/account_capabilities_notifier.dart';
 import 'package:sport_platform/shared/enums/summary_status.dart';
 
 /// «¿Hay un problema con el resultado?»: lo que el dirigente de equipo ve de un partido y lo que puede hacer.
@@ -16,8 +18,8 @@ import 'package:sport_platform/shared/enums/summary_status.dart';
 /// partido, y solo cuando el partido ya tiene resultado: para cualquier otra cuenta [isAvailable] es falso y no se pide
 /// nada más (los avisos ni siquiera se leen).
 class MatchResultDisputeNotifier extends ChangeNotifier {
-  static const _loadErrorKey = 'match_detail.dispute.error_load';
-  static const _saveErrorKey = 'match_detail.dispute.error_save';
+  static const _loadErrorKey = LocaleKeys.match_detail_dispute_error_load;
+  static const _saveErrorKey = LocaleKeys.match_detail_dispute_error_save;
 
   final AccountCapabilitiesNotifier _capabilities;
   final PlayersService _playersService;
@@ -82,7 +84,8 @@ class MatchResultDisputeNotifier extends ChangeNotifier {
           disputes = disputesOfTeam(await _service.getByMatch(match.id), teamId);
         }
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('MatchResultDisputeNotifier.load', error, stackTrace);
       status = SummaryStatus.failed;
     }
     if (loadId != _loadCount) return;

@@ -1,3 +1,4 @@
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/modules/events/shared/data/models/championship_model.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/championship_phase.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/match_stage.dart';
@@ -8,10 +9,10 @@ typedef TextKey = ({String key, List<String> args});
 
 /// Cuántos cruces tiene una ronda de eliminación directa → su nombre de toda la vida.
 const _knockoutRoundKeys = <int, String>{
-  1: 'championship.round_final',
-  2: 'championship.round_semifinals',
-  4: 'championship.round_quarterfinals',
-  8: 'championship.round_round_of_16',
+  1: LocaleKeys.championship_round_final,
+  2: LocaleKeys.championship_round_semifinals,
+  4: LocaleKeys.championship_round_quarterfinals,
+  8: LocaleKeys.championship_round_round_of_16,
 };
 
 /// El nombre de una ronda de la llave: «Final», «Semifinales», «Cuartos de final»… por el número de
@@ -23,14 +24,14 @@ TextKey describeRound(ChampionshipRoundModel round) {
       ? _knockoutRoundKeys[knockoutTies]
       : null;
   if (namedKey != null) return (key: namedKey, args: const []);
-  return (key: 'championship.round_number', args: ['${round.roundNumber}']);
+  return (key: LocaleKeys.championship_round_number, args: ['${round.roundNumber}']);
 }
 
 /// El título de la tabla de una etapa: la de un grupo lleva su letra («Grupo A»).
 TextKey describeTable(ChampionshipTableModel table) {
   final group = table.groupNumber;
   if (table.phase == ChampionshipPhase.groups && group != null) {
-    return (key: 'championship.table_group', args: [groupLetter(group)]);
+    return (key: LocaleKeys.championship_table_group, args: [groupLetter(group)]);
   }
   return (key: 'championship.tables.${table.phase.apiValue}', args: const []);
 }

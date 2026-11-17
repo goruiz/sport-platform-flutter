@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 
@@ -16,7 +19,7 @@ class MyStatsCard extends StatelessWidget {
     super.key,
     required this.stats,
     this.subtitle,
-    this.margin = const EdgeInsets.fromLTRB(16, 8, 16, 4),
+    this.margin = const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.xs),
   });
 
   @override
@@ -24,10 +27,10 @@ class MyStatsCard extends StatelessWidget {
     context.locale;
     return Container(
       margin: margin,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 14),
       decoration: BoxDecoration(
         color: AppColors.primaryLight.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.5)),
       ),
       child: Column(
@@ -36,26 +39,26 @@ class MyStatsCard extends StatelessWidget {
           Row(
             children: [
               const Icon(Icons.person_pin_outlined, color: AppColors.primaryLight, size: 20),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text(
-                'rankings.my_stats.title'.tr(),
+                LocaleKeys.rankings_my_stats_title.tr(),
                 style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           if (subtitle != null) ...[
-            const SizedBox(height: 4),
-            Text(subtitle!, style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12)),
+            const SizedBox(height: AppSpacing.xs),
+            Text(subtitle!, style: AppTextStyles.footnote),
           ],
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
           Row(
             children: [
-              _Counter(label: 'rankings.my_stats.matches'.tr(), value: stats.matchesPlayed),
-              _Counter(label: 'rankings.my_stats.goals'.tr(), value: stats.goals),
-              _Counter(label: 'rankings.my_stats.assists'.tr(), value: stats.assists),
-              _Counter(label: 'rankings.my_stats.yellow'.tr(), value: stats.yellowCards, color: AppColors.cardYellow),
-              _Counter(label: 'rankings.my_stats.red'.tr(), value: stats.redCards, color: AppColors.cardRed),
-              _Counter(label: 'rankings.my_stats.fouls'.tr(), value: stats.fouls),
+              _Counter(label: LocaleKeys.rankings_my_stats_matches.tr(), value: stats.matchesPlayed),
+              _Counter(label: LocaleKeys.rankings_my_stats_goals.tr(), value: stats.goals),
+              _Counter(label: LocaleKeys.rankings_my_stats_assists.tr(), value: stats.assists),
+              _Counter(label: LocaleKeys.rankings_my_stats_yellow.tr(), value: stats.yellowCards, color: AppColors.cardYellow),
+              _Counter(label: LocaleKeys.rankings_my_stats_red.tr(), value: stats.redCards, color: AppColors.cardRed),
+              _Counter(label: LocaleKeys.rankings_my_stats_fouls.tr(), value: stats.fouls),
             ],
           ),
         ],
@@ -77,10 +80,10 @@ class _Counter extends StatelessWidget {
       child: Column(
         children: [
           Text('$value', style: TextStyle(color: color, fontSize: 22, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 2),
+          const SizedBox(height: AppSpacing.hairline),
           FittedBox(
             fit: BoxFit.scaleDown,
-            child: Text(label, style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 11)),
+            child: Text(label, style: AppTextStyles.micro),
           ),
         ],
       ),

@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/championship_service.dart';
@@ -52,12 +55,12 @@ class _ChampionshipTabState extends State<ChampionshipTab>
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-            child: CircularProgressIndicator(color: AppColors.primaryLight),
+            child: CircularProgressIndicator(),
           );
         }
         if (snapshot.hasError) {
           return ErrorRetry(
-            message: 'championship.load_error'.tr(),
+            message: LocaleKeys.championship_load_error.tr(),
             onRetry: _reload,
           );
         }
@@ -65,8 +68,8 @@ class _ChampionshipTabState extends State<ChampionshipTab>
         if (!championship.hasChampionship) {
           return EmptyState(
             icon: Icons.account_tree_outlined,
-            title: 'championship.none_title'.tr(),
-            subtitle: 'championship.none_subtitle'.tr(),
+            title: LocaleKeys.championship_none_title.tr(),
+            subtitle: LocaleKeys.championship_none_subtitle.tr(),
           );
         }
         return RefreshIndicator(
@@ -74,7 +77,7 @@ class _ChampionshipTabState extends State<ChampionshipTab>
           color: AppColors.primaryLight,
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+            padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.listBottom),
             children: _buildSections(championship),
           ),
         );
@@ -88,33 +91,33 @@ class _ChampionshipTabState extends State<ChampionshipTab>
     final hasNothingToShow = championship.tables.isEmpty && eliminationRounds.isEmpty;
     return [
       ChampionshipSummaryCard(championship: championship),
-      const SizedBox(height: 20),
+      const SizedBox(height: AppSpacing.xl),
       if (hasNothingToShow) _buildNothingGenerated(),
       for (final table in championship.tables) ...[
         ChampionshipTableCard(table: table, advancingRows: advancingRows),
-        const SizedBox(height: 20),
+        const SizedBox(height: AppSpacing.xl),
       ],
       if (eliminationRounds.isNotEmpty) ...[
-        _buildSectionTitle('championship.bracket'.tr()),
+        _buildSectionTitle(LocaleKeys.championship_bracket.tr()),
         for (final round in eliminationRounds) ...[
           ChampionshipRoundCard(round: round, championship: championship),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
         ],
       ],
     ];
   }
 
   Widget _buildNothingGenerated() => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
         child: Text(
-          'championship.nothing_generated'.tr(),
+          LocaleKeys.championship_nothing_generated.tr(),
           textAlign: TextAlign.center,
-          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+          style: AppTextStyles.bodyMuted,
         ),
       );
 
   Widget _buildSectionTitle(String title) => Padding(
-        padding: const EdgeInsets.only(bottom: 10, left: 4),
+        padding: const EdgeInsets.only(bottom: AppSpacing.snug, left: AppSpacing.xs),
         child: Text(
           title,
           style: const TextStyle(

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/modules/users/data/datasource/account_service.dart';
 import 'package:sport_platform/modules/users/domain/enums/account_capability.dart';
 
@@ -45,7 +46,8 @@ class AccountCapabilitiesNotifier extends ChangeNotifier {
       _capabilities = capabilities;
       notifyListeners();
       return capabilities;
-    } catch (_) {
+    } catch (error) {
+      AppLogger.warning('AccountCapabilitiesNotifier._read', error);
       return _capabilities ?? const {};
     } finally {
       _loading = null;

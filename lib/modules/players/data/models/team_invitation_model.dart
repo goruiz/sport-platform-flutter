@@ -1,3 +1,5 @@
+import 'package:sport_platform/core/network/json_reader.dart';
+
 /// Una invitación a unirse a un equipo, vista por la persona invitada.
 class TeamInvitationModel {
   final String id;
@@ -17,15 +19,13 @@ class TeamInvitationModel {
   });
 
   factory TeamInvitationModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'invitación');
     return TeamInvitationModel(
-      id: json['id']?.toString() ?? '',
-      teamId: json['teamId']?.toString() ?? '',
-      teamName: json['teamName']?.toString(),
-      expiresAt: _parseDate(json['expiresAt']),
-      createdAt: _parseDate(json['createdAt']),
+      id: reader.requiredString('id'),
+      teamId: reader.requiredString('teamId'),
+      teamName: reader.optionalString('teamName'),
+      expiresAt: reader.optionalDateTime('expiresAt'),
+      createdAt: reader.optionalDateTime('createdAt'),
     );
   }
-
-  static DateTime? _parseDate(dynamic value) =>
-      value == null ? null : DateTime.tryParse(value.toString());
 }

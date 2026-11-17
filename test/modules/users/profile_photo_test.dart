@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/network/api_error_codes.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/users/data/datasource/player_photo_service.dart';
 import 'package:sport_platform/modules/users/domain/profile_photo_picker.dart';
 import 'package:sport_platform/modules/users/domain/profile_photo_rules.dart';

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/services/user_session.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
@@ -24,7 +25,7 @@ class _EmailVerificationBannerState extends State<EmailVerificationBanner> {
     final messageKey = await action();
     if (!mounted) return;
     setState(() => _busy = false);
-    final isSuccess = messageKey == 'verify_email.resent' || messageKey == 'verify_email.confirmed';
+    final isSuccess = messageKey == LocaleKeys.verify_email_resent || messageKey == LocaleKeys.verify_email_confirmed;
     final text = messageKey.tr();
     isSuccess ? AppSnackbar.success(context, text) : AppSnackbar.warning(context, text);
   }
@@ -39,10 +40,10 @@ class _EmailVerificationBannerState extends State<EmailVerificationBanner> {
         if (!notifier.needsVerification) return const SizedBox.shrink();
         return Container(
           margin: const EdgeInsets.only(bottom: AppSpacing.xl),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
             color: AppColors.warning.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(color: AppColors.warning.withValues(alpha: 0.6)),
           ),
           child: Column(
@@ -51,10 +52,10 @@ class _EmailVerificationBannerState extends State<EmailVerificationBanner> {
               Row(
                 children: [
                   const Icon(Icons.mark_email_unread_outlined, color: AppColors.warningLight),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: AppSpacing.snug),
                   Expanded(
                     child: Text(
-                      'verify_email.title'.tr(),
+                      LocaleKeys.verify_email_title.tr(),
                       style: const TextStyle(
                         color: AppColors.white,
                         fontWeight: FontWeight.bold,
@@ -64,22 +65,22 @@ class _EmailVerificationBannerState extends State<EmailVerificationBanner> {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Text(
-                'verify_email.text'.tr(args: [UserSession.current?.email ?? '']),
+                LocaleKeys.verify_email_text.tr(args: [UserSession.current?.email ?? '']),
                 style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13, height: 1.4),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               Wrap(
                 spacing: 8,
                 children: [
                   OutlinedButton(
                     onPressed: _busy ? null : () => _run(notifier.resend),
-                    child: Text('verify_email.resend'.tr()),
+                    child: Text(LocaleKeys.verify_email_resend.tr()),
                   ),
                   TextButton(
                     onPressed: _busy ? null : () => _run(notifier.checkAgain),
-                    child: Text('verify_email.check'.tr()),
+                    child: Text(LocaleKeys.verify_email_check.tr()),
                   ),
                 ],
               ),

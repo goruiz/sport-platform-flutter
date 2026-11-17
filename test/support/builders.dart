@@ -1,5 +1,5 @@
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/shared/enums/match_status.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 
 /// Un partido listo para usar en los tests: solo se dice lo que importa para la prueba.
@@ -11,7 +11,7 @@ MatchModel matchOf({
   MatchStatus status = MatchStatus.scheduled,
   int? homeScore,
   int? awayScore,
-  String eventId = 'event-1',
+  String? eventId = 'event-1',
   String? homeTeamName,
   String? awayTeamName,
   String? eventName,

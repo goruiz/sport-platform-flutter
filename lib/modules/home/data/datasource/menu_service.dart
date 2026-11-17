@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 
 class MenuResult {
   final List<MenuItemModel> navItems;

@@ -1,11 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/team_in_event.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/providers/team_in_event_notifier.dart';
@@ -124,7 +125,7 @@ class _TeamInEventPageState extends State<TeamInEventPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(widget.team.teamName, style: AppTextStyles.pageTitle),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppSpacing.hairline),
                   Text(widget.event.name, style: AppTextStyles.caption),
                 ],
               ),
@@ -136,7 +137,7 @@ class _TeamInEventPageState extends State<TeamInEventPage> {
   // --------------- Partidos: balance, racha, próximos y resultados ---------------
 
   List<Widget> _buildMatchesSections() {
-    final title = 'leagues.team_detail.record_title'.tr();
+    final title = LocaleKeys.leagues_team_detail_record_title.tr();
     switch (_notifier.matchesStatus) {
       case SummaryStatus.loading:
         return [TeamInEventSectionTitle(title), const SkeletonBox(height: 140), _gap];
@@ -144,7 +145,7 @@ class _TeamInEventPageState extends State<TeamInEventPage> {
         return [
           TeamInEventSectionTitle(title),
           TeamInEventMessage(
-            message: 'leagues.team_detail.matches_error'.tr(),
+            message: LocaleKeys.leagues_team_detail_matches_error.tr(),
             onRetry: _notifier.loadMatches,
           ),
           _gap,
@@ -160,7 +161,7 @@ class _TeamInEventPageState extends State<TeamInEventPage> {
     if (matches.isEmpty) {
       return [
         TeamInEventSectionTitle(recordTitle),
-        TeamInEventMessage(message: 'leagues.team_detail.no_matches'.tr()),
+        TeamInEventMessage(message: LocaleKeys.leagues_team_detail_no_matches.tr()),
         _gap,
       ];
     }
@@ -172,17 +173,17 @@ class _TeamInEventPageState extends State<TeamInEventPage> {
         TeamInEventSectionTitle(recordTitle),
         TeamRecordCard(record: record),
         const SizedBox(height: AppSpacing.lg),
-        TeamInEventSectionTitle('reports.recent_form'.tr()),
+        TeamInEventSectionTitle(LocaleKeys.reports_recent_form.tr()),
         RecentFormChips(form: form),
         _gap,
       ],
       if (matches.upcoming.isNotEmpty) ...[
-        TeamInEventSectionTitle('leagues.team_detail.upcoming_title'.tr()),
+        TeamInEventSectionTitle(LocaleKeys.leagues_team_detail_upcoming_title.tr()),
         ..._matchCards(matches.upcoming.take(limit)),
         _gap,
       ],
       if (matches.results.isNotEmpty) ...[
-        TeamInEventSectionTitle('leagues.team_detail.results_title'.tr()),
+        TeamInEventSectionTitle(LocaleKeys.leagues_team_detail_results_title.tr()),
         ..._matchCards(matches.results.take(limit)),
         _gap,
       ],
@@ -203,13 +204,13 @@ class _TeamInEventPageState extends State<TeamInEventPage> {
   List<Widget> _buildPlayersSections() => [
         ..._buildStatsSections(),
         if (_notifier.rosterStatus == SummaryStatus.ready && _notifier.roster.isNotEmpty) ...[
-          TeamInEventSectionTitle('mobile.teams.players'.tr()),
+          TeamInEventSectionTitle(LocaleKeys.mobile_teams_players.tr()),
           TeamRosterList(players: sortCaptainFirst(_notifier.roster)),
         ],
       ];
 
   List<Widget> _buildStatsSections() {
-    final scorersTitle = 'leagues.team_detail.scorers_title'.tr();
+    final scorersTitle = LocaleKeys.leagues_team_detail_scorers_title.tr();
     switch (_notifier.statsStatus) {
       case SummaryStatus.loading:
         return [TeamInEventSectionTitle(scorersTitle), const SkeletonBox(height: 110), _gap];
@@ -217,7 +218,7 @@ class _TeamInEventPageState extends State<TeamInEventPage> {
         return [
           TeamInEventSectionTitle(scorersTitle),
           TeamInEventMessage(
-            message: 'leagues.team_detail.stats_error'.tr(),
+            message: LocaleKeys.leagues_team_detail_stats_error.tr(),
             onRetry: _notifier.loadStats,
           ),
           _gap,
@@ -239,11 +240,11 @@ class _TeamInEventPageState extends State<TeamInEventPage> {
     return [
       TeamInEventSectionTitle(scorersTitle),
       if (scorers.isEmpty)
-        TeamInEventMessage(message: 'leagues.team_detail.scorers_empty'.tr())
+        TeamInEventMessage(message: LocaleKeys.leagues_team_detail_scorers_empty.tr())
       else
         TeamScorersList(scorers: scorers),
       const SizedBox(height: AppSpacing.lg),
-      TeamInEventSectionTitle('leagues.team_detail.discipline_title'.tr()),
+      TeamInEventSectionTitle(LocaleKeys.leagues_team_detail_discipline_title.tr()),
       TeamStatsCard(
         disciplineStatus: SummaryStatus.ready,
         discipline: buildTeamDiscipline(widget.team.teamId, [_notifier.eventStats]),

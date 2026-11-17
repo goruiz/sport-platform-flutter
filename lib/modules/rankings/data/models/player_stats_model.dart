@@ -1,3 +1,5 @@
+import 'package:sport_platform/core/network/json_reader.dart';
+
 /// Lo que hizo un jugador, sumado por el backend: en todos los partidos de un evento o, si viene de sus totales
 /// (`GET /players/me/stats`), en todos los eventos en que jugó.
 class PlayerStatsModel {
@@ -35,19 +37,20 @@ class PlayerStatsModel {
   bool get isEmpty => matchesPlayed + goals + assists + yellowCards + redCards + fouls == 0;
 
   factory PlayerStatsModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'estadísticas de jugador');
+    // Una cifra que no llega es que no hubo nada que contar: cero.
+    int count(String field) => reader.optionalInt(field) ?? 0;
     return PlayerStatsModel(
-      playerId: json['playerId']?.toString() ?? '',
-      playerName: json['playerName']?.toString(),
-      teamId: json['teamId']?.toString() ?? '',
-      teamName: json['teamName']?.toString(),
-      goals: _asInt(json['goals']),
-      assists: _asInt(json['assists']),
-      yellowCards: _asInt(json['yellowCards']),
-      redCards: _asInt(json['redCards']),
-      fouls: _asInt(json['fouls']),
-      matchesPlayed: _asInt(json['matchesPlayed']),
+      playerId: reader.requiredString('playerId'),
+      playerName: reader.optionalString('playerName'),
+      teamId: reader.requiredString('teamId'),
+      teamName: reader.optionalString('teamName'),
+      goals: count('goals'),
+      assists: count('assists'),
+      yellowCards: count('yellowCards'),
+      redCards: count('redCards'),
+      fouls: count('fouls'),
+      matchesPlayed: count('matchesPlayed'),
     );
   }
-
-  static int _asInt(dynamic value) => value is num ? value.toInt() : 0;
 }

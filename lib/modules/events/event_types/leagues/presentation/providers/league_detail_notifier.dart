@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_matches_repository.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_teams_repository.dart';
-import '../../data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import '../../data/models/team_event_model.dart';
 
 /// Los equipos y los partidos de un evento, solo para leerlos: los gestiona el organizador desde el panel.
@@ -38,8 +40,9 @@ class LeagueDetailNotifier extends ChangeNotifier {
     notifyListeners();
     try {
       _teams = await _teamsRepo.getByEvent(eventId);
-    } catch (_) {
-      _teamsError = 'leagues.error_load_teams';
+    } catch (error, stackTrace) {
+      AppLogger.error('LeagueDetailNotifier.loadTeams', error, stackTrace);
+      _teamsError = LocaleKeys.leagues_error_load_teams;
     } finally {
       _loadingTeams = false;
       notifyListeners();
@@ -52,8 +55,9 @@ class LeagueDetailNotifier extends ChangeNotifier {
     notifyListeners();
     try {
       _groupedMatches = _groupByDate(await _matchesRepo.getByEvent(eventId));
-    } catch (_) {
-      _matchesError = 'leagues.error_load_matches';
+    } catch (error, stackTrace) {
+      AppLogger.error('LeagueDetailNotifier.loadMatches', error, stackTrace);
+      _matchesError = LocaleKeys.leagues_error_load_matches;
     } finally {
       _loadingMatches = false;
       notifyListeners();

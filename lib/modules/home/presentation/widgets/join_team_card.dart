@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
@@ -33,19 +34,19 @@ class JoinTeamCard extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: Text('mobile.teams.empty_title'.tr(), style: AppTextStyles.sectionTitle),
+                child: Text(LocaleKeys.mobile_teams_empty_title.tr(), style: AppTextStyles.sectionTitle),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          Text('join_team.home_hint'.tr(), style: AppTextStyles.bodyMuted),
+          Text(LocaleKeys.join_team_home_hint.tr(), style: AppTextStyles.bodyMuted),
           const SizedBox(height: AppSpacing.lg),
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
               onPressed: onJoin,
               icon: const Icon(Icons.vpn_key_outlined, size: 20),
-              label: Text('join_team.title'.tr()),
+              label: Text(LocaleKeys.join_team_title.tr()),
             ),
           ),
         ],

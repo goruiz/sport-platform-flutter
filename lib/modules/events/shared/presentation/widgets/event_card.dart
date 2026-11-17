@@ -28,7 +28,7 @@ class EventCard extends StatelessWidget {
       onTap: onTap,
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.page,
-        vertical: AppSpacing.xs + 2,
+        vertical: AppSpacing.xs + AppSpacing.hairline,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,7 +66,7 @@ class EventCard extends StatelessWidget {
                 style: AppTextStyles.cardTitle.copyWith(fontSize: 16),
               ),
               if (event.format.isNotEmpty) ...[
-                const SizedBox(height: 2),
+                const SizedBox(height: AppSpacing.hairline),
                 Text(event.format, style: AppTextStyles.caption),
               ],
             ],
@@ -81,7 +81,7 @@ class EventCard extends StatelessWidget {
     return Row(
       children: [
         const Icon(Icons.calendar_today_outlined, size: 15, color: AppColors.whiteSubtle),
-        const SizedBox(width: 6),
+        const SizedBox(width: AppSpacing.tight),
         Expanded(
           child: Text(
             DateFormatters.shortRange(

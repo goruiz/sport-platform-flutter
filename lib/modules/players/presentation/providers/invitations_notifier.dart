@@ -1,14 +1,16 @@
 import 'package:flutter/foundation.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/services/session_service.dart';
 import 'package:sport_platform/modules/players/data/datasource/team_invitations_service.dart';
 import 'package:sport_platform/modules/players/data/models/team_invitation_model.dart';
-import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
+import 'package:sport_platform/shared/enums/category_eligibility_issue.dart';
 import 'package:sport_platform/modules/players/domain/enums/team_invitation_error.dart';
 
 /// Las invitaciones pendientes del usuario. Lo comparten el inicio (tarjeta y campana con su
 /// contador) y la bandeja, por eso vive en GetIt y se reinicia al cerrar la sesión.
 class InvitationsNotifier extends ChangeNotifier {
-  static const _genericErrorKey = 'invitations.error_generic';
+  static const _genericErrorKey = LocaleKeys.invitations_error_generic;
 
   final TeamInvitationsService _service;
   final SessionService _sessionService;
@@ -36,7 +38,8 @@ class InvitationsNotifier extends ChangeNotifier {
     notifyListeners();
     try {
       _invitations = await _service.getMine();
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('InvitationsNotifier.load', error, stackTrace);
       _error = _genericErrorKey;
     } finally {
       _loading = false;

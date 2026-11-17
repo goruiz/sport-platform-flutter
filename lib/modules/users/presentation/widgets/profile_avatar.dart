@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/shared/widgets/initials_avatar.dart';
 
@@ -29,7 +30,7 @@ class ProfileAvatar extends StatelessWidget {
     context.locale;
     return Semantics(
       button: onTap != null,
-      label: 'mobile.profile.photo.change'.tr(),
+      label: LocaleKeys.mobile_profile_photo_change.tr(),
       child: GestureDetector(
         onTap: isBusy ? null : onTap,
         child: SizedBox(

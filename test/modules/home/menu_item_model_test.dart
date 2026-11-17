@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 
 // Sin un EasyLocalization inicializado `tr()` responde la propia clave, que es justo el caso que el modelo debe cubrir:
 // un diccionario que no conoce la clave de la base de datos.

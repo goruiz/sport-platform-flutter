@@ -1,3 +1,5 @@
+import 'package:sport_platform/core/network/json_reader.dart';
+
 class StandingModel {
   final int position;
   final String teamId;
@@ -26,18 +28,19 @@ class StandingModel {
   });
 
   factory StandingModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'posición');
     return StandingModel(
-      position: json['position'] as int,
-      teamId: json['teamId'].toString(),
-      teamName: json['teamName'].toString(),
-      played: json['played'] as int,
-      won: json['won'] as int,
-      drawn: json['drawn'] as int,
-      lost: json['lost'] as int,
-      goalsFor: json['goalsFor'] as int,
-      goalsAgainst: json['goalsAgainst'] as int,
-      goalDifference: json['goalDifference'] as int,
-      points: json['points'] as int,
+      position: reader.requiredInt('position'),
+      teamId: reader.requiredString('teamId'),
+      teamName: reader.requiredString('teamName'),
+      played: reader.requiredInt('played'),
+      won: reader.requiredInt('won'),
+      drawn: reader.requiredInt('drawn'),
+      lost: reader.requiredInt('lost'),
+      goalsFor: reader.requiredInt('goalsFor'),
+      goalsAgainst: reader.requiredInt('goalsAgainst'),
+      goalDifference: reader.requiredInt('goalDifference'),
+      points: reader.requiredInt('points'),
     );
   }
 }

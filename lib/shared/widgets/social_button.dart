@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 class SocialButton extends StatelessWidget {
@@ -18,11 +20,11 @@ class SocialButton extends StatelessWidget {
     return OutlinedButton.icon(
       onPressed: onPressed ?? () {},
       icon: Icon(icon, color: AppColors.white, size: 20),
-      label: Text(label, style: const TextStyle(color: AppColors.white, fontSize: 14)),
+      label: Text(label, style: AppTextStyles.body),
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 13),
         side: const BorderSide(color: AppColors.inputBorder),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
         backgroundColor: AppColors.inputFill,
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
@@ -15,8 +16,8 @@ class InvitationsCard extends StatelessWidget {
 
   /// «Tienes 1 invitación pendiente» / «Tienes 3 invitaciones pendientes»: el singular tiene su propio texto.
   static String _title(int count) => count == 1
-      ? 'invitations.pending_count_one'.tr()
-      : 'invitations.pending_count'.tr(namedArgs: {'count': '$count'});
+      ? LocaleKeys.invitations_pending_count_one.tr()
+      : LocaleKeys.invitations_pending_count.tr(namedArgs: {'count': '$count'});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +46,7 @@ class InvitationsCard extends StatelessWidget {
                   children: [
                     Text(_title(notifier.pendingCount), style: AppTextStyles.cardTitle),
                     if (teamNames.isNotEmpty) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppSpacing.hairline),
                       Text(
                         teamNames,
                         maxLines: 1,

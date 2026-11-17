@@ -1,5 +1,5 @@
 import 'package:sport_platform/core/utils/text_folding.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
+import 'package:sport_platform/modules/courts/data/models/court_model.dart';
 import 'package:sport_platform/modules/sport_complexes/data/models/sport_complex_model.dart';
 
 /// Un complejo con sus canchas, como lo muestra la pantalla.

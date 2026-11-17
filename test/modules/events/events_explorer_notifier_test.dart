@@ -6,14 +6,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/team_events_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_explorer_notifier.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_status.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 
 import '../../support/builders.dart';
 
@@ -361,7 +361,14 @@ void _registerSearchServiceTests() {
         'success': true,
         'data': {
           'content': [
-            {'id': 'e1', 'name': 'Copa', 'status': 'ACTIVE', 'startDate': '2026-12-01', 'endDate': '2026-12-20'},
+            {
+              'id': 'e1',
+              'name': 'Copa',
+              'status': 'ACTIVE',
+              'startDate': '2026-12-01',
+              'endDate': '2026-12-20',
+              'createdAt': '2026-11-01T10:00:00',
+            },
           ],
           'page': 1,
           'size': 20,

@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/shared/data/models/championship_model.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/championship_action.dart';
@@ -16,10 +19,10 @@ class ChampionshipSummaryCard extends StatelessWidget {
     final structure = championship.structure;
     final action = championship.nextStep?.action;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.inputBorder),
       ),
       child: Column(
@@ -34,14 +37,14 @@ class ChampionshipSummaryCard extends StatelessWidget {
             ),
           ),
           if (structure != null && championship.formatName != null) ...[
-            const SizedBox(height: 2),
+            const SizedBox(height: AppSpacing.hairline),
             Text(
               structure.translationKey.tr(),
-              style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 12),
+              style: AppTextStyles.footnote,
             ),
           ],
           if (championship.phases.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -66,17 +69,17 @@ class ChampionshipSummaryCard extends StatelessWidget {
       PhaseStatus.pending => (Icons.hourglass_empty, AppColors.whiteSubtle),
     };
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.snug, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: color.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: color),
-          const SizedBox(width: 6),
+          const SizedBox(width: AppSpacing.tight),
           Text(
             phase.phase.translationKey.tr(),
             style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600),
@@ -88,14 +91,14 @@ class ChampionshipSummaryCard extends StatelessWidget {
 
   Widget _buildChampion() {
     final name = championship.teamName(championship.championTeamId) ??
-        'championship.tbd'.tr();
+        LocaleKeys.championship_tbd.tr();
     return Row(
       children: [
         const Icon(Icons.emoji_events, color: AppColors.podiumGold, size: 28),
-        const SizedBox(width: 10),
+        const SizedBox(width: AppSpacing.snug),
         Expanded(
           child: Text(
-            'championship.champion'.tr(args: [name]),
+            LocaleKeys.championship_champion.tr(args: [name]),
             style: const TextStyle(
               color: AppColors.podiumGold,
               fontSize: 15,
@@ -113,7 +116,7 @@ class ChampionshipSummaryCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Icon(Icons.flag_outlined, color: AppColors.primaryLight, size: 18),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: Text(
             action.translationKey.tr(namedArgs: {

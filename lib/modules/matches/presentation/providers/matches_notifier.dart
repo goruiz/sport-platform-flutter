@@ -1,14 +1,16 @@
 import 'package:flutter/foundation.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/courts_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/court_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
+import 'package:sport_platform/modules/courts/data/datasource/courts_service.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/courts/data/models/court_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/matches_service.dart';
 import 'package:sport_platform/modules/matches/domain/match_rules.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 
 /// De qué partidos se habla: los del equipo activo del usuario o los de un evento que elige.
 enum MatchesScope { mine, all }
@@ -91,8 +93,9 @@ class MatchesNotifier extends ChangeNotifier {
       _courtsById = {for (final court in results[1] as List<CourtModel>) court.id: court};
       // Sin partidos propios no hay nada que mostrar en «Mi equipo»: se abre con los eventos.
       _scope = _mine.isEmpty ? MatchesScope.all : MatchesScope.mine;
-    } catch (_) {
-      _error = 'mobile.matches.load_error';
+    } catch (error, stackTrace) {
+      AppLogger.error('MatchesNotifier.load', error, stackTrace);
+      _error = LocaleKeys.mobile_matches_load_error;
     } finally {
       _loading = false;
       notifyListeners();
@@ -145,8 +148,9 @@ class MatchesNotifier extends ChangeNotifier {
       if (eventId != null && !_matchesByEventId.containsKey(eventId)) {
         _matchesByEventId[eventId] = await _matchesService.getByEvent(eventId);
       }
-    } catch (_) {
-      _error = 'mobile.matches.load_error';
+    } catch (error, stackTrace) {
+      AppLogger.error('MatchesNotifier._loadSelectedEvent', error, stackTrace);
+      _error = LocaleKeys.mobile_matches_load_error;
     } finally {
       _loadingAll = false;
       notifyListeners();

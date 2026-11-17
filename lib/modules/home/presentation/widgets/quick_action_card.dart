@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_platform/core/routes/app_route_factory.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/children_sheet.dart';
 
 /// Un acceso del inicio: una tarjeta con un destello del color de su acento, el icono en una pastilla de ese color

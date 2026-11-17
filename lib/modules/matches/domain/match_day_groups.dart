@@ -1,4 +1,4 @@
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 
 /// Los partidos de un mismo día.
 class MatchDayGroup {

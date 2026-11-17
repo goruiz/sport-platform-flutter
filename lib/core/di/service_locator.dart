@@ -2,15 +2,15 @@ import 'package:get_it/get_it.dart';
 import 'package:sport_platform/core/routes/app_navigator.dart';
 import 'package:sport_platform/core/services/session_expired_listener.dart';
 import 'package:sport_platform/core/services/session_service.dart';
-import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
+import 'package:sport_platform/core/routes/app_pages.dart';
 import 'package:sport_platform/modules/courts/data/datasource/court_availability_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/courts_service.dart';
+import 'package:sport_platform/modules/courts/data/datasource/courts_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/league_matches_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/league_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/league_teams_event_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/standings_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/teams_service.dart';
+import 'package:sport_platform/modules/teams/data/datasource/teams_service.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_matches_repository.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/domain/repositories/i_league_teams_repository.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/championship_service.dart';
@@ -26,12 +26,12 @@ import 'package:sport_platform/modules/players/data/datasource/join_team_service
 import 'package:sport_platform/modules/players/data/datasource/team_invitations_service.dart';
 import 'package:sport_platform/modules/users/data/datasource/account_service.dart';
 import 'package:sport_platform/modules/users/data/datasource/player_photo_service.dart';
-import 'package:sport_platform/modules/users/presentation/providers/account_capabilities_notifier.dart';
+import 'package:sport_platform/modules/users/data/providers/account_capabilities_notifier.dart';
 import 'package:sport_platform/modules/users/presentation/providers/email_verification_notifier.dart';
 import 'package:sport_platform/modules/players/presentation/providers/invitations_notifier.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/sport_complexes/data/datasource/sport_complexes_service.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 import 'package:sport_platform/modules/users/data/datasource/user_profile_service.dart';
 import 'package:sport_platform/modules/users/domain/repositories/i_user_profile_repository.dart';
 import 'package:sport_platform/shared/services/session_expired_handler.dart';
@@ -51,7 +51,7 @@ void setupServiceLocator() {
     () => SessionExpiredHandler(
       sessionService: getIt<SessionService>(),
       navigatorKey: AppNavigator.key,
-      loginPageBuilder: () => const LoginPage(),
+      loginPageBuilder: AppPages.login,
     ),
   );
 

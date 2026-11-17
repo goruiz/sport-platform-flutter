@@ -1,23 +1,26 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/presentation/widgets/standings_tab.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/events_search_service.dart';
 import 'package:sport_platform/modules/events/shared/data/datasource/team_events_service.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/presentation/widgets/championship_tab.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/rankings/data/datasource/player_stats_service.dart';
 import 'package:sport_platform/modules/rankings/data/models/player_stats_model.dart';
 import 'package:sport_platform/modules/rankings/domain/leaderboards.dart';
 import 'package:sport_platform/modules/rankings/domain/my_stats.dart';
 import 'package:sport_platform/modules/rankings/presentation/widgets/leaderboard_list.dart';
 import 'package:sport_platform/modules/rankings/presentation/widgets/my_stats_card.dart';
-import 'package:sport_platform/modules/teams/presentation/providers/active_team_notifier.dart';
+import 'package:sport_platform/modules/teams/data/providers/active_team_notifier.dart';
 import 'package:sport_platform/modules/teams/presentation/widgets/active_team_pill.dart';
 import 'package:sport_platform/shared/widgets/empty_state.dart';
 import 'package:sport_platform/shared/widgets/error_retry.dart';
@@ -117,7 +120,8 @@ class _RankingsPageState extends State<RankingsPage>
       final player = await getIt<PlayersService>().getCurrent();
       await _activeTeam.sync(player);
       return player;
-    } catch (_) {
+    } catch (error) {
+      AppLogger.warning('_RankingsPageState._readCurrentPlayer', error);
       return null;
     }
   }
@@ -145,7 +149,7 @@ class _RankingsPageState extends State<RankingsPage>
           isScrollable: true,
           tabAlignment: TabAlignment.start,
           tabs: [
-            Tab(text: 'rankings.standings'.tr()),
+            Tab(text: LocaleKeys.rankings_standings.tr()),
             for (final kind in LeaderboardKind.values) Tab(text: kind.translationKey.tr()),
           ],
         ),
@@ -154,7 +158,7 @@ class _RankingsPageState extends State<RankingsPage>
         children: [
           // Fuera de la lectura de eventos: un equipo sin eventos (o una lectura que falla) no debe dejar al jugador sin
           // poder volver a elegir otro.
-          const ActiveTeamPill(margin: EdgeInsets.fromLTRB(16, 16, 16, 0)),
+          const ActiveTeamPill(margin: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, 0)),
           Expanded(child: _buildBody()),
         ],
       ),
@@ -167,12 +171,12 @@ class _RankingsPageState extends State<RankingsPage>
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-            child: CircularProgressIndicator(color: AppColors.primaryLight),
+            child: CircularProgressIndicator(),
           );
         }
         if (snapshot.hasError) {
           return ErrorRetry(
-            message: 'rankings.load_error'.tr(),
+            message: LocaleKeys.rankings_load_error.tr(),
             onRetry: () => setState(() {
               _eventsFuture = _loadEvents();
             }),
@@ -197,8 +201,8 @@ class _RankingsPageState extends State<RankingsPage>
     final hasTeam = _activeTeam.activeTeamId != null;
     return EmptyState(
       icon: Icons.emoji_events_outlined,
-      title: (hasTeam ? 'rankings.no_team_events_title' : 'rankings.no_events_title').tr(),
-      subtitle: (hasTeam ? 'rankings.no_team_events_subtitle' : 'rankings.no_events_subtitle').tr(),
+      title: (hasTeam ? LocaleKeys.rankings_no_team_events_title : LocaleKeys.rankings_no_events_title).tr(),
+      subtitle: (hasTeam ? LocaleKeys.rankings_no_team_events_subtitle : LocaleKeys.rankings_no_events_subtitle).tr(),
     );
   }
 
@@ -215,7 +219,7 @@ class _RankingsPageState extends State<RankingsPage>
 
   Widget _buildEventSelector(List<EventModel> events) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.xl, AppSpacing.lg, AppSpacing.sm),
       child: DropdownButtonFormField<String>(
         // ignore: deprecated_member_use
         value: _selectedEvent!.id,
@@ -234,7 +238,7 @@ class _RankingsPageState extends State<RankingsPage>
         },
         dropdownColor: AppColors.sheetBackground,
         style: const TextStyle(color: AppColors.white),
-        decoration: AppInputDecoration.standard('rankings.event'.tr()),
+        decoration: AppInputDecoration.standard(LocaleKeys.rankings_event.tr()),
       ),
     );
   }
@@ -259,11 +263,11 @@ class _RankingsPageState extends State<RankingsPage>
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: AppColors.primaryLight),
+              child: CircularProgressIndicator(),
             );
           }
           if (snapshot.hasError) {
-            return ErrorRetry(message: 'rankings.load_error'.tr(), onRetry: _reloadStats);
+            return ErrorRetry(message: LocaleKeys.rankings_load_error.tr(), onRetry: _reloadStats);
           }
           return _buildLeaderboard(kind, snapshot.data ?? const []);
         },
@@ -287,7 +291,7 @@ class _RankingsPageState extends State<RankingsPage>
             kind: kind,
             onRefresh: _reloadStats,
             highlightPlayerId: _currentPlayer?.id,
-            emptySubtitleKey: isTeamScope ? 'rankings.empty_team_subtitle' : 'rankings.empty_subtitle',
+            emptySubtitleKey: isTeamScope ? LocaleKeys.rankings_empty_team_subtitle : LocaleKeys.rankings_empty_subtitle,
           ),
         ),
       ],
@@ -296,7 +300,7 @@ class _RankingsPageState extends State<RankingsPage>
 
   Widget _buildScopeSelector() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
       child: SegmentedButton<LeaderboardScope>(
         segments: [
           for (final scope in LeaderboardScope.values)

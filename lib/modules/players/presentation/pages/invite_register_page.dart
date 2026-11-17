@@ -1,20 +1,23 @@
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/auth/data/datasource/login_service.dart';
-import 'package:sport_platform/modules/auth/presentation/pages/login_page.dart';
-import 'package:sport_platform/modules/home/presentation/pages/home_page.dart';
+import 'package:sport_platform/core/routes/app_pages.dart';
 import 'package:sport_platform/modules/players/data/datasource/players_auth_service.dart';
-import 'package:sport_platform/modules/players/domain/enums/category_eligibility_issue.dart';
+import 'package:sport_platform/shared/enums/category_eligibility_issue.dart';
 import 'package:sport_platform/modules/players/domain/enums/team_invitation_error.dart';
-import 'package:sport_platform/modules/users/domain/enums/gender.dart';
-import 'package:sport_platform/modules/users/domain/name_rules.dart';
+import 'package:sport_platform/core/models/gender.dart';
+import 'package:sport_platform/core/utils/name_rules.dart';
 import 'package:sport_platform/modules/users/domain/profile_field_errors.dart';
-import 'package:sport_platform/modules/users/presentation/utils/person_name_input.dart';
-import 'package:sport_platform/modules/users/presentation/widgets/birth_date_field.dart';
-import 'package:sport_platform/modules/users/presentation/widgets/gender_field.dart';
+import 'package:sport_platform/shared/widgets/person_name_input.dart';
+import 'package:sport_platform/shared/widgets/birth_date_field.dart';
+import 'package:sport_platform/shared/widgets/gender_field.dart';
 import 'package:sport_platform/shared/widgets/app_snackbar.dart';
 import 'package:sport_platform/shared/widgets/gradient_background.dart';
 import 'package:sport_platform/shared/widgets/sport_text_field.dart';
@@ -80,9 +83,10 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
     } on DioException catch (e) {
       if (!mounted) return;
       AppSnackbar.error(context, _registerErrorKey(e).tr());
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('_InviteRegisterPageState._onRegister', error, stackTrace);
       if (!mounted) return;
-      AppSnackbar.error(context, 'invite_register.error_generic'.tr());
+      AppSnackbar.error(context, LocaleKeys.invite_register_error_generic.tr());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -99,8 +103,8 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
     final fieldErrors = ProfileFieldErrors.fromException(error);
     final dataError = fieldErrors.gender ?? fieldErrors.birthDate;
     if (dataError != null) return dataError.translationKey;
-    if (error.response?.statusCode == 409) return 'invite_register.error_email_taken';
-    return 'invite_register.error_generic';
+    if (error.response?.statusCode == 409) return LocaleKeys.invite_register_error_email_taken;
+    return LocaleKeys.invite_register_error_generic;
   }
 
   // El backend crea la cuenta junto con el jugador: entra con la contraseña que acaba de elegir.
@@ -112,18 +116,19 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
         password: _passwordCtrl.text,
       );
       return true;
-    } catch (_) {
+    } catch (error) {
+      AppLogger.warning('_InviteRegisterPageState._signInWithNewAccount', error);
       return false;
     }
   }
 
   void _openAppAfterRegistering({required bool isSignedIn}) {
     final messageKey =
-        isSignedIn ? 'invite_register.success' : 'invite_register.success_sign_in';
+        isSignedIn ? LocaleKeys.invite_register_success : LocaleKeys.invite_register_success_sign_in;
     AppSnackbar.success(context, messageKey.tr());
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (_) => isSignedIn ? const HomePage() : const LoginPage(),
+        builder: (_) => isSignedIn ? AppPages.home() : AppPages.login(),
       ),
       (_) => false,
     );
@@ -134,20 +139,20 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
     return Scaffold(
       body: GradientBackground(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
           child: Column(
             children: [
               const SizedBox(height: 56),
               _buildHeader(),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
               _buildInviteBanner(),
-              const SizedBox(height: 28),
+              const SizedBox(height: AppSpacing.section),
               _buildForm(),
-              const SizedBox(height: 28),
+              const SizedBox(height: AppSpacing.section),
               _buildRegisterButton(),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
               _buildSignIn(),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.xxxl),
             ],
           ),
         ),
@@ -159,9 +164,9 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
     return Column(
       children: [
         const Icon(Icons.sports, color: AppColors.primaryLight, size: 52),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         Text(
-          'invite_register.title'.tr(),
+          LocaleKeys.invite_register_title.tr(),
           style: const TextStyle(
             color: AppColors.white,
             fontSize: 26,
@@ -180,7 +185,7 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.primaryLight.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: AppColors.primaryLight.withValues(alpha: 0.3),
         ),
@@ -192,10 +197,10 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
             color: AppColors.primaryLight,
             size: 22,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: AppSpacing.snug),
           Expanded(
             child: Text(
-              'invite_register.subtitle'.tr(),
+              LocaleKeys.invite_register_subtitle.tr(),
               style: const TextStyle(
                 color: AppColors.white,
                 fontSize: 13,
@@ -226,50 +231,50 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
               Expanded(
                 child: SportTextField(
                   controller: _firstNameCtrl,
-                  hint: 'invite_register.first_name'.tr(),
+                  hint: LocaleKeys.invite_register_first_name.tr(),
                   icon: Icons.person_outline,
                   textCapitalization: TextCapitalization.words,
                   inputFormatters: personNameInputFormatters,
-                  validator: (v) => _nameError(v, requiredKey: 'invite_register.first_name_required'),
+                  validator: (v) => _nameError(v, requiredKey: LocaleKeys.invite_register_first_name_required),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: SportTextField(
                   controller: _lastNameCtrl,
-                  hint: 'invite_register.last_name'.tr(),
+                  hint: LocaleKeys.invite_register_last_name.tr(),
                   icon: Icons.person_outline,
                   textCapitalization: TextCapitalization.words,
                   inputFormatters: personNameInputFormatters,
-                  validator: (v) => _nameError(v, requiredKey: 'invite_register.last_name_required'),
+                  validator: (v) => _nameError(v, requiredKey: LocaleKeys.invite_register_last_name_required),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           GenderField(value: _gender, onChanged: (gender) => setState(() => _gender = gender)),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           BirthDateField(value: _birthDate, onChanged: (date) => setState(() => _birthDate = date)),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           SportTextField(
             controller: _emailCtrl,
-            hint: 'invite_register.email'.tr(),
+            hint: LocaleKeys.invite_register_email.tr(),
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (v) {
               if (v == null || v.trim().isEmpty) {
-                return 'invite_register.email_required'.tr();
+                return LocaleKeys.invite_register_email_required.tr();
               }
               if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v.trim())) {
-                return 'invite_register.email_invalid'.tr();
+                return LocaleKeys.invite_register_email_invalid.tr();
               }
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           SportTextField(
             controller: _passwordCtrl,
-            hint: 'invite_register.password'.tr(),
+            hint: LocaleKeys.invite_register_password.tr(),
             icon: Icons.lock_outline,
             obscureText: _obscurePassword,
             suffixIcon: IconButton(
@@ -285,10 +290,10 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
             ),
             validator: (v) {
               if (v == null || v.isEmpty) {
-                return 'invite_register.password_required'.tr();
+                return LocaleKeys.invite_register_password_required.tr();
               }
               if (v.length < AppConstants.minPasswordLength.value) {
-                return 'invite_register.password_too_short'.tr(args: [AppConstants.minPasswordLength.asText]);
+                return LocaleKeys.invite_register_password_too_short.tr(args: [AppConstants.minPasswordLength.asText]);
               }
               final hasUpper = RegExp(r'[A-Z]').hasMatch(v);
               final hasLower = RegExp(r'[a-z]').hasMatch(v);
@@ -296,15 +301,15 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
               final hasSpecial =
                   RegExp(r'[!@#$%^&*(),.?":{}|<>\-_=+\[\]\\;`~]').hasMatch(v);
               if (!hasUpper || !hasLower || !hasDigit || !hasSpecial) {
-                return 'invite_register.password_weak'.tr();
+                return LocaleKeys.invite_register_password_weak.tr();
               }
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           SportTextField(
             controller: _confirmPasswordCtrl,
-            hint: 'invite_register.confirm_password'.tr(),
+            hint: LocaleKeys.invite_register_confirm_password.tr(),
             icon: Icons.lock_outline,
             obscureText: _obscureConfirm,
             suffixIcon: IconButton(
@@ -320,18 +325,18 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
             ),
             validator: (v) {
               if (v == null || v.isEmpty) {
-                return 'invite_register.confirm_password_required'.tr();
+                return LocaleKeys.invite_register_confirm_password_required.tr();
               }
               if (v != _passwordCtrl.text) {
-                return 'invite_register.passwords_mismatch'.tr();
+                return LocaleKeys.invite_register_passwords_mismatch.tr();
               }
               return null;
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           SportTextField(
             controller: _phoneCtrl,
-            hint: 'invite_register.phone'.tr(),
+            hint: LocaleKeys.invite_register_phone.tr(),
             icon: Icons.phone_outlined,
             keyboardType: TextInputType.phone,
           ),
@@ -356,7 +361,7 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
                 ),
               )
             : Text(
-                'invite_register.register_button'.tr(),
+                LocaleKeys.invite_register_register_button.tr(),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -372,16 +377,16 @@ class _InviteRegisterPageState extends State<InviteRegisterPage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'invite_register.already_have_account'.tr(),
-          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 14),
+          LocaleKeys.invite_register_already_have_account.tr(),
+          style: AppTextStyles.bodyMuted,
         ),
         GestureDetector(
           onTap: () => Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const LoginPage()),
+            MaterialPageRoute(builder: (_) => AppPages.login()),
             (_) => false,
           ),
           child: Text(
-            'invite_register.sign_in'.tr(),
+            LocaleKeys.invite_register_sign_in.tr(),
             style: const TextStyle(
               color: AppColors.primaryLight,
               fontSize: 14,

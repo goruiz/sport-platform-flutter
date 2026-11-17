@@ -20,7 +20,7 @@ class SelectedEventInfo extends StatelessWidget {
       child: Row(
         children: [
           const Icon(Icons.calendar_today_outlined, size: 15, color: AppColors.whiteSubtle),
-          const SizedBox(width: 6),
+          const SizedBox(width: AppSpacing.tight),
           Expanded(
             child: Text(
               DateFormatters.shortRange(event.startDate, event.endDate, context.locale.languageCode),

@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/shared/data/models/championship_model.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/match_stage.dart';
@@ -23,7 +25,7 @@ class ChampionshipRoundCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(bottom: 8, left: 4),
+          padding: const EdgeInsets.only(bottom: AppSpacing.sm, left: AppSpacing.xs),
           child: Text(
             title.key.tr(args: title.args),
             style: const TextStyle(
@@ -57,11 +59,11 @@ class _TieTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final stage = tie.stage;
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.compact),
         border: Border.all(color: AppColors.inputBorder),
       ),
       child: Column(
@@ -76,17 +78,17 @@ class _TieTile extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: AppSpacing.tight),
           ],
           _TeamLine(
             name: _nameOf(tie.teamAId),
             goals: tie.hasResult ? tie.teamAGoals : null,
             isWinner: tie.winnerTeamId != null && tie.winnerTeamId == tie.teamAId,
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSpacing.tight),
           if (tie.bye)
             Text(
-              'championship.bye'.tr(),
+              LocaleKeys.championship_bye.tr(),
               style: const TextStyle(
                 color: AppColors.whiteSubtle,
                 fontSize: 12,
@@ -100,9 +102,9 @@ class _TieTile extends StatelessWidget {
               isWinner: tie.winnerTeamId != null && tie.winnerTeamId == tie.teamBId,
             ),
           if (tie.needsTiebreak) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
-              'championship.needs_tiebreak'.tr(),
+              LocaleKeys.championship_needs_tiebreak.tr(),
               style: const TextStyle(color: AppColors.warning, fontSize: 12),
             ),
           ],
@@ -112,7 +114,7 @@ class _TieTile extends StatelessWidget {
   }
 
   String _nameOf(String? teamId) =>
-      championship.teamName(teamId) ?? 'championship.tbd'.tr();
+      championship.teamName(teamId) ?? LocaleKeys.championship_tbd.tr();
 }
 
 class _TeamLine extends StatelessWidget {
@@ -140,7 +142,7 @@ class _TeamLine extends StatelessWidget {
         ),
         if (isWinner)
           const Padding(
-            padding: EdgeInsets.only(right: 8),
+            padding: EdgeInsets.only(right: AppSpacing.sm),
             child: Icon(Icons.check_circle, size: 16, color: AppColors.primaryLight),
           ),
         if (goals != null)

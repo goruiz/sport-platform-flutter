@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 /// Una fila de la tabla de posiciones, ya lista para dibujar.
@@ -42,7 +45,7 @@ class StandingsTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppRadius.compact),
       child: Column(
         children: [
           _buildHeader(),
@@ -55,14 +58,14 @@ class StandingsTable extends StatelessWidget {
   Widget _buildHeader() {
     return Container(
       color: AppColors.primaryDark,
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.snug, horizontal: AppSpacing.md),
       child: Row(
         children: [
           const _HeaderCell('#', width: 28),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              'leagues.standings_col_team'.tr(),
+              LocaleKeys.leagues_standings_col_team.tr(),
               style: const TextStyle(
                 color: AppColors.whiteSubtle,
                 fontSize: 11,
@@ -71,14 +74,14 @@ class StandingsTable extends StatelessWidget {
               ),
             ),
           ),
-          _HeaderCell('leagues.standings_col_played'.tr(), width: 30),
-          _HeaderCell('leagues.standings_col_won'.tr(), width: 28),
-          _HeaderCell('leagues.standings_col_drawn'.tr(), width: 28),
-          _HeaderCell('leagues.standings_col_lost'.tr(), width: 28),
+          _HeaderCell(LocaleKeys.leagues_standings_col_played.tr(), width: 30),
+          _HeaderCell(LocaleKeys.leagues_standings_col_won.tr(), width: 28),
+          _HeaderCell(LocaleKeys.leagues_standings_col_drawn.tr(), width: 28),
+          _HeaderCell(LocaleKeys.leagues_standings_col_lost.tr(), width: 28),
           if (showGoalDifference)
-            _HeaderCell('leagues.standings_col_gd'.tr(), width: 32),
+            _HeaderCell(LocaleKeys.leagues_standings_col_gd.tr(), width: 32),
           _HeaderCell(
-            'leagues.standings_col_pts'.tr(),
+            LocaleKeys.leagues_standings_col_pts.tr(),
             width: 36,
             highlight: true,
           ),
@@ -99,11 +102,11 @@ class StandingsTable extends StatelessWidget {
           bottom: BorderSide(color: AppColors.inputBorder, width: 0.5),
         ),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
+      padding: const EdgeInsets.symmetric(vertical: 11, horizontal: AppSpacing.md),
       child: Row(
         children: [
           _PositionBadge(position: row.position),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               row.teamName,
@@ -236,7 +239,7 @@ class _PositionBadge extends StatelessWidget {
       child: Text(
         '$position',
         textAlign: TextAlign.center,
-        style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+        style: AppTextStyles.secondary,
       ),
     );
   }

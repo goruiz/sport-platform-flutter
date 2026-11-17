@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/core/network/json_reader.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
+import 'package:sport_platform/shared/enums/match_status.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_attendance_service.dart';
 import 'package:sport_platform/modules/matches/data/models/match_attendance_model.dart';
 import 'package:sport_platform/modules/matches/domain/match_attendance_rules.dart';
@@ -183,7 +184,7 @@ void main() {
     });
 
     test('sin respuesta propia ni lista queda en blanco', () {
-      final model = MatchAttendanceModel.fromJson({'matchId': 'm1', 'myStatus': null});
+      final model = MatchAttendanceModel.fromJson({'matchId': 'm1', 'confirmedCount': 0, 'declinedCount': 0, 'myStatus': null});
 
       expect(model.myStatus, isNull);
       expect(model.attendees, isEmpty);
@@ -192,12 +193,18 @@ void main() {
     test('una respuesta con un estado desconocido se omite en vez de romper', () {
       final model = MatchAttendanceModel.fromJson({
         'matchId': 'm1',
+        'confirmedCount': 0,
+        'declinedCount': 0,
         'attendees': [
           {'playerId': 'p1', 'teamId': 'home', 'status': 'QUIZAS'},
         ],
       });
 
       expect(model.attendees, isEmpty);
+    });
+
+    test('sin los totales no se inventan: es una respuesta mal formada', () {
+      expect(() => MatchAttendanceModel.fromJson({'matchId': 'm1'}), throwsA(isA<MalformedResponseException>()));
     });
   });
 

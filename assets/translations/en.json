@@ -346,6 +346,7 @@
     "match_day_label": "Round {n}",
     "match_status_suspended": "Suspended",
     "match_status_rescheduled": "Rescheduled",
+    "match_status_unknown": "Unknown status",
     "standings_col_gd": "GD",
     "info_dates": "Dates",
     "info_format": "Format",

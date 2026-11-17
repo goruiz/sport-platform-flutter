@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_platform/core/constants/strings_constants/home_strings_constants.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/modules/home/presentation/widgets/empty_card.dart';
 
 class ActivityCard extends StatelessWidget {
@@ -10,8 +10,8 @@ class ActivityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return EmptyCard(
       icon: Icons.timeline,
-      message: HomeStringsConstants.noActivityTitle.tr(),
-      subtitle: HomeStringsConstants.noActivitySubtitle.tr(),
+      message: LocaleKeys.home_no_activity_title.tr(),
+      subtitle: LocaleKeys.home_no_activity_subtitle.tr(),
     );
   }
 }

@@ -1,5 +1,5 @@
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/domain/enums/match_status.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
+import 'package:sport_platform/shared/enums/match_status.dart';
 
 /// Reglas de los partidos que usan varias pantallas. Funciones puras: el reloj entra por parámetro.
 
@@ -14,7 +14,7 @@ List<MatchModel> matchesOfTeam(Iterable<MatchModel> matches, String? teamId) {
 /// Los ids de los eventos en que juega el equipo [teamId] (los de sus partidos), sin repetir. Sin equipo no hay ninguno.
 Set<String> eventIdsOfTeam(Iterable<MatchModel> matches, String? teamId) => {
       for (final match in matchesOfTeam(matches, teamId))
-        if (match.eventId.isNotEmpty) match.eventId,
+        ?match.eventId,
     };
 
 /// Los partidos que aún no se juegan (los cancelados no cuentan), el más cercano primero.

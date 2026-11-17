@@ -5,7 +5,7 @@ import 'package:sport_platform/modules/events/event_types/leagues/presentation/p
 import 'package:sport_platform/modules/events/shared/data/models/event_model.dart';
 import 'package:sport_platform/modules/events/shared/data/providers/events_notifier.dart';
 import 'package:sport_platform/modules/events/shared/presentation/pages/event_type_page.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 
 class LeaguesPage extends StatelessWidget {
   final MenuItemModel item;

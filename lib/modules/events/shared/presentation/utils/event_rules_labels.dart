@@ -1,3 +1,4 @@
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/modules/events/shared/data/models/event_format_rules.dart';
 import 'package:sport_platform/modules/events/shared/domain/enums/event_rule_kind.dart';
 import 'package:sport_platform/modules/events/shared/presentation/utils/championship_labels.dart';
@@ -6,9 +7,9 @@ import 'package:sport_platform/modules/events/shared/presentation/utils/champion
 /// (los desempates son uno por criterio, en orden de prioridad).
 typedef EventRuleLine = ({EventRuleKind kind, List<TextKey> values});
 
-const _numberKey = 'event_rules.values.number';
-const _yesKey = 'event_rules.values.yes';
-const _noKey = 'event_rules.values.no';
+const _numberKey = LocaleKeys.event_rules_values_number;
+const _yesKey = LocaleKeys.event_rules_values_yes;
+const _noKey = LocaleKeys.event_rules_values_no;
 
 /// Las reglas que tiene el evento, en el orden en que se leen. Solo salen las que su formato usa (el backend manda
 /// `null` en las demás) y los límites de jugadores por equipo si el evento los fija. Vacía si no hay nada que decir.
@@ -26,14 +27,14 @@ List<EventRuleLine> describeEventRules(
 List<EventRuleLine> _describeFormatRules(EventFormatRules rules) {
   return [
     (kind: EventRuleKind.structure, values: [_text(rules.structure.translationKey)]),
-    ?_legsLine(EventRuleKind.roundTrip, rules.roundTrip, singleLegKey: 'event_rules.values.round_trip_no'),
+    ?_legsLine(EventRuleKind.roundTrip, rules.roundTrip, singleLegKey: LocaleKeys.event_rules_values_round_trip_no),
     ?_pointsLine(rules),
     ?_tiebreakersLine(rules),
     ?_numberLine(EventRuleKind.swissRounds, rules.swissRounds),
     ?_numberLine(EventRuleKind.groupCount, rules.groupCount),
     ?_numberLine(EventRuleKind.teamsAdvancingPerGroup, rules.teamsAdvancingPerGroup),
     ?_numberLine(EventRuleKind.playoffTeams, rules.playoffTeams),
-    ?_legsLine(EventRuleKind.knockoutRoundTrip, rules.knockoutRoundTrip, singleLegKey: 'event_rules.values.single_match'),
+    ?_legsLine(EventRuleKind.knockoutRoundTrip, rules.knockoutRoundTrip, singleLegKey: LocaleKeys.event_rules_values_single_match),
     ?_yesNoLine(EventRuleKind.thirdPlaceMatch, rules.thirdPlaceMatch),
     ?_yesNoLine(EventRuleKind.grandFinalReset, rules.grandFinalReset),
   ];
@@ -44,7 +45,7 @@ EventRuleLine? _pointsLine(EventFormatRules rules) {
   return (
     kind: EventRuleKind.points,
     values: [
-      _text('event_rules.values.points', ['${rules.pointsForWin}', '${rules.pointsForDraw}', '${rules.pointsForLoss}']),
+      _text(LocaleKeys.event_rules_values_points, ['${rules.pointsForWin}', '${rules.pointsForDraw}', '${rules.pointsForLoss}']),
     ],
   );
 }
@@ -62,7 +63,7 @@ EventRuleLine? _legsLine(EventRuleKind kind, bool? isRoundTrip, {required String
   if (isRoundTrip == null) return null;
   return (
     kind: kind,
-    values: [_text(isRoundTrip ? 'event_rules.values.round_trip_yes' : singleLegKey)],
+    values: [_text(isRoundTrip ? LocaleKeys.event_rules_values_round_trip_yes : singleLegKey)],
   );
 }
 
@@ -80,11 +81,11 @@ EventRuleLine? _numberLine(EventRuleKind kind, int? value) {
 EventRuleLine? _describePlayersPerTeam(int? min, int? max) {
   final TextKey? value;
   if (min != null && max != null) {
-    value = min == max ? _text(_numberKey, ['$min']) : _text('event_rules.values.players_between', ['$min', '$max']);
+    value = min == max ? _text(_numberKey, ['$min']) : _text(LocaleKeys.event_rules_values_players_between, ['$min', '$max']);
   } else if (min != null) {
-    value = _text('event_rules.values.players_min', ['$min']);
+    value = _text(LocaleKeys.event_rules_values_players_min, ['$min']);
   } else if (max != null) {
-    value = _text('event_rules.values.players_max', ['$max']);
+    value = _text(LocaleKeys.event_rules_values_players_max, ['$max']);
   } else {
     value = null;
   }

@@ -1,10 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_input_decoration.dart';
 import 'package:sport_platform/core/theme/app_text_styles.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/domain/match_dispute_rules.dart';
 import 'package:sport_platform/shared/widgets/sheet_handle.dart';
 
@@ -70,11 +72,11 @@ class _MatchResultDisputeSheetState extends State<MatchResultDisputeSheet> {
   }
 
   String? _validateReason(String? value) =>
-      (value == null || value.trim().isEmpty) ? 'match_detail.dispute.errors.REASON_REQUIRED'.tr() : null;
+      (value == null || value.trim().isEmpty) ? LocaleKeys.match_detail_dispute_errors_REASON_REQUIRED.tr() : null;
 
   String? _scoreProblemKey(ProposedScoreInput score) => switch (score.problem) {
-        ProposedScoreProblem.incomplete => 'match_detail.dispute.errors.SCORE_INCOMPLETE',
-        ProposedScoreProblem.invalid => 'match_detail.dispute.errors.INVALID_SCORE',
+        ProposedScoreProblem.incomplete => LocaleKeys.match_detail_dispute_errors_SCORE_INCOMPLETE,
+        ProposedScoreProblem.invalid => LocaleKeys.match_detail_dispute_errors_INVALID_SCORE,
         null => null,
       };
 
@@ -110,9 +112,9 @@ class _MatchResultDisputeSheetState extends State<MatchResultDisputeSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.sheetBackground,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
       ),
-      padding: EdgeInsets.fromLTRB(24, 16, 24, 24 + bottom),
+      padding: EdgeInsets.fromLTRB(AppSpacing.xxl, AppSpacing.lg, AppSpacing.xxl, AppSpacing.xxl + bottom),
       child: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -121,11 +123,11 @@ class _MatchResultDisputeSheetState extends State<MatchResultDisputeSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SheetHandle(),
-              const SizedBox(height: 20),
-              Text('match_detail.dispute.sheet_title'.tr(), style: AppTextStyles.sectionTitle),
-              const SizedBox(height: 6),
+              const SizedBox(height: AppSpacing.xl),
+              Text(LocaleKeys.match_detail_dispute_sheet_title.tr(), style: AppTextStyles.sectionTitle),
+              const SizedBox(height: AppSpacing.tight),
               Text(
-                'match_detail.dispute.current_result'.tr(
+                LocaleKeys.match_detail_dispute_current_result.tr(
                   namedArgs: {
                     'home': widget.homeName,
                     'homeScore': '${match.homeScore}',
@@ -135,7 +137,7 @@ class _MatchResultDisputeSheetState extends State<MatchResultDisputeSheet> {
                 ),
                 style: AppTextStyles.bodyMuted,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
               TextFormField(
                 controller: _reasonController,
                 autofocus: true,
@@ -145,37 +147,37 @@ class _MatchResultDisputeSheetState extends State<MatchResultDisputeSheet> {
                 maxLength: disputeReasonMaxLength,
                 textCapitalization: TextCapitalization.sentences,
                 style: const TextStyle(color: AppColors.white),
-                decoration: AppInputDecoration.standard('match_detail.dispute.reason_label'.tr()).copyWith(
-                  hintText: 'match_detail.dispute.reason_hint'.tr(),
+                decoration: AppInputDecoration.standard(LocaleKeys.match_detail_dispute_reason_label.tr()).copyWith(
+                  hintText: LocaleKeys.match_detail_dispute_reason_hint.tr(),
                   hintStyle: const TextStyle(color: AppColors.whiteSubtle),
                   alignLabelWithHint: true,
                 ),
                 validator: _validateReason,
               ),
-              const SizedBox(height: 8),
-              Text('match_detail.dispute.score_title'.tr(), style: AppTextStyles.caption),
-              const SizedBox(height: 10),
+              const SizedBox(height: AppSpacing.sm),
+              Text(LocaleKeys.match_detail_dispute_score_title.tr(), style: AppTextStyles.caption),
+              const SizedBox(height: AppSpacing.snug),
               Row(
                 children: [
                   Expanded(child: _scoreField(_homeScoreController, widget.homeName)),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(child: _scoreField(_awayScoreController, widget.awayName)),
                 ],
               ),
               if (_problemKey != null) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 Text(_problemKey!.tr(), style: const TextStyle(color: AppColors.error, fontSize: 13)),
               ],
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.xxl),
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
                       onPressed: _isSending ? null : () => Navigator.of(context).pop(false),
-                      child: Text('common.cancel'.tr()),
+                      child: Text(LocaleKeys.common_cancel.tr()),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: FilledButton(
                       onPressed: _isSending ? null : _send,
@@ -185,7 +187,7 @@ class _MatchResultDisputeSheetState extends State<MatchResultDisputeSheet> {
                               height: 20,
                               child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
                             )
-                          : Text('match_detail.dispute.send'.tr()),
+                          : Text(LocaleKeys.match_detail_dispute_send.tr()),
                     ),
                   ),
                 ],

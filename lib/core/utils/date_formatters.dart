@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 
 class DateFormatters {
   static String date(DateTime d) =>
@@ -19,9 +20,9 @@ class DateFormatters {
     final clock = now ?? DateTime.now();
     final daysAway = _calendarDay(day).difference(_calendarDay(clock)).inDays;
     return switch (daysAway) {
-      0 => 'common.today'.tr(),
-      1 => 'common.tomorrow'.tr(),
-      -1 => 'common.yesterday'.tr(),
+      0 => LocaleKeys.common_today.tr(),
+      1 => LocaleKeys.common_tomorrow.tr(),
+      -1 => LocaleKeys.common_yesterday.tr(),
       _ => day.year == clock.year
           ? DateFormat.MMMEd(languageCode).format(day)
           : DateFormat.yMMMEd(languageCode).format(day),

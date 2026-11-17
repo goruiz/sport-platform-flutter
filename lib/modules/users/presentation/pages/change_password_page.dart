@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
@@ -42,12 +44,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         newPassword: _newController.text,
       );
       if (!mounted) return;
-      AppSnackbar.success(context, 'account.change_password.success'.tr());
+      AppSnackbar.success(context, LocaleKeys.account_change_password_success.tr());
       Navigator.of(context).pop();
     } catch (error) {
       if (!mounted) return;
       final reason = AccountError.fromException(error);
-      AppSnackbar.error(context, (reason?.translationKey ?? 'account.errors.generic').tr());
+      AppSnackbar.error(context, (reason?.translationKey ?? LocaleKeys.account_errors_generic).tr());
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -93,37 +95,37 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         backgroundColor: AppColors.primaryDark,
         iconTheme: const IconThemeData(color: AppColors.white),
         title: Text(
-          'account.change_password.title'.tr(),
+          LocaleKeys.account_change_password_title.tr(),
           style: const TextStyle(color: AppColors.white),
         ),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppSpacing.xl),
           children: [
             _passwordField(
               controller: _currentController,
-              hintKey: 'account.change_password.current',
+              hintKey: LocaleKeys.account_change_password_current,
               validator: (value) => (value ?? '').isEmpty
                   ? PasswordIssue.empty.translationKey.tr()
                   : null,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             _passwordField(
               controller: _newController,
-              hintKey: 'account.change_password.new',
+              hintKey: LocaleKeys.account_change_password_new,
               validator: (value) => _messageOf(
                 checkNewPassword(value ?? '', currentPassword: _currentController.text),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             _passwordField(
               controller: _confirmController,
-              hintKey: 'account.change_password.confirm',
+              hintKey: LocaleKeys.account_change_password_confirm,
               validator: (value) => _messageOf(checkConfirmation(_newController.text, value ?? '')),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: AppSpacing.section),
             SizedBox(
               height: 52,
               child: FilledButton(
@@ -134,7 +136,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         height: 22,
                         child: CircularProgressIndicator(color: AppColors.white, strokeWidth: 2.5),
                       )
-                    : Text('account.change_password.submit'.tr()),
+                    : Text(LocaleKeys.account_change_password_submit.tr()),
               ),
             ),
           ],

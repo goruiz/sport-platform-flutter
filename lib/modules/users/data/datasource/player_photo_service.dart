@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:sport_platform/core/network/api_endpoints.dart';
 import 'package:sport_platform/core/network/dio_client.dart';
 import 'package:sport_platform/core/network/response_parser.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/player_model.dart';
+import 'package:sport_platform/modules/players/data/models/player_model.dart';
 import 'package:sport_platform/modules/users/domain/profile_photo_rules.dart';
 
 /// La foto de perfil del jugador de la cuenta. El backend la guarda en su base de datos y deja en el jugador su

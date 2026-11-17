@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
-import 'package:sport_platform/modules/home/data/models/menu_item_model.dart';
+import 'package:sport_platform/core/modules/menu_item_model.dart';
 import 'package:sport_platform/modules/home/presentation/constants/menu_colors.dart';
 
 class ChildrenSheet extends StatelessWidget {
@@ -18,7 +20,7 @@ class ChildrenSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 12, 0, 24),
+      padding: const EdgeInsets.fromLTRB(0, AppSpacing.md, 0, AppSpacing.xxl),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,9 +35,9 @@ class ChildrenSheet extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             child: Row(
               children: [
                 Container(
@@ -51,7 +53,7 @@ class ChildrenSheet extends StatelessWidget {
                     size: 18,
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: AppSpacing.snug),
                 Text(
                   parent.localizedName,
                   style: const TextStyle(
@@ -72,7 +74,7 @@ class ChildrenSheet extends StatelessWidget {
                 final color = kMenuColors[i % kMenuColors.length];
                 return ListTile(
                   contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.hairline),
                   leading: Container(
                     width: 36,
                     height: 36,
@@ -88,13 +90,12 @@ class ChildrenSheet extends StatelessWidget {
                   ),
                   title: Text(
                     child.localizedName,
-                    style: const TextStyle(color: AppColors.white, fontSize: 14),
+                    style: AppTextStyles.body,
                   ),
                   subtitle: child.localizedDescription != null
                       ? Text(
                           child.localizedDescription!,
-                          style: const TextStyle(
-                              color: AppColors.whiteSubtle, fontSize: 12),
+                          style: AppTextStyles.footnote,
                         )
                       : null,
                   onTap: () {

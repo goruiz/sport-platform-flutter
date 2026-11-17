@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/network/api_error_codes.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/datasource/players_service.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/match_model.dart';
+import 'package:sport_platform/modules/players/data/datasource/players_service.dart';
+import 'package:sport_platform/modules/matches/data/models/match_model.dart';
 import 'package:sport_platform/modules/matches/data/datasource/match_attendance_service.dart';
 import 'package:sport_platform/modules/matches/data/models/match_attendance_model.dart';
 import 'package:sport_platform/modules/matches/domain/match_attendance_rules.dart';
@@ -10,8 +12,8 @@ import 'package:sport_platform/shared/enums/summary_status.dart';
 /// La asistencia a un partido para quien juega en uno de sus equipos: quiénes van y su propia respuesta.
 /// Quien no es de esos equipos no ve nada de esto ([isParticipant] es falso y no se lee la asistencia).
 class MatchAttendanceNotifier extends ChangeNotifier {
-  static const _loadErrorKey = 'match_detail.attendance.error_load';
-  static const _saveErrorKey = 'match_detail.attendance.error_save';
+  static const _loadErrorKey = LocaleKeys.match_detail_attendance_error_load;
+  static const _saveErrorKey = LocaleKeys.match_detail_attendance_error_save;
 
   final PlayersService _playersService;
   final MatchAttendanceService _service;
@@ -66,7 +68,8 @@ class MatchAttendanceNotifier extends ChangeNotifier {
       teamId = player == null ? null : teamOfPlayerInMatch(match, player.teamIds);
       isParticipantNow = teamId != null;
       if (isParticipantNow) attendance = await _service.get(match.id);
-    } catch (_) {
+    } catch (error, stackTrace) {
+      AppLogger.error('MatchAttendanceNotifier.load', error, stackTrace);
       status = SummaryStatus.failed;
     }
     if (loadId != _loadCount) return;

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_model.dart';
+import 'package:sport_platform/modules/teams/data/models/team_model.dart';
 import 'package:sport_platform/modules/home/data/datasource/home_dashboard_service.dart';
 
 import '../../support/builders.dart';

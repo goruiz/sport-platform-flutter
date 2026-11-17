@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sport_platform/core/services/auth_storage.dart';
 import 'package:sport_platform/core/services/session_service.dart';
 import 'package:sport_platform/core/services/user_session.dart';
-import 'package:sport_platform/modules/users/domain/entities/user_entity.dart';
+import 'package:sport_platform/core/models/user_entity.dart';
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));

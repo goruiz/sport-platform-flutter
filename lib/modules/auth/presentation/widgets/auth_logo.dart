@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
-import 'package:sport_platform/core/constants/strings_constants/app_strings_constants.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 
 class AuthLogo extends StatelessWidget {
@@ -32,7 +34,7 @@ class AuthLogo extends StatelessWidget {
             color: AppColors.white,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.lg),
         Text(
           AppConstants.appName.value,
           style: const TextStyle(
@@ -42,10 +44,10 @@ class AuthLogo extends StatelessWidget {
             letterSpacing: 1,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
-          AppStringsConstants.appTagline.tr(),
-          style: const TextStyle(color: AppColors.whiteSubtle, fontSize: 13),
+          LocaleKeys.app_tagline.tr(),
+          style: AppTextStyles.secondary,
         ),
       ],
     );

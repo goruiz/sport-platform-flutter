@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/core/theme/app_dimensions.dart';
 import 'package:sport_platform/modules/teams/presentation/widgets/team_switcher_card.dart';
@@ -130,7 +131,7 @@ class _Navigation extends StatelessWidget {
       children: [
         _ArrowButton(
           icon: Icons.chevron_left_rounded,
-          tooltip: 'mobile.teams.previous_team'.tr(),
+          tooltip: LocaleKeys.mobile_teams_previous_team.tr(),
           onPressed: selectedIndex > 0 ? () => onGoTo(selectedIndex - 1) : null,
         ),
         ExcludeSemantics(
@@ -142,7 +143,7 @@ class _Navigation extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   // Zona de toque más grande que el punto, que mide 8.
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.md),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 250),
                       curve: Curves.easeOutCubic,
@@ -160,7 +161,7 @@ class _Navigation extends StatelessWidget {
         ),
         _ArrowButton(
           icon: Icons.chevron_right_rounded,
-          tooltip: 'mobile.teams.next_team'.tr(),
+          tooltip: LocaleKeys.mobile_teams_next_team.tr(),
           onPressed: selectedIndex < count - 1 ? () => onGoTo(selectedIndex + 1) : null,
         ),
       ],

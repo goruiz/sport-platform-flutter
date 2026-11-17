@@ -1,3 +1,5 @@
+import 'package:sport_platform/core/network/json_reader.dart';
+
 class CourtModel {
   final String id;
   final String name;
@@ -16,13 +18,14 @@ class CourtModel {
   });
 
   factory CourtModel.fromJson(Map<String, dynamic> json) {
+    final reader = JsonReader(json, resource: 'cancha');
     return CourtModel(
-      id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      description: json['description']?.toString(),
-      location: json['location']?.toString(),
-      sportComplexId: json['sportComplexId']?.toString(),
-      sportComplexName: json['sportComplexName']?.toString(),
+      id: reader.requiredString('id'),
+      name: reader.requiredString('name'),
+      description: reader.optionalString('description'),
+      location: reader.optionalString('location'),
+      sportComplexId: reader.optionalString('sportComplexId'),
+      sportComplexName: reader.optionalString('sportComplexName'),
     );
   }
 

@@ -5,6 +5,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
+import 'package:sport_platform/core/utils/app_logger.dart';
 import 'package:sport_platform/core/constants/app_constants.dart';
 import 'package:sport_platform/core/di/service_locator.dart';
 import 'package:sport_platform/core/modules/modules_setup.dart';
@@ -100,12 +102,15 @@ class _AppRouterState extends State<_AppRouter> {
     try {
       final initial = await appLinks.getInitialLink();
       if (initial != null) _handleLink(initial, isInitial: true);
-    } catch (_) {}
+    } catch (error) {
+      AppLogger.warning('_AppRouterState._initDeepLinks', error);
+    }
 
     // Foreground: handle links received while the app is running.
     _linkSubscription = appLinks.uriLinkStream.listen(
       _handleLink,
-      onError: (_) {},
+      onError: (Object error, StackTrace stackTrace) =>
+          AppLogger.error('_AppRouterState._initDeepLinks (enlaces recibidos)', error, stackTrace),
     );
   }
 
@@ -164,7 +169,7 @@ class _AppRouterState extends State<_AppRouter> {
     final context = AppNavigator.key.currentContext;
     if (context == null || !context.mounted) return;
     final text = messageKey.tr();
-    messageKey == 'verify_email.confirmed'
+    messageKey == LocaleKeys.verify_email_confirmed
         ? AppSnackbar.success(context, text)
         : AppSnackbar.warning(context, text);
   }
@@ -242,7 +247,7 @@ class _AppRouterState extends State<_AppRouter> {
           return const Scaffold(
             backgroundColor: AppColors.backgroundEnd,
             body: Center(
-              child: CircularProgressIndicator(color: AppColors.primaryLight),
+              child: CircularProgressIndicator(),
             ),
           );
         }

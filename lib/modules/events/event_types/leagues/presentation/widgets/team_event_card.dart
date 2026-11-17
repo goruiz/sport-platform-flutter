@@ -1,5 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_platform/core/theme/app_dimensions.dart';
+import 'package:sport_platform/core/theme/app_text_styles.dart';
+import 'package:sport_platform/core/constants/locale_keys.g.dart';
 import 'package:sport_platform/core/theme/app_colors.dart';
 import 'package:sport_platform/modules/events/event_types/leagues/data/models/team_event_model.dart';
 import 'package:sport_platform/shared/widgets/initials_avatar.dart';
@@ -19,17 +22,17 @@ class TeamEventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.tight),
       decoration: BoxDecoration(
         color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.compact),
         border: Border.all(color: AppColors.inputBorder),
       ),
       child: InkWell(
         onTap: onOpen,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.compact),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
           child: Row(
             children: [
               InitialsAvatar(name: team.teamName, size: 42),
@@ -47,13 +50,10 @@ class TeamEventCard extends StatelessWidget {
                       ),
                     ),
                     if (onOpen != null) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppSpacing.hairline),
                       Text(
-                        'leagues.team_detail.tap_hint'.tr(),
-                        style: const TextStyle(
-                          color: AppColors.whiteSubtle,
-                          fontSize: 12,
-                        ),
+                        LocaleKeys.leagues_team_detail_tap_hint.tr(),
+                        style: AppTextStyles.footnote,
                       ),
                     ],
                   ],
